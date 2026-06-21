@@ -80,9 +80,9 @@ const hasBets  = computed(() => store.betslip.length > 0);
   width: 100%;
   max-width: 480px;
   height: 46px;
-  background: linear-gradient(180deg, #2a2b34 0%, #18191f 100%);
-  border-top: 1px solid rgba(255,255,255,0.06);
-  box-shadow: 0 -2px 16px rgba(0,0,0,0.4);
+  background: linear-gradient(180deg, #c026d3 0%, #a21caf 100%);
+  border-top: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 -2px 16px rgba(162,28,175,0.45);
   display: flex;
   align-items: flex-end;
   justify-content: space-around;
@@ -101,7 +101,7 @@ const hasBets  = computed(() => store.betslip.length > 0);
   padding-bottom: 1px;
   cursor: pointer;
   text-decoration: none;
-  color: rgba(255,255,255,0.32);
+  color: rgba(255,255,255,0.65);
   transition: color 0.18s;
   position: relative;
 }
@@ -153,7 +153,7 @@ const hasBets  = computed(() => store.betslip.length > 0);
   width: 46px;
   height: 46px;
   border-radius: 50%;
-  border: 2.5px solid #18191f;
+  border: 2.5px solid #a21caf;
   background: radial-gradient(circle at 38% 32%, #5ef088, #12b812 50%, #087808);
   box-shadow:
     0 0 0 1.5px rgba(18,184,18,0.4),
@@ -189,11 +189,11 @@ const hasBets  = computed(() => store.betslip.length > 0);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1.5px solid #18191f;
+  border: 1.5px solid #a21caf;
 }
 
 .bnav__label--center {
-  color: rgba(255,255,255,0.32);
+  color: rgba(255,255,255,0.65);
   font-size: 8px;
   font-weight: 600;
   letter-spacing: 0.3px;
