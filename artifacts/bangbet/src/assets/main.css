@@ -11,7 +11,7 @@
   --bg-white: #ffffff;
 
   /* ── Header / nav gradients (exact from original) ── */
-  --bg-header: linear-gradient(90deg, #424752, #1c1e24);
+  --bg-header: #ffe60f;
   --bg-sportmenu: linear-gradient(90deg, #636673, #1c1d24);
   --bg-nav: linear-gradient(180deg, #32333d 0%, #1c1e24 100%);
 
@@ -102,14 +102,14 @@ html, body {
   box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 }
 
-.header__logo { height: 26px; width: auto; }
+.header__logo { height: 26px; width: auto; filter: brightness(0); }
 
 .header__actions { display: flex; align-items: center; gap: 7px; }
 
 .btn-login {
   background: transparent;
-  border: 1.5px solid var(--accent);
-  color: var(--accent);
+  border: 1.5px solid #1c1e24;
+  color: #1c1e24;
   padding: 6px 15px;
   border-radius: var(--radius-btn);
   font-size: 13px;
@@ -121,15 +121,14 @@ html, body {
 .btn-login:active { opacity: 0.7; }
 
 .btn-register {
-  background: var(--accent-grad);
+  background: #1c1e24;
   border: none;
-  color: #1c1e24;
+  color: var(--accent);
   padding: 6px 15px;
   border-radius: var(--radius-btn);
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: var(--shadow-btn);
   transition: opacity 0.2s;
 }
 .btn-register:active { opacity: 0.85; }
@@ -191,10 +190,10 @@ html, body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 9px 13px 7px;
+  padding: 5px 8px 4px;
   cursor: pointer;
   position: relative;
-  min-width: 64px;
+  min-width: 46px;
   transition: background 0.2s;
 }
 
@@ -212,12 +211,12 @@ html, body {
   border-radius: 2px 2px 0 0;
 }
 
-.sport-menu__icon { width: 26px; height: 26px; object-fit: contain; }
+.sport-menu__icon { width: 18px; height: 18px; object-fit: contain; }
 
 .sport-menu__name {
-  font-size: 10px;
+  font-size: 9px;
   color: rgba(255,255,255,0.50);
-  margin-top: 4px;
+  margin-top: 2px;
   text-align: center;
   white-space: nowrap;
 }
