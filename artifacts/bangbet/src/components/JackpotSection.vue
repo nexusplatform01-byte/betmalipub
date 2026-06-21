@@ -108,60 +108,67 @@ onUnmounted(() => ivs.forEach(clearInterval));
   letter-spacing: 0.3px;
 }
 
-/* ── 2×2 grid ── */
+/* ── 1 row, 4 columns ── */
 .jp-pool__grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
 }
 
 /* ── Base card ── */
 .jp-card {
-  border-radius: 10px;
+  border-radius: 7px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.13);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.13);
+  min-width: 0;
 }
 
 .jp-card__head {
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 6px 9px 5px;
+  gap: 3px;
+  padding: 4px 5px 3px;
 }
 
 .jp-card__medal {
-  font-size: 14px;
+  font-size: 11px;
   line-height: 1;
+  flex-shrink: 0;
 }
 
 .jp-card__name {
-  font-size: 11px;
+  font-size: 8.5px;
   font-weight: 800;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .jp-card__body {
   display: flex;
-  align-items: baseline;
-  gap: 3px;
-  padding: 5px 9px 7px;
+  flex-direction: column;
+  gap: 0px;
+  padding: 3px 5px 5px;
 }
 
 .jp-card__ush {
-  font-size: 9px;
+  font-size: 7.5px;
   font-weight: 700;
-  opacity: 0.88;
+  opacity: 0.85;
   flex-shrink: 0;
+  line-height: 1.2;
 }
 
 .jp-card__amount {
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 900;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.1px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   font-variant-numeric: tabular-nums;
+  line-height: 1.3;
 }
 
 /* ── GOLD — rich yellow/amber gradient ── */
