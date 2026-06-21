@@ -44,47 +44,34 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 
-const DH = 14; // digit window height in px (must match CSS --dh)
+const DH = 20; // digit window height px — must match CSS .jp-digit-win height and @keyframes
 
 interface Tier {
   id: string;
   name: string;
   medal: string;
   base: number;
-  /** ms for ones digit to complete one full 0-9 cycle */
-  oneDur: number;
+  oneDur: number; // ms for ones to complete 0→9 cycle
 }
 
 const tiers: Tier[] = [
-  { id: 'gold',    name: 'GOLD',    medal: '🥇', base: 856_241_337, oneDur: 800   },
-  { id: 'silver',  name: 'SILVER',  medal: '🥈', base: 432_817_658, oneDur: 2_500 },
-  { id: 'bronze',  name: 'BRONZE',  medal: '🥉', base: 287_542_110, oneDur: 7_000 },
+  { id: 'gold',    name: 'GOLD',    medal: '🥇', base: 856_241_337, oneDur: 800    },
+  { id: 'silver',  name: 'SILVER',  medal: '🥈', base: 432_817_658, oneDur: 2_500  },
+  { id: 'bronze',  name: 'BRONZE',  medal: '🥉', base: 287_542_110, oneDur: 7_000  },
   { id: 'premium', name: 'PREMIUM', medal: '💎', base: 194_163_808, oneDur: 18_000 },
 ];
 
-interface Slot {
-  sep: boolean;
-  dur: number;
-  offset: number;
-}
+interface Slot { sep: boolean; dur: number; offset: number; }
 
 function buildSlots(tier: Tier): Slot[] {
   const str = String(Math.floor(tier.base)).padStart(9, '0');
   const result: Slot[] = [];
-
   for (let i = 0; i < 9; i++) {
     if (i === 3 || i === 6) result.push({ sep: true, dur: 0, offset: 0 });
-
-    const posFromRight = 8 - i; // 0=ones, 1=tens, 2=hundreds …
+    const posFromRight = 8 - i;
     const digit = parseInt(str[i], 10);
-
-    // each step left is 10× slower
     const dur = tier.oneDur * Math.pow(10, posFromRight);
-
-    // negative animationDelay = how far into the cycle we start
-    // digit N → start at N/10 through the cycle
     const offset = (digit / 10) * dur;
-
     result.push({ sep: false, dur, offset });
   }
   return result;
@@ -96,16 +83,12 @@ const slots = reactive<Record<string, Slot[]>>(
 </script>
 
 <style scoped>
-/* ─── layout ─────────────────────────────── */
+/* ─── wrapper ──────────────────────────────────────────── */
 .jp-pool { padding: 8px 10px 6px; }
 
 .jp-pool__header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px; margin-bottom: 8px;
 }
-
 .jp-pool__icon  { font-size: 15px; }
 .jp-pool__label {
   font-size: 12px; font-weight: 800;
@@ -117,129 +100,170 @@ const slots = reactive<Record<string, Slot[]>>(
   border-radius: 10px; padding: 2px 8px;
 }
 
-/* 1 row, 4 cols */
+/* 1 row · 4 equal columns */
 .jp-pool__grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 5px;
 }
 
-/* ─── card shell ──────────────────────────── */
+/* ─── card ──────────────────────────────────────────────── */
 .jp-card {
-  border-radius: 7px;
-  overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0,0,0,.13);
+  border-radius: 8px; overflow: hidden;
+  box-shadow: 0 3px 10px rgba(0,0,0,.18);
   min-width: 0;
 }
 
 .jp-card__head {
   display: flex; align-items: center; gap: 3px;
-  padding: 4px 5px 3px;
+  padding: 5px 6px 4px;
 }
-.jp-card__medal { font-size: 11px; flex-shrink: 0; }
+.jp-card__medal { font-size: 12px; flex-shrink: 0; }
 .jp-card__name  {
-  font-size: 8.5px; font-weight: 800;
-  letter-spacing: .3px; white-space: nowrap;
-  overflow: hidden; text-overflow: ellipsis;
+  font-size: 8px; font-weight: 900; letter-spacing: .4px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
 .jp-card__body {
-  display: flex; flex-direction: column; gap: 0;
-  padding: 3px 5px 5px;
-}
-.jp-card__ush {
-  font-size: 7px; font-weight: 700;
-  opacity: .8; line-height: 1.3;
+  display: flex; flex-direction: column;
+  align-items: flex-start;
+  padding: 4px 6px 8px;
+  gap: 2px;
 }
 
-/* ─── digit reel ──────────────────────────── */
+.jp-card__ush {
+  font-size: 7px; font-weight: 700;
+  opacity: .75; line-height: 1; color: #fff;
+}
+
+/* ─── digit reel ────────────────────────────────────────── */
 .jp-card__digits {
-  display: flex; align-items: center; gap: 1px;
+  display: flex; align-items: center; gap: 0px;
 }
 
 .jp-sep {
-  font-size: 8px; font-weight: 900;
-  color: rgba(255,255,255,.7);
-  line-height: 1;
-  margin: 0 1px;
+  font-size: 10px; font-weight: 900;
+  line-height: 1; margin: 0 1px; color: rgba(255,255,255,.6);
+  align-self: center;
 }
 
-/* Fixed-height window – clips reel */
+/* clip window — one digit tall */
 .jp-digit-win {
-  width: 8px;
-  height: 14px;           /* --dh */
+  width: 11px;
+  height: 20px;      /* = DH */
   overflow: hidden;
   position: relative;
   flex-shrink: 0;
+  /* subtle inner border for each digit slot */
+  border-radius: 2px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.35), inset 0 -1px 1px rgba(255,255,255,.15);
+  background: rgba(0,0,0,.18);
+  margin: 0 0.5px;
 }
 
-/* The spinning strip: 11 digits tall (0-9-0 for seamless loop) */
+/* the spinning strip: 11 digits (0-9-0) */
 .jp-digit-reel {
-  display: flex;
-  flex-direction: column;
-  position: absolute;
-  top: 0; left: 0;
+  display: flex; flex-direction: column;
+  position: absolute; top: 0; left: 0; right: 0;
   animation: reel-spin linear infinite;
   will-change: transform;
 }
 
 .jp-d {
-  width: 8px;
-  height: 14px;           /* --dh */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 9.5px;
-  font-weight: 900;
-  color: #fff;
+  width: 100%;
+  height: 20px;       /* = DH */
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 900;
   font-variant-numeric: tabular-nums;
   flex-shrink: 0;
+  /* metallic sheen added per-tier below */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 @keyframes reel-spin {
   from { transform: translateY(0); }
-  to   { transform: translateY(-140px); } /* 10 × 14px */
+  to   { transform: translateY(-200px); }  /* 10 × 20px */
 }
 
-/* ─── tier colours ────────────────────────── */
-
-/* GOLD */
+/* ─── GOLD — molten amber metallic ─────────────────────── */
 .jp-card--gold .jp-card__head {
   background: linear-gradient(135deg,#ffe455 0%,#f5a500 100%);
 }
 .jp-card--gold .jp-card__name { color: #5c3200; }
 .jp-card--gold .jp-card__body {
-  background: linear-gradient(135deg,#f9c613 0%,#e8870a 100%);
+  background: linear-gradient(160deg,#c87800 0%,#7a4000 100%);
 }
-.jp-card--gold .jp-card__ush { color: #fff8d0; }
+.jp-card--gold .jp-digit-win {
+  background: rgba(0,0,0,.22);
+}
+.jp-card--gold .jp-d {
+  background-image: linear-gradient(180deg,
+    #fffaaa 0%,
+    #ffd700 20%,
+    #e8a000 45%,
+    #ffd700 70%,
+    #fffaaa 100%
+  );
+  filter: drop-shadow(0 1px 1px rgba(80,30,0,.7));
+}
 
-/* SILVER */
+/* ─── SILVER — polished steel ───────────────────────────── */
 .jp-card--silver .jp-card__head {
   background: linear-gradient(135deg,#e4e8f0 0%,#b0b5c0 100%);
 }
-.jp-card--silver .jp-card__name { color: #2a2d35; }
+.jp-card--silver .jp-card__name { color: #1a1e28; }
 .jp-card--silver .jp-card__body {
-  background: linear-gradient(135deg,#9da3b0 0%,#6b7280 100%);
+  background: linear-gradient(160deg,#5a6070 0%,#2e3240 100%);
 }
-.jp-card--silver .jp-card__ush { color: #e8eaf0; }
+.jp-card--silver .jp-d {
+  background-image: linear-gradient(180deg,
+    #ffffff 0%,
+    #d0d5df 20%,
+    #90959f 50%,
+    #d0d5df 75%,
+    #ffffff 100%
+  );
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.6));
+}
 
-/* BRONZE */
+/* ─── BRONZE — warm copper ──────────────────────────────── */
 .jp-card--bronze .jp-card__head {
   background: linear-gradient(135deg,#f0a06a 0%,#c46830 100%);
 }
 .jp-card--bronze .jp-card__name { color: #3d1800; }
 .jp-card--bronze .jp-card__body {
-  background: linear-gradient(135deg,#c47038 0%,#8c4210 100%);
+  background: linear-gradient(160deg,#8c4210 0%,#4a1e00 100%);
 }
-.jp-card--bronze .jp-card__ush { color: #ffd8b8; }
+.jp-card--bronze .jp-d {
+  background-image: linear-gradient(180deg,
+    #ffd0a0 0%,
+    #d4834a 20%,
+    #8c4820 50%,
+    #d4834a 75%,
+    #ffd0a0 100%
+  );
+  filter: drop-shadow(0 1px 1px rgba(60,10,0,.65));
+}
 
-/* PREMIUM */
+/* ─── PREMIUM — amethyst gem ────────────────────────────── */
 .jp-card--premium .jp-card__head {
   background: linear-gradient(135deg,#c48aff 0%,#8840ee 100%);
 }
 .jp-card--premium .jp-card__name { color: #fff; }
 .jp-card--premium .jp-card__body {
-  background: linear-gradient(135deg,#7c30e8 0%,#4510aa 100%);
+  background: linear-gradient(160deg,#5010a8 0%,#25006a 100%);
 }
 .jp-card--premium .jp-card__ush { color: #dcc8ff; }
+.jp-card--premium .jp-d {
+  background-image: linear-gradient(180deg,
+    #f0e0ff 0%,
+    #c080ff 20%,
+    #8830d0 50%,
+    #c080ff 75%,
+    #f0e0ff 100%
+  );
+  filter: drop-shadow(0 1px 1px rgba(20,0,60,.7));
+}
 </style>
