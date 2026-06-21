@@ -10,6 +10,7 @@ const router = createRouter({
     { path: "/promotions", name: "promotions", component: () => import("@/views/PromotionsView.vue") },
     { path: "/account", name: "account", component: () => import("@/views/AccountView.vue") },
     { path: "/jackpot", name: "jackpot", component: () => import("@/views/JackpotView.vue") },
+    { path: "/match/:id", name: "match", component: () => import("@/views/MatchDetailView.vue") },
   ],
   scrollBehavior: () => ({ top: 0 }),
 });
