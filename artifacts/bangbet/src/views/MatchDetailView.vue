@@ -329,15 +329,17 @@ function placeBet(team: string, odds: number, key: string) {
 }
 .md-hero__odd {
   flex: 1;
-  background: rgba(255,255,255,0.15);
-  border: 1.5px solid rgba(255,255,255,0.3);
+  background: rgba(192, 38, 211, 0.28);
+  border: 1.5px solid rgba(217, 70, 239, 0.55);
   border-radius: 8px;
   display: flex; flex-direction: column; align-items: center;
   padding: 6px 4px; cursor: pointer; color: #fff;
-  transition: background 0.15s;
+  transition: background 0.15s, border-color 0.15s;
 }
 .md-hero__odd.selected {
-  background: #ffe60f; border-color: #ffe60f; color: #333;
+  background: rgba(192, 38, 211, 0.7);
+  border-color: #e879f9;
+  color: #fff;
 }
 .md-hero__odd-label { font-size: 10px; font-weight: 600; opacity: .8; }
 .md-hero__odd-val   { font-size: 15px; font-weight: 800; }
