@@ -413,21 +413,51 @@ function placeBet(team: string, odds: number, key: string) {
 .md-market__odds.three-col { grid-template-columns: 1fr 1fr 1fr; }
 
 .md-odd-btn {
-  display: flex; flex-direction: column; align-items: center;
-  padding: 8px 4px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
   background: #f2f3f5;
   border: 1.5px solid #e6e7eb;
-  border-radius: 8px;
+  border-radius: 7px;
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
+  position: relative;
+  min-height: 36px;
 }
 .md-odd-btn.selected {
-  background: #d946ef22;
+  background: rgba(192, 38, 211, 0.08);
   border-color: #c026d3;
 }
-.md-odd-btn__label { font-size: 10px; color: #6a6f7a; font-weight: 500; }
-.md-odd-btn__val   { font-size: 14px; font-weight: 800; color: #292a33; }
+.md-odd-btn__label {
+  font-size: 11px;
+  color: #6a6f7a;
+  font-weight: 500;
+  flex: 1;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 6px;
+}
+.md-odd-btn__val {
+  font-size: 13px;
+  font-weight: 800;
+  color: #292a33;
+  white-space: nowrap;
+}
 .md-odd-btn.selected .md-odd-btn__val { color: #c026d3; }
+.md-odd-btn.selected::after {
+  content: '✓';
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: 8px;
+  font-weight: 900;
+  color: #c026d3;
+  line-height: 1;
+}
 
 /* ── stats ── */
 .md-stats { padding: 12px 14px; }
