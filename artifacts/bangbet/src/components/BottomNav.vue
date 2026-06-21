@@ -79,15 +79,15 @@ const hasBets  = computed(() => store.betslip.length > 0);
   transform: translateX(-50%);
   width: 100%;
   max-width: 480px;
-  height: 56px;
-  background: linear-gradient(180deg, #32333d 0%, #1c1e24 100%);
-  border-top: 1px solid rgba(255,255,255,0.07);
-  box-shadow: 0 -2px 12px rgba(0,0,0,0.35);
+  height: 46px;
+  background: linear-gradient(180deg, #2a2b34 0%, #18191f 100%);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 -2px 16px rgba(0,0,0,0.4);
   display: flex;
   align-items: flex-end;
   justify-content: space-around;
   z-index: 200;
-  padding-bottom: 6px;
+  padding-bottom: 5px;
 }
 
 /* ── regular tab ────────────────────────────────────── */
@@ -97,15 +97,28 @@ const hasBets  = computed(() => store.betslip.length > 0);
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  gap: 3px;
-  padding-bottom: 2px;
+  gap: 2px;
+  padding-bottom: 1px;
   cursor: pointer;
   text-decoration: none;
-  color: rgba(255,255,255,0.38);
-  transition: color 0.2s;
+  color: rgba(255,255,255,0.32);
+  transition: color 0.18s;
+  position: relative;
 }
 .bnav__item.active {
   color: #ffe60f;
+}
+/* active top-bar indicator */
+.bnav__item.active::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 2px;
+  background: #ffe60f;
+  border-radius: 0 0 3px 3px;
 }
 .bnav__icon {
   display: flex;
@@ -114,10 +127,11 @@ const hasBets  = computed(() => store.betslip.length > 0);
   line-height: 1;
 }
 .bnav__label {
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 600;
   line-height: 1;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
 }
 
 /* ── center betslip wrapper ─────────────────────────── */
@@ -127,23 +141,23 @@ const hasBets  = computed(() => store.betslip.length > 0);
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  gap: 3px;
+  gap: 2px;
   position: relative;
-  padding-bottom: 2px;
+  padding-bottom: 1px;
 }
 
 /* the raised circle */
 .bnav__betslip {
   position: absolute;
-  bottom: 18px;               /* lifts above nav bar */
-  width: 56px;
-  height: 56px;
+  bottom: 14px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
-  border: 3px solid #1c1e24;  /* matches nav bg for "cut-out" effect */
-  background: radial-gradient(circle at 40% 35%, #4de87a, #10a310 55%, #097a09);
+  border: 2.5px solid #18191f;
+  background: radial-gradient(circle at 38% 32%, #5ef088, #12b812 50%, #087808);
   box-shadow:
-    0 0 0 2px rgba(16,163,16,0.35),
-    0 4px 14px rgba(0,0,0,0.5);
+    0 0 0 1.5px rgba(18,184,18,0.4),
+    0 4px 12px rgba(0,0,0,0.45);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -153,39 +167,41 @@ const hasBets  = computed(() => store.betslip.length > 0);
   flex-shrink: 0;
 }
 .bnav__betslip:active {
-  transform: scale(0.93);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  transform: scale(0.92);
 }
 .bnav__betslip--active {
-  animation: betslip-pulse 2s ease-in-out infinite;
+  animation: betslip-pulse 2.2s ease-in-out infinite;
 }
 
 /* badge count */
 .bnav__betslip-badge {
   position: absolute;
-  top: -2px;
-  right: -2px;
-  min-width: 16px;
-  height: 16px;
-  padding: 0 4px;
+  top: -1px;
+  right: -1px;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
   background: #ff4c4c;
   color: #fff;
-  font-size: 9px;
-  font-weight: 700;
-  border-radius: 8px;
+  font-size: 8px;
+  font-weight: 800;
+  border-radius: 7px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1.5px solid #1c1e24;
+  border: 1.5px solid #18191f;
 }
 
 .bnav__label--center {
-  margin-top: 2px;
-  color: rgba(255,255,255,0.38);
+  color: rgba(255,255,255,0.32);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
 }
 
 @keyframes betslip-pulse {
-  0%, 100% { box-shadow: 0 0 0 2px rgba(16,163,16,0.35), 0 4px 14px rgba(0,0,0,0.5); }
-  50%       { box-shadow: 0 0 0 5px rgba(16,163,16,0.20), 0 4px 18px rgba(0,0,0,0.5); }
+  0%, 100% { box-shadow: 0 0 0 1.5px rgba(18,184,18,0.4), 0 4px 12px rgba(0,0,0,0.45); }
+  50%       { box-shadow: 0 0 0 4px rgba(18,184,18,0.18), 0 4px 16px rgba(0,0,0,0.45); }
 }
 </style>
