@@ -11,7 +11,7 @@
   --bg-white: #ffffff;
 
   /* ── Header / nav gradients (exact from original) ── */
-  --bg-header: #ffe60f;
+  --bg-header: #d946ef;
   --bg-sportmenu: #d946ef;
   --bg-nav: linear-gradient(180deg, #32333d 0%, #1c1e24 100%);
 
@@ -98,7 +98,7 @@ html, body {
   align-items: center;
   justify-content: space-between;
   padding: 0 12px;
-  height: 50px;
+  height: 42px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 }
 

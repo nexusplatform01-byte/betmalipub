@@ -1,9 +1,9 @@
 <template>
   <div class="page">
     <AppHeader />
-    <SportMenu active-name="Football" />
     <main>
       <BannerSlider />
+      <SportMenu active-name="Football" />
 
       <!-- Live Matches -->
       <div class="section">
