@@ -1,6 +1,8 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import path from "path";
+import { cartographer } from "@replit/vite-plugin-cartographer";
+import runtimeErrorModal from "@replit/vite-plugin-runtime-error-modal";
 
 const rawPort = process.env.PORT;
 if (!rawPort) throw new Error("PORT environment variable is required but was not provided.");
@@ -11,7 +13,11 @@ const basePath = process.env.BASE_PATH ?? "/";
 
 export default defineConfig({
   base: basePath,
-  plugins: [vue()],
+  plugins: [
+    vue(),
+    cartographer(),
+    runtimeErrorModal(),
+  ],
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "src"),
