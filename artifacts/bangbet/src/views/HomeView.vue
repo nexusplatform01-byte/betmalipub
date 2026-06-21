@@ -91,7 +91,7 @@
       </div>
     </div>
 
-    <BottomNav />
+    <BottomNav @open-betslip="showBetslip = true" />
   </div>
 </template>
 
