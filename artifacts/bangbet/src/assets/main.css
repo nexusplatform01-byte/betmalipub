@@ -108,8 +108,8 @@ html, body {
 
 .btn-login {
   background: transparent;
-  border: 1.5px solid rgba(255,255,255,0.85);
-  color: #fff;
+  border: 1.5px solid #000;
+  color: #000;
   padding: 6px 15px;
   border-radius: var(--radius-btn);
   font-size: 13px;
@@ -122,7 +122,7 @@ html, body {
 
 .btn-register {
   background: #fff;
-  border: none;
+  border: 1.5px solid #000;
   color: #d946ef;
   padding: 6px 15px;
   border-radius: var(--radius-btn);
