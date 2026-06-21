@@ -466,6 +466,174 @@ html, body {
 .odds-btn__flame { font-size: 13px; line-height: 1; }
 
 /* ═══════════════════════════════════════
+   JACKPOT SECTION
+═══════════════════════════════════════ */
+.jackpot-section {
+  background: #fff;
+  border-bottom: 1px solid #ebebeb;
+  padding: 10px 12px 12px;
+}
+
+.jackpot-section__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.jackpot-section__trophy { font-size: 16px; }
+.jackpot-section__title {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #1a1a1a;
+  flex: 1;
+}
+.jackpot-section__must {
+  font-size: 9px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #f97316, #ef4444);
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 20px;
+  letter-spacing: 0.04em;
+}
+
+.jackpot-section__grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ── Tier rows (full width) ── */
+.jackpot-card {
+  border-radius: 10px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+
+.jackpot-card--gold {
+  background: linear-gradient(90deg, #fffbeb 0%, #fef3c7 100%);
+  border: 1.5px solid #fbbf24;
+  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.18);
+}
+.jackpot-card--silver {
+  background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1.5px solid #94a3b8;
+  box-shadow: 0 2px 8px rgba(148, 163, 184, 0.15);
+}
+.jackpot-card--bronze {
+  background: linear-gradient(90deg, #fff7ed 0%, #ffedd5 100%);
+  border: 1.5px solid #c2834f;
+  box-shadow: 0 2px 8px rgba(194, 131, 79, 0.15);
+}
+.jackpot-card--premium {
+  background: linear-gradient(90deg, #fdf4ff 0%, #f3e8ff 100%);
+  border: 1.5px solid #a855f7;
+  box-shadow: 0 2px 8px rgba(168, 85, 247, 0.15);
+}
+
+.jackpot-card__left {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  min-width: 78px;
+}
+.jackpot-card__medal { font-size: 15px; line-height: 1; }
+.jackpot-card__name {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+.jackpot-card--gold    .jackpot-card__name { color: #b45309; }
+.jackpot-card--silver  .jackpot-card__name { color: #475569; }
+.jackpot-card--bronze  .jackpot-card__name { color: #92400e; }
+.jackpot-card--premium .jackpot-card__name { color: #7c3aed; }
+
+.jackpot-card__dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  animation: jackpot-pulse 1.2s ease-in-out infinite;
+  margin-left: auto;
+}
+.jackpot-card--gold    .jackpot-card__dot { background: #f59e0b; }
+.jackpot-card--silver  .jackpot-card__dot { background: #64748b; }
+.jackpot-card--bronze  .jackpot-card__dot { background: #c2834f; }
+.jackpot-card--premium .jackpot-card__dot { background: #a855f7; }
+
+@keyframes jackpot-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.5); opacity: 0.5; }
+}
+
+/* ── Ticker area (right side, takes remaining space) ── */
+.jackpot-card__ticker {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 3px;
+  min-width: 0;
+}
+.jackpot-card__ush {
+  font-size: 9px;
+  font-weight: 700;
+  color: #888;
+  flex-shrink: 0;
+  margin-right: 1px;
+}
+.jackpot-card__digits {
+  display: flex;
+  align-items: center;
+}
+
+.jackpot-sep {
+  font-size: 14px;
+  font-weight: 700;
+  color: #aaa;
+  line-height: 1;
+  width: 5px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* ── Individual digit slot — true reel strip ── */
+.jackpot-digit-window {
+  display: inline-block;
+  width: 10px;
+  height: 18px;
+  overflow: hidden;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+.jackpot-digit-reel {
+  display: flex;
+  flex-direction: column;
+  transition-property: transform;
+  transition-timing-function: ease;
+  /* duration set via inline style per tier */
+}
+.jackpot-digit-char {
+  display: flex;
+  width: 10px;
+  height: 18px;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.jackpot-card--gold    .jackpot-digit-char { color: #b45309; }
+.jackpot-card--silver  .jackpot-digit-char { color: #334155; }
+.jackpot-card--bronze  .jackpot-digit-char { color: #92400e; }
+.jackpot-card--premium .jackpot-digit-char { color: #6d28d9; }
+
+/* ═══════════════════════════════════════
    BETSLIP FAB
 ═══════════════════════════════════════ */
 .betslip-fab {

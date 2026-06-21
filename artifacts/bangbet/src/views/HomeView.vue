@@ -4,6 +4,7 @@
     <main>
       <BannerSlider />
       <SportMenu active-name="Football" />
+      <JackpotSection />
 
       <!-- Live Matches -->
       <div class="section">
@@ -99,6 +100,7 @@ import { ref, computed } from "vue";
 import AppHeader from "@/components/AppHeader.vue";
 import BottomNav from "@/components/BottomNav.vue";
 import SportMenu from "@/components/SportMenu.vue";
+import JackpotSection from "@/components/JackpotSection.vue";
 import BannerSlider from "@/components/BannerSlider.vue";
 import MatchCard from "@/components/MatchCard.vue";
 import { useAppStore } from "@/stores/app";
