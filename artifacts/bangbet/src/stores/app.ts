@@ -12,6 +12,7 @@ export const useAppStore = defineStore("app", () => {
 
   interface BetItem {
     matchId: string;
+    baseMatchId: string;
     team: string;
     odds: number;
     market: string;
@@ -30,10 +31,14 @@ export const useAppStore = defineStore("app", () => {
   }
 
   function addToBetslip(item: BetItem) {
-    const exists = betslip.value.findIndex((b) => b.matchId === item.matchId);
-    if (exists !== -1) {
-      betslip.value.splice(exists, 1);
+    const sameSelection = betslip.value.findIndex((b) => b.matchId === item.matchId);
+    if (sameSelection !== -1) {
+      // tapping the same odd again → deselect
+      betslip.value.splice(sameSelection, 1);
     } else {
+      // remove any other odd already selected for this match, then add new one
+      const idx = betslip.value.findIndex((b) => b.baseMatchId === item.baseMatchId);
+      if (idx !== -1) betslip.value.splice(idx, 1);
       betslip.value.push(item);
     }
   }

@@ -245,7 +245,7 @@ function isSelected(key: string) {
   return store.betslip.some(b => b.matchId === `${match.value.id}-${key}`);
 }
 function placeBet(team: string, odds: number, key: string) {
-  store.addToBetslip({ matchId: `${match.value.id}-${key}`, team, odds, market: key });
+  store.addToBetslip({ matchId: `${match.value.id}-${key}`, baseMatchId: match.value.id, team, odds, market: key });
 }
 </script>
 

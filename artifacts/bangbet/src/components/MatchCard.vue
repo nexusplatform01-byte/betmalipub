@@ -125,7 +125,7 @@ function isSelected(matchId: string, side: string) {
 }
 
 function placeBet(matchId: string, team: string, odds: number, market: string) {
-  store.addToBetslip({ matchId: `${matchId}-${market}`, team, odds, market });
+  store.addToBetslip({ matchId: `${matchId}-${market}`, baseMatchId: matchId, team, odds, market });
 }
 </script>
 
