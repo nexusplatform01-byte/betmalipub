@@ -26,15 +26,15 @@
       <div class="match-card__markets" :class="{ 'match-card__markets--two': !match.markets.draw }">
         <button class="odds-btn" :class="{ selected: isSelected(match.id, 'home') }" @click="placeBet(match.id, match.homeTeam, match.markets.home, '1')">
           <span class="odds-btn__label">1</span>
-          <span class="odds-btn__value">{{ match.markets.home }}</span>
+          <span class="odds-btn__value">{{ match.markets.home }}<span v-if="maxOdd === match.markets.home" class="odds-btn__flame">🔥</span></span>
         </button>
         <button v-if="match.markets.draw" class="odds-btn" :class="{ selected: isSelected(match.id, 'draw') }" @click="placeBet(match.id, 'Draw', match.markets.draw, 'X')">
           <span class="odds-btn__label">X</span>
-          <span class="odds-btn__value">{{ match.markets.draw }}</span>
+          <span class="odds-btn__value">{{ match.markets.draw }}<span v-if="maxOdd === match.markets.draw" class="odds-btn__flame">🔥</span></span>
         </button>
         <button class="odds-btn" :class="{ selected: isSelected(match.id, 'away') }" @click="placeBet(match.id, match.awayTeam, match.markets.away, '2')">
           <span class="odds-btn__label">2</span>
-          <span class="odds-btn__value">{{ match.markets.away }}</span>
+          <span class="odds-btn__value">{{ match.markets.away }}<span v-if="maxOdd === match.markets.away" class="odds-btn__flame">🔥</span></span>
         </button>
       </div>
     </div>
@@ -42,6 +42,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
 import { useAppStore } from "@/stores/app";
 
 const props = defineProps<{
@@ -62,6 +63,11 @@ const props = defineProps<{
 }>();
 
 const store = useAppStore();
+
+const maxOdd = computed(() => {
+  const odds = [props.match.markets.home, props.match.markets.draw, props.match.markets.away].filter(Boolean) as number[];
+  return Math.max(...odds);
+});
 
 function isSelected(matchId: string, side: string) {
   return store.betslip.some((b) => b.matchId === `${matchId}-${side}`);
