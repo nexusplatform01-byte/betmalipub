@@ -254,6 +254,9 @@ function placeBet(team: string, odds: number, key: string) {
   min-height: 100vh;
   background: #f2f3f5;
   padding-bottom: 60px;
+  overflow-x: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* ── header ── */
@@ -276,7 +279,9 @@ function placeBet(team: string, odds: number, key: string) {
 
 /* ── hero ── */
 .md-hero {
-  background: linear-gradient(160deg, #16a34a, #15803d);
+  background:
+    linear-gradient(160deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 100%),
+    url('https://www.shutterstock.com/shutterstock/videos/3745993915/thumb/1.jpg') center/cover no-repeat;
   padding: 16px 14px 14px;
   color: #fff;
 }
@@ -364,7 +369,11 @@ function placeBet(team: string, odds: number, key: string) {
 .md-tab__count { font-size: 10px; color: inherit; opacity: .7; }
 
 /* ── market groups ── */
-.md-markets { padding: 10px 10px 0; }
+.md-markets {
+  padding: 10px 10px 0;
+  box-sizing: border-box;
+  width: 100%;
+}
 
 .md-group {
   background: #fff;
@@ -372,6 +381,8 @@ function placeBet(team: string, odds: number, key: string) {
   overflow: hidden;
   margin-bottom: 8px;
   box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  width: 100%;
+  box-sizing: border-box;
 }
 .md-group__head {
   display: flex; align-items: center; justify-content: space-between;
@@ -388,13 +399,13 @@ function placeBet(team: string, odds: number, key: string) {
 }
 
 /* individual market */
-.md-market { padding: 10px 12px 12px; border-bottom: 1px solid #f4f4f6; }
+.md-market { padding: 10px 12px 12px; border-bottom: 1px solid #f4f4f6; box-sizing: border-box; width: 100%; }
 .md-market:last-child { border-bottom: none; }
 .md-market__name {
   font-size: 11px; font-weight: 600; color: #6a6f7a; margin-bottom: 7px;
 }
 .md-market__odds {
-  display: grid; gap: 6px;
+  display: grid; gap: 6px; width: 100%; box-sizing: border-box;
 }
 .md-market__odds.two-col   { grid-template-columns: 1fr 1fr; }
 .md-market__odds.three-col { grid-template-columns: 1fr 1fr 1fr; }
