@@ -35,7 +35,7 @@
           <span class="odds-btn__label">1</span>
           <span class="odds-btn__value">
             {{ match.markets.home }}
-            <span v-if="maxOdd === match.markets.home" class="odds-btn__flame">🔥</span>
+            <img v-if="maxOdd === match.markets.home" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="odds-btn__flame-img" />
           </span>
           <span v-if="isSelected(match.id, '1')" class="odds-btn__check">✓</span>
         </button>
@@ -49,7 +49,7 @@
           <span class="odds-btn__label">X</span>
           <span class="odds-btn__value">
             {{ match.markets.draw }}
-            <span v-if="maxOdd === match.markets.draw" class="odds-btn__flame">🔥</span>
+            <img v-if="maxOdd === match.markets.draw" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="odds-btn__flame-img" />
           </span>
           <span v-if="isSelected(match.id, 'X')" class="odds-btn__check">✓</span>
         </button>
@@ -62,7 +62,7 @@
           <span class="odds-btn__label">2</span>
           <span class="odds-btn__value">
             {{ match.markets.away }}
-            <span v-if="maxOdd === match.markets.away" class="odds-btn__flame">🔥</span>
+            <img v-if="maxOdd === match.markets.away" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="odds-btn__flame-img" />
           </span>
           <span v-if="isSelected(match.id, '2')" class="odds-btn__check">✓</span>
         </button>
@@ -142,6 +142,11 @@ function placeBet(matchId: string, team: string, odds: number, market: string) {
   font-weight: 900;
   color: #c026d3;
   line-height: 1;
+}
+.odds-btn__flame-img {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
 }
 
 /* ── footer tabs ── */

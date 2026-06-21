@@ -462,7 +462,6 @@ html, body {
   justify-content: center;
 }
 .odds-btn.selected .odds-btn__value { color: #c026d3; }
-.odds-btn__flame { font-size: 13px; line-height: 1; }
 
 /* ═══════════════════════════════════════
    JACKPOT SECTION
