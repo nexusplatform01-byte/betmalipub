@@ -205,7 +205,7 @@ const marketGroups = computed(() => reactive([
     ],
   },
   {
-    id: 'cards', title: 'Cards', open: false,
+    id: 'cards', title: 'Cards', open: true,
     markets: [
       { name: 'Total Cards Over/Under 3.5', outcomes: [
         { label: 'Over 3.5',  odds: 1.85 },
@@ -218,7 +218,7 @@ const marketGroups = computed(() => reactive([
     ],
   },
   {
-    id: 'corners', title: 'Corners', open: false,
+    id: 'corners', title: 'Corners', open: true,
     markets: [
       { name: 'Total Corners Over/Under 8.5', outcomes: [
         { label: 'Over 8.5',  odds: 1.80 },
