@@ -11,8 +11,8 @@
   --bg-white: #ffffff;
 
   /* ── Header / nav gradients (exact from original) ── */
-  --bg-header: linear-gradient(90deg, #424752, #1c1e24);
-  --bg-sportmenu: #ffe60f;
+  --bg-header: #ffe60f;
+  --bg-sportmenu: #d946ef;
   --bg-nav: linear-gradient(180deg, #32333d 0%, #1c1e24 100%);
 
   /* ── Brand accent ── */
@@ -215,13 +215,13 @@ html, body {
 
 .sport-menu__name {
   font-size: 9px;
-  color: rgba(0,0,0,0.65);
+  color: rgba(255,255,255,0.80);
   margin-top: 2px;
   text-align: center;
   white-space: nowrap;
 }
 
-.sport-menu__item.active .sport-menu__name { color: #1c1e24; font-weight: 700; }
+.sport-menu__item.active .sport-menu__name { color: #fff; font-weight: 700; }
 
 .sport-menu__badge {
   position: absolute;
