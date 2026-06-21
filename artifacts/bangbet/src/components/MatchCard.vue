@@ -1,13 +1,13 @@
 <template>
   <div class="match-card">
-    <div class="match-card__header">
+    <div class="match-card__header" style="cursor:pointer" @click="$router.push(`/match/${match.id}`)">
       <img :src="match.leagueLogo" :alt="match.league" class="match-card__league-icon" />
       <span class="match-card__league">{{ match.league }}</span>
       <span v-if="match.isLive" class="match-card__live-badge">Live</span>
       <span v-else class="match-card__time">{{ match.startTime }}</span>
     </div>
 
-    <div class="match-card__body">
+    <div class="match-card__body" style="cursor:pointer" @click="$router.push(`/match/${match.id}`)">
       <div class="match-card__teams">
         <span class="match-card__team">{{ match.homeTeam }}</span>
         <div v-if="match.isLive" style="text-align:center;min-width:60px">
