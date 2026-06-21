@@ -12,7 +12,7 @@
 
   /* ── Header / nav gradients (exact from original) ── */
   --bg-header: #ffe60f;
-  --bg-sportmenu: linear-gradient(90deg, #636673, #1c1d24);
+  --bg-sportmenu: linear-gradient(90deg, #65e138, #05ba35);
   --bg-nav: linear-gradient(180deg, #32333d 0%, #1c1e24 100%);
 
   /* ── Brand accent ── */
