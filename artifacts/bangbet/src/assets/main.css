@@ -11,7 +11,7 @@
   --bg-white: #ffffff;
 
   /* ── Header / nav gradients (exact from original) ── */
-  --bg-header: #ffe60f;
+  --bg-header: #d946ef;
   --bg-sportmenu: #d946ef;
   --bg-nav: linear-gradient(180deg, #32333d 0%, #1c1e24 100%);
 
@@ -102,14 +102,14 @@ html, body {
   box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 }
 
-.header__logo { height: 26px; width: auto; filter: brightness(0); }
+.header__logo { height: 26px; width: auto; filter: brightness(0) invert(1); }
 
 .header__actions { display: flex; align-items: center; gap: 7px; }
 
 .btn-login {
   background: transparent;
-  border: 1.5px solid #1c1e24;
-  color: #1c1e24;
+  border: 1.5px solid rgba(255,255,255,0.85);
+  color: #fff;
   padding: 6px 15px;
   border-radius: var(--radius-btn);
   font-size: 13px;
@@ -121,9 +121,9 @@ html, body {
 .btn-login:active { opacity: 0.7; }
 
 .btn-register {
-  background: #1c1e24;
+  background: #fff;
   border: none;
-  color: var(--accent);
+  color: #d946ef;
   padding: 6px 15px;
   border-radius: var(--radius-btn);
   font-size: 13px;
@@ -147,7 +147,7 @@ html, body {
   transform: translateX(-50%);
   width: 100%;
   max-width: 480px;
-  height: 56px;
+  height: 42px;
   background: var(--bg-nav);
   box-shadow: var(--shadow-nav);
   display: flex;
@@ -171,8 +171,8 @@ html, body {
 }
 
 .bottom-nav__item.active { color: var(--accent); }
-.bottom-nav__icon { font-size: 19px; line-height: 1; }
-.bottom-nav__label { font-size: 10px; font-weight: 500; }
+.bottom-nav__icon { font-size: 15px; line-height: 1; }
+.bottom-nav__label { font-size: 9px; font-weight: 500; }
 
 /* ═══════════════════════════════════════
    SPORT MENU
