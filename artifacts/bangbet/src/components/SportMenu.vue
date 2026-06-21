@@ -7,7 +7,9 @@
       :class="{ active: activeName === item.name }"
       @click="select(item)"
     >
-      <img :src="item.icon" :alt="item.name" class="sport-menu__icon" />
+      <div class="sport-menu__icon-wrap">
+        <img :src="item.icon" :alt="item.name" class="sport-menu__icon" />
+      </div>
       <span class="sport-menu__name">{{ item.name }}</span>
       <span v-if="item.isNew" class="sport-menu__badge">New</span>
       <span v-if="item.selfText" class="sport-menu__selftext">{{ item.selfText }}</span>

@@ -12,7 +12,7 @@
 
   /* ── Header / nav gradients (exact from original) ── */
   --bg-header: #ffe60f;
-  --bg-sportmenu: linear-gradient(90deg, #65e138, #05ba35);
+  --bg-sportmenu: linear-gradient(180deg, rgba(120,40,200,0.90) 0%, rgba(255,255,255,0.88) 50%, rgba(5,186,53,0.75) 100%);
   --bg-nav: linear-gradient(180deg, #32333d 0%, #1c1e24 100%);
 
   /* ── Brand accent ── */
@@ -211,17 +211,40 @@ html, body {
   border-radius: 2px 2px 0 0;
 }
 
+.sport-menu__icon-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255,255,255,0.30) 0%, rgba(255,255,255,0.10) 100%);
+  border: 1.5px solid rgba(255,255,255,0.55);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(2px);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.sport-menu__item.active .sport-menu__icon-wrap {
+  background: linear-gradient(135deg, rgba(255,230,15,0.45) 0%, rgba(255,230,15,0.15) 100%);
+  border-color: rgba(255,230,15,0.80);
+  box-shadow: 0 2px 8px rgba(255,230,15,0.30), inset 0 1px 0 rgba(255,255,255,0.40);
+  transform: scale(1.08);
+}
+
 .sport-menu__icon { width: 18px; height: 18px; object-fit: contain; }
 
 .sport-menu__name {
   font-size: 9px;
-  color: rgba(255,255,255,0.50);
-  margin-top: 2px;
+  color: rgba(255,255,255,0.90);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.40);
+  margin-top: 3px;
   text-align: center;
   white-space: nowrap;
+  font-weight: 600;
 }
 
-.sport-menu__item.active .sport-menu__name { color: var(--accent); font-weight: 600; }
+.sport-menu__item.active .sport-menu__name { color: #fff; font-weight: 700; }
 
 .sport-menu__badge {
   position: absolute;
