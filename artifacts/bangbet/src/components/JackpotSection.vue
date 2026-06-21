@@ -1,96 +1,158 @@
 <template>
-  <section class="jackpot-section">
-    <div class="jackpot-section__header">
-      <span class="jackpot-section__trophy">🏆</span>
-      <span class="jackpot-section__title">JACKPOT POOL</span>
-      <span class="jackpot-section__must">MUST WIN</span>
-    </div>
+  <section class="jp-pool">
+    <div class="jp-pool__grid">
 
-    <div class="jackpot-section__grid">
-      <div
-        v-for="tier in tiers"
-        :key="tier.id"
-        class="jackpot-card"
-        :class="`jackpot-card--${tier.id}`"
-      >
-        <div class="jackpot-card__left">
-          <span class="jackpot-card__medal">{{ tier.medal }}</span>
-          <span class="jackpot-card__name">{{ tier.name }}</span>
-          <span class="jackpot-card__dot"></span>
+      <!-- Sports Jackpot -->
+      <div class="jp-card">
+        <div class="jp-card__head">
+          <span class="jp-card__title">Sports Jackpot</span>
+          <span class="jp-card__badge jp-card__badge--muswin">Must Win</span>
         </div>
-        <div class="jackpot-card__ticker">
-          <span class="jackpot-card__ush">USH</span>
-          <div class="jackpot-card__digits">
-            <template v-for="(slot, i) in getSlots(tier.id)" :key="i">
-              <span v-if="slot === SEP" class="jackpot-sep">,</span>
-              <span v-else class="jackpot-digit-window">
-                <span
-                  class="jackpot-digit-reel"
-                  :style="{
-                    transform: `translateY(-${(slot as number) * DIGIT_H}px)`,
-                    transitionDuration: `${tier.transMs}ms`
-                  }"
-                >
-                  <span v-for="d in 10" :key="d" class="jackpot-digit-char">{{ d - 1 }}</span>
-                </span>
-              </span>
-            </template>
-          </div>
+        <div class="jp-card__body">
+          <span class="jp-card__tier">Grand</span>
+          <span class="jp-card__sep"></span>
+          <span class="jp-card__currency">USH</span>
+          <span class="jp-card__amount">{{ sportsDisplay }}</span>
         </div>
       </div>
+
+      <!-- Casino Jackpot -->
+      <div class="jp-card">
+        <div class="jp-card__head">
+          <span class="jp-card__title">Casino Jackpot</span>
+          <span class="jp-card__badge jp-card__badge--bolt">⚡</span>
+        </div>
+        <div class="jp-card__body">
+          <span class="jp-card__tier">Super</span>
+          <span class="jp-card__sep"></span>
+          <span class="jp-card__currency">USH</span>
+          <span class="jp-card__amount">{{ casinoDisplay }}</span>
+        </div>
+      </div>
+
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 
-const DIGIT_H = 18; // px — height of each digit row in the reel
-const SEP     = ',' as const;
+const sports = ref(1_706_115);
+const casino = ref(4_861_240);
 
-interface TierConfig {
-  id: string;
-  name: string;
-  medal: string;
-  base: number;
-  tickMs: number;
-  maxInc: number;
-  transMs: number;
+function fmt(n: number) {
+  return Math.floor(n).toLocaleString('en-US');
 }
 
-const tiers: TierConfig[] = [
-  { id: 'gold',    name: 'GOLD',    medal: '🥇', base: 856_241_337, tickMs: 48,  maxInc: 79, transMs: 65  },
-  { id: 'silver',  name: 'SILVER',  medal: '🥈', base: 432_817_658, tickMs: 93,  maxInc: 43, transMs: 120 },
-  { id: 'bronze',  name: 'BRONZE',  medal: '🥉', base: 287_542_110, tickMs: 175, maxInc: 21, transMs: 220 },
-  { id: 'premium', name: 'PREMIUM', medal: '💎', base: 194_163_808, tickMs: 330, maxInc: 9,  transMs: 400 },
-];
+const sportsDisplay = computed(() => fmt(sports.value));
+const casinoDisplay = computed(() => fmt(casino.value));
 
-const amounts = ref<Record<string, number>>(
-  Object.fromEntries(tiers.map(t => [t.id, t.base]))
-);
-
-/** Returns array of digit numbers (0-9) or SEP for commas. Always 9 digits → "XXX,XXX,XXX" */
-function getSlots(id: string): Array<number | typeof SEP> {
-  const str = String(Math.min(Math.floor(amounts.value[id]), 999_999_999)).padStart(9, '0');
-  return [
-    +str[0], +str[1], +str[2], SEP,
-    +str[3], +str[4], +str[5], SEP,
-    +str[6], +str[7], +str[8],
-  ];
-}
-
-const intervals: ReturnType<typeof setInterval>[] = [];
+const ivs: ReturnType<typeof setInterval>[] = [];
 
 onMounted(() => {
-  tiers.forEach(t => {
-    const iv = setInterval(() => {
-      let next = amounts.value[t.id] + Math.floor(Math.random() * t.maxInc) + 1;
-      if (next >= 1_000_000_000) next = t.base;
-      amounts.value[t.id] = next;
-    }, t.tickMs);
-    intervals.push(iv);
-  });
+  ivs.push(setInterval(() => { sports.value += Math.floor(Math.random() * 12) + 1; }, 80));
+  ivs.push(setInterval(() => { casino.value += Math.floor(Math.random() * 18) + 1; }, 60));
 });
 
-onUnmounted(() => intervals.forEach(clearInterval));
+onUnmounted(() => ivs.forEach(clearInterval));
 </script>
+
+<style scoped>
+.jp-pool {
+  padding: 6px 10px 4px;
+}
+
+.jp-pool__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.jp-card {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+  background: #fff;
+}
+
+.jp-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 8px;
+  background: #fff;
+}
+
+.jp-card__title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #292a33;
+  white-space: nowrap;
+}
+
+.jp-card__badge {
+  font-size: 9px;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 2px 6px;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.jp-card__badge--muswin {
+  background: #10a310;
+  color: #fff;
+}
+
+.jp-card__badge--bolt {
+  background: #10a310;
+  color: #fff;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-size: 10px;
+}
+
+.jp-card__body {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #10a310;
+  padding: 5px 8px;
+}
+
+.jp-card__tier {
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.jp-card__sep {
+  width: 1px;
+  height: 12px;
+  background: rgba(255,255,255,0.4);
+  flex-shrink: 0;
+}
+
+.jp-card__currency {
+  font-size: 9px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.85);
+  flex-shrink: 0;
+}
+
+.jp-card__amount {
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+</style>
