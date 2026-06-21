@@ -32,12 +32,12 @@
           <div class="section-title">🏆 Sports Jackpot</div>
           <RouterLink to="/jackpot" class="section-more">Play ›</RouterLink>
         </div>
-        <div style="margin: 0 8px 8px; border-radius: 8px; overflow: hidden; cursor: pointer;" @click="$router.push('/jackpot')">
-          <img src="/static/img/Bg_SpotsJP_H5.83a074b.png" alt="Jackpot" style="width:100%; display:block; border-radius:8px" />
+        <div style="margin:0 10px 8px; border-radius:8px; overflow:hidden; cursor:pointer;" @click="$router.push('/jackpot')">
+          <img src="/static/img/Bg_SpotsJP_H5.83a074b.png" alt="Jackpot" style="width:100%;display:block;border-radius:8px;" />
         </div>
       </div>
 
-      <!-- Site Footer -->
+      <!-- Footer -->
       <div class="site-footer">
         <img src="/static/img/Logo_HomeFooter_Bangbet.db450bf.png" alt="Bangbet" class="footer-logo" />
         <div class="footer-social">
@@ -62,28 +62,28 @@
 
     <!-- Betslip Panel -->
     <div v-if="showBetslip" class="modal-overlay" @click.self="showBetslip = false">
-      <div class="modal">
+      <div class="modal" style="position:relative">
         <button class="modal__close" @click="showBetslip = false">✕</button>
         <h2 class="modal__title">Betslip ({{ store.betslip.length }})</h2>
-        <div v-for="bet in store.betslip" :key="bet.matchId" style="display:flex; justify-content:space-between; align-items:center; padding: 10px 0; border-bottom: 1px solid var(--border);">
+        <div v-for="bet in store.betslip" :key="bet.matchId" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
           <div>
-            <div style="font-size:13px; font-weight:600;">{{ bet.team }}</div>
-            <div style="font-size:11px; color:var(--text-muted);">Market: {{ bet.market }}</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text-dark)">{{ bet.team }}</div>
+            <div style="font-size:11px;color:var(--text-grey)">Market: {{ bet.market }}</div>
           </div>
-          <span style="font-size:16px; font-weight:700; color:var(--accent);">{{ bet.odds }}</span>
+          <span style="font-size:16px;font-weight:700;color:var(--green)">{{ bet.odds }}</span>
         </div>
-        <div style="margin-top:14px;">
+        <div style="margin-top:14px">
           <div class="form-group">
             <label class="form-label">Stake (UGX)</label>
             <input v-model="stakeAmount" class="form-input" type="number" placeholder="Min 1 UGX" />
           </div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:14px; font-size:13px;">
-            <span style="color:var(--text-muted)">Total Odds:</span>
-            <span style="font-weight:700; color:var(--accent)">{{ totalOdds.toFixed(2) }}</span>
+          <div style="display:flex;justify-content:space-between;margin-bottom:10px;font-size:13px">
+            <span style="color:var(--text-grey)">Total Odds:</span>
+            <span style="font-weight:700;color:var(--green)">{{ totalOdds.toFixed(2) }}</span>
           </div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:16px; font-size:13px;">
-            <span style="color:var(--text-muted)">Potential Win:</span>
-            <span style="font-weight:700; color:var(--green)">UGX {{ potentialWin }}</span>
+          <div style="display:flex;justify-content:space-between;margin-bottom:14px;font-size:13px">
+            <span style="color:var(--text-grey)">Potential Win:</span>
+            <span style="font-weight:700;color:#10a310">UGX {{ potentialWin }}</span>
           </div>
           <button class="btn-full" @click="placeBet">Place Bet</button>
         </div>

@@ -3,14 +3,14 @@
     <AppHeader />
 
     <!-- Logged out state -->
-    <div v-if="!store.isLoggedIn" style="padding:40px 20px; text-align:center;">
-      <img src="/static/images/Img_Logo_Yellow_66.png" alt="Bangbet" style="height:48px; margin-bottom:24px;" />
-      <h2 style="font-size:20px; font-weight:700; margin-bottom:8px;">My Account</h2>
-      <p style="color:var(--text-muted); font-size:14px; margin-bottom:28px; line-height:1.5;">
+    <div v-if="!store.isLoggedIn" style="background:var(--bg-white);padding:40px 20px;text-align:center;flex:1">
+      <img src="/static/images/Img_Logo_Yellow_66.png" alt="Bangbet" style="height:44px;margin-bottom:24px;" />
+      <h2 style="font-size:19px;font-weight:700;margin-bottom:8px;color:var(--text-dark)">My Account</h2>
+      <p style="color:var(--text-grey);font-size:13px;margin-bottom:28px;line-height:1.5">
         Login to view your account, check your bets, and manage your balance.
       </p>
-      <button class="btn-register" style="width:100%; padding:14px; font-size:16px; border-radius:8px; margin-bottom:12px;" @click="openLogin">Login</button>
-      <button class="btn-login" style="width:100%; padding:14px; font-size:16px; border-radius:8px;" @click="openRegister">Register</button>
+      <button class="btn-register" style="width:100%;padding:13px;font-size:15px;border-radius:6px;margin-bottom:10px;" @click="openLogin">Login</button>
+      <button class="btn-login" style="width:100%;padding:13px;font-size:15px;border-radius:6px;" @click="openRegister">Register</button>
     </div>
 
     <!-- Logged in state -->

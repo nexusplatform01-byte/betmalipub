@@ -9,11 +9,11 @@
     <div class="jackpot-banner">
       <div class="jackpot-label">Current Jackpot Prize</div>
       <div class="jackpot-amount">UGX 6,600,000</div>
-      <div style="font-size:12px; color:var(--text-muted); margin-top:8px;">Predict 12 correct scores to win!</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.55);margin-top:6px;">Predict 12 correct scores to win!</div>
     </div>
 
-    <div style="padding:10px 10px 0;">
-      <img src="/static/img/Bg_SportsJackpot_Up_36.b6e66f7.png" alt="Jackpot" style="width:100%; border-radius:8px; display:block; margin-bottom:10px;" />
+    <div style="padding:10px 10px 0;background:var(--bg-main);">
+      <img src="/static/img/Bg_SportsJackpot_Up_36.b6e66f7.png" alt="Jackpot" style="width:100%;border-radius:8px;display:block;margin-bottom:8px;" />
     </div>
 
     <div class="section">
@@ -23,8 +23,8 @@
       <MatchCard v-for="match in store.topMatches.slice(0, 6)" :key="match.id" :match="match" />
     </div>
 
-    <div style="padding:0 10px 16px;">
-      <button class="btn-full">Place Jackpot Bet</button>
+    <div style="padding:0 10px 16px;background:var(--bg-main);">
+      <button class="btn-full" style="background:var(--accent);color:#000;">Place Jackpot Bet</button>
     </div>
 
     <BottomNav />

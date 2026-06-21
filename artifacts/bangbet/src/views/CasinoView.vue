@@ -5,11 +5,12 @@
       <span class="page-title">🎰 Casino</span>
     </div>
 
-    <div style="padding: 12px 10px 4px; display:flex; gap:8px; overflow-x:auto;">
+    <div class="tab-bar">
       <button
         v-for="tab in tabs"
         :key="tab"
-        :style="{ background: activeTab === tab ? 'var(--accent)' : 'var(--bg-card)', color: activeTab === tab ? '#000' : 'var(--text-secondary)', border: '1px solid ' + (activeTab === tab ? 'var(--accent)' : 'var(--border)'), borderRadius: '20px', padding: '6px 14px', fontSize: '12px', fontWeight: '600', cursor: 'pointer', flexShrink: '0' }"
+        class="tab-btn"
+        :class="{ active: activeTab === tab }"
         @click="activeTab = tab"
       >{{ tab }}</button>
     </div>
