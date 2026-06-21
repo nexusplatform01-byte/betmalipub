@@ -1,13 +1,13 @@
 <template>
   <div class="page">
     <AppHeader />
-    <SportMenu :active-name="sportName" />
 
     <div class="search-bar">
       <input class="search-input" type="search" :placeholder="`Search ${sportName} matches...`" v-model="query" />
     </div>
 
     <main>
+      <SportMenu :active-name="sportName" />
       <!-- Live Matches -->
       <div class="section" v-if="liveFiltered.length">
         <div class="section-header">
