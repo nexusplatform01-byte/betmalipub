@@ -329,8 +329,7 @@ const promos = [
     display: grid;
     grid-template-columns: 220px 1fr 300px;
     gap: 0;
-    max-width: 1600px;
-    margin: 0 auto;
+    width: 100%;
     min-height: calc(100vh - 120px);
     align-items: start;
   }

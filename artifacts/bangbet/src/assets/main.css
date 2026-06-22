@@ -75,6 +75,19 @@ html, body {
   min-height: 100vh;
 }
 
+@media (min-width: 1024px) {
+  #app {
+    max-width: 100%;
+    margin: 0;
+  }
+  .page {
+    padding-bottom: 0;
+  }
+  .bottom-nav {
+    display: none !important;
+  }
+}
+
 .app-wrapper { width: 100%; }
 ::-webkit-scrollbar { display: none; }
 
