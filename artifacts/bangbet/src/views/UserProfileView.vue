@@ -371,7 +371,7 @@ const txFilters  = ["All", "Deposits", "Withdrawals"];
 const allBets = [
   {
     id: 1, ticketId: "441823", type: "Single", status: "won" as const,
-    stake: 5000, totalOdds: 4.10, potentialWin: 20500, payout: 20500,
+    stake: 5000, totalOdds: 4.10, potentialWin: 20500, winBonus: 8200, payout: 28700,
     date: "Jun 20, 2026 14:32",
     selections: [
       { match: "Arsenal vs Chelsea", team: "Arsenal Win", market: "Full Time Result", odds: 4.10,
@@ -400,7 +400,7 @@ const allBets = [
   },
   {
     id: 4, ticketId: "298341", type: "Accumulator", status: "won" as const,
-    stake: 3000, totalOdds: 12.30, potentialWin: 36900, payout: 36900,
+    stake: 3000, totalOdds: 12.30, potentialWin: 36900, winBonus: 14760, payout: 51660,
     date: "Jun 15, 2026 21:00",
     selections: [
       { match: "Barcelona vs Real Madrid", team: "Real Madrid Win", market: "Full Time Result", odds: 2.80,
