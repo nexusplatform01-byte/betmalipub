@@ -86,6 +86,13 @@ html, body {
   .bottom-nav {
     display: none !important;
   }
+  .header {
+    height: 36px;
+    padding: 0 16px;
+  }
+  .header__logo {
+    height: 20px;
+  }
 }
 
 .app-wrapper { width: 100%; }

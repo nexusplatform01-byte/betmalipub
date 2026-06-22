@@ -197,8 +197,8 @@ function addBet(team: string, odds: number, key: string) {
 
 .mdp__hero {
   background:
-    linear-gradient(160deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.4) 100%),
-    url('/static/img/Bg_Match_WorldCup2026.8cb657b.jpg') center/cover no-repeat;
+    linear-gradient(160deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 100%),
+    url('https://www.shutterstock.com/shutterstock/videos/3745993915/thumb/1.jpg') center/cover no-repeat;
   padding: 14px 16px 12px; color: #fff;
 }
 .mdp__teams-row {
@@ -248,8 +248,9 @@ function addBet(team: string, odds: number, key: string) {
 
 .mdp__body { padding-bottom: 16px; }
 .mdp__grp {
-  background: #fff; margin-bottom: 4px;
-  border-top: 1px solid #e6e7eb; border-bottom: 1px solid #e6e7eb;
+  background: #fff; margin: 8px 8px 0;
+  border: 1px solid #e6e7eb;
+  border-radius: 12px; overflow: hidden;
 }
 .mdp__grp-head {
   display: flex; align-items: center; justify-content: space-between;
