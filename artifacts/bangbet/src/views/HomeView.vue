@@ -73,13 +73,11 @@
               <div class="dtmt__col-odd">1X</div>
               <div class="dtmt__col-odd">X2</div>
               <div class="dtmt__col-odd">12</div>
-              <div class="dtmt__col-odd">O2.5</div>
-              <div class="dtmt__col-odd">U2.5</div>
             </div>
             <div v-for="match in store.liveMatches" :key="match.id" class="dtmt__row" @click="$router.push(`/match/${match.id}`)">
               <div class="dtmt__col-match">
                 <div class="dtmt__league">
-                  <span class="dtmt__live-badge">LIVE</span> {{ match.league }}
+                  <span class="dtmt__live-badge">Live</span> {{ match.league }}
                 </div>
                 <div class="dtmt__teams">{{ match.homeTeam }} <span class="dtmt__score">{{ match.homeScore }}-{{ match.awayScore }}</span> {{ match.awayTeam }}</div>
                 <div class="dtmt__time">{{ match.minute }}'</div>
@@ -90,8 +88,6 @@
               <button class="dtmt__odd-btn" @click.stop="addOdd(match,'1X',dc(match.markets.home,match.markets.draw))">{{ dc(match.markets.home,match.markets.draw) }}</button>
               <button class="dtmt__odd-btn" @click.stop="addOdd(match,'X2',dc(match.markets.draw,match.markets.away))">{{ dc(match.markets.draw,match.markets.away) }}</button>
               <button class="dtmt__odd-btn" @click.stop="addOdd(match,'12',dc(match.markets.home,match.markets.away))">{{ dc(match.markets.home,match.markets.away) }}</button>
-              <button class="dtmt__odd-btn" @click.stop="addOdd(match,'O2.5',getOver(match))">{{ getOver(match) }}</button>
-              <button class="dtmt__odd-btn" @click.stop="addOdd(match,'U2.5',getUnder(match))">{{ getUnder(match) }}</button>
             </div>
           </div>
         </div>
@@ -115,8 +111,6 @@
               <div class="dtmt__col-odd">1X</div>
               <div class="dtmt__col-odd">X2</div>
               <div class="dtmt__col-odd">12</div>
-              <div class="dtmt__col-odd">O2.5</div>
-              <div class="dtmt__col-odd">U2.5</div>
             </div>
             <div v-for="match in store.topMatches" :key="match.id" class="dtmt__row" @click="$router.push(`/match/${match.id}`)">
               <div class="dtmt__col-match">
@@ -130,8 +124,6 @@
               <button class="dtmt__odd-btn" @click.stop="addOdd(match,'1X',dc(match.markets.home,match.markets.draw))">{{ dc(match.markets.home,match.markets.draw) }}</button>
               <button class="dtmt__odd-btn" @click.stop="addOdd(match,'X2',dc(match.markets.draw,match.markets.away))">{{ dc(match.markets.draw,match.markets.away) }}</button>
               <button class="dtmt__odd-btn" @click.stop="addOdd(match,'12',dc(match.markets.home,match.markets.away))">{{ dc(match.markets.home,match.markets.away) }}</button>
-              <button class="dtmt__odd-btn" @click.stop="addOdd(match,'O2.5',getOver(match))">{{ getOver(match) }}</button>
-              <button class="dtmt__odd-btn" @click.stop="addOdd(match,'U2.5',getUnder(match))">{{ getUnder(match) }}</button>
             </div>
           </div>
         </div>
@@ -514,7 +506,7 @@ const promos = [
   }
   .dtmt__head {
     display: grid;
-    grid-template-columns: 1fr repeat(8, 72px);
+    grid-template-columns: 1fr repeat(6, minmax(60px, 72px));
     background: #f5f6f9;
     border-bottom: 1px solid #e6e7eb;
     padding: 0 4px;
@@ -531,7 +523,7 @@ const promos = [
   }
   .dtmt__row {
     display: grid;
-    grid-template-columns: 1fr repeat(8, 72px);
+    grid-template-columns: 1fr repeat(6, minmax(60px, 72px));
     border-bottom: 1px solid #f0f0f4;
     cursor: pointer;
     transition: background 0.1s;
