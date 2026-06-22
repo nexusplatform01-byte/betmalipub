@@ -19,7 +19,7 @@
           <span class="jp-card__name">{{ tier.name }}</span>
         </div>
         <div class="jp-card__body">
-          <span class="jp-card__ush">USH</span>
+          <span class="jp-card__ush">UGX</span>
           <div class="jp-card__digits">
             <template v-for="(slot, idx) in slots[tier.id]" :key="idx">
               <span v-if="slot.sep" class="jp-sep">,</span>
