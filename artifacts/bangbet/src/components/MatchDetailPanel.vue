@@ -73,6 +73,61 @@
       </div>
     </div>
 
+    <!-- AI Prediction tab -->
+    <div v-if="tab === 'AI Prediction'" class="mdp__ai">
+      <div class="ai-header">
+        <span class="ai-badge">🤖 AI</span>
+        <div>
+          <div class="ai-title">AI Match Prediction</div>
+          <div class="ai-sub">Powered by Bangbet Intelligence Engine</div>
+        </div>
+      </div>
+
+      <div class="ai-verdict">
+        <div class="ai-verdict-label">Recommended Bet</div>
+        <div class="ai-verdict-pick">{{ aiPick }}</div>
+        <div class="ai-verdict-conf">
+          <span>Confidence</span>
+          <div class="ai-conf-bar"><div class="ai-conf-fill" :style="{ width: aiConf + '%', background: aiConf > 70 ? '#16a34a' : aiConf > 50 ? '#ca8a04' : '#dc2626' }"></div></div>
+          <span class="ai-conf-pct">{{ aiConf }}%</span>
+        </div>
+      </div>
+
+      <div class="ai-probs">
+        <div class="ai-prob-item" v-for="p in aiProbs" :key="p.label">
+          <div class="ai-prob-head">
+            <span class="ai-prob-label">{{ p.label }}</span>
+            <span class="ai-prob-pct">{{ p.pct }}%</span>
+          </div>
+          <div class="ai-prob-bar"><div class="ai-prob-fill" :style="{ width: p.pct + '%', background: p.color }"></div></div>
+        </div>
+      </div>
+
+      <div class="ai-factors">
+        <div class="ai-factors-title">Key Factors</div>
+        <div class="ai-factor" v-for="f in aiFactors" :key="f.label">
+          <span class="ai-factor-icon">{{ f.icon }}</span>
+          <div class="ai-factor-info">
+            <div class="ai-factor-label">{{ f.label }}</div>
+            <div class="ai-factor-val">{{ f.val }}</div>
+          </div>
+          <span class="ai-factor-impact" :class="f.impact">{{ f.impact === 'pos' ? '↑ Positive' : f.impact === 'neg' ? '↓ Negative' : '→ Neutral' }}</span>
+        </div>
+      </div>
+
+      <div class="ai-score-pred">
+        <div class="ai-factors-title">Score Prediction</div>
+        <div class="ai-score-row">
+          <div class="ai-score-team">{{ match.homeTeam }}<span class="ai-score-num">{{ aiScore[0] }}</span></div>
+          <span class="ai-score-sep">–</span>
+          <div class="ai-score-team ai-score-team--right"><span class="ai-score-num">{{ aiScore[1] }}</span>{{ match.awayTeam }}</div>
+        </div>
+        <div class="ai-score-note">Most likely scoreline based on form & H2H</div>
+      </div>
+
+      <div class="ai-disclaimer">⚠️ AI predictions are for informational purposes only. Bet responsibly.</div>
+    </div>
+
     <div v-if="tab === 'Statistics'" class="mdp__stats">
       <div class="mdp__stat-row" v-for="s in stats" :key="s.label">
         <span class="mdp__stat-h">{{ s.home }}</span>
@@ -98,7 +153,7 @@ defineEmits<{ (e: 'close'): void }>();
 
 const store = useAppStore();
 const tab = ref('Markets');
-const tabs = ['Markets', 'Statistics'];
+const tabs = ['Markets', 'Statistics', 'AI Prediction'];
 const panelEl = ref<HTMLElement | null>(null);
 watch(() => props.match, () => { nextTick(() => panelEl.value?.scrollTo({ top: 0, behavior: 'instant' })); }, { immediate: true });
 
@@ -156,6 +211,37 @@ const stats = [
   { label: 'Corners',         home: '6',   away: '3',   homePct: 67, awayPct: 33 },
   { label: 'Fouls',           home: '9',   away: '13',  homePct: 41, awayPct: 59 },
   { label: 'Yellow Cards',    home: '1',   away: '2',   homePct: 33, awayPct: 67 },
+];
+
+const aiConf = computed(() => {
+  const max = Math.max(props.match.markets.home, props.match.markets.away);
+  const min = Math.min(props.match.markets.home, props.match.markets.away);
+  return Math.round(45 + (max / min) * 18);
+});
+const aiPick = computed(() => {
+  if (props.match.markets.home < props.match.markets.away) return `${props.match.homeTeam} to Win (1)`;
+  if (props.match.markets.away < props.match.markets.home) return `${props.match.awayTeam} to Win (2)`;
+  return 'Draw (X)';
+});
+const aiProbs = computed(() => {
+  const h = props.match.markets.home, a = props.match.markets.away;
+  const total = 1/h + 1/3.2 + 1/a;
+  return [
+    { label: `${props.match.homeTeam} Win`, pct: Math.round((1/h)/total*100), color: '#c026d3' },
+    { label: 'Draw',                         pct: Math.round((1/3.2)/total*100), color: '#6366f1' },
+    { label: `${props.match.awayTeam} Win`, pct: Math.round((1/a)/total*100),  color: '#16a34a' },
+  ];
+});
+const aiScore = computed(() => {
+  return props.match.markets.home < props.match.markets.away ? [2, 1] : [1, 2];
+});
+const aiFactors = [
+  { icon: '📈', label: 'Home Form',     val: 'W W D W L (last 5)',   impact: 'pos' },
+  { icon: '📉', label: 'Away Form',     val: 'L D W L D (last 5)',   impact: 'neg' },
+  { icon: '⚔️', label: 'Head to Head',  val: 'Home leads 3-1-1',     impact: 'pos' },
+  { icon: '🏟️', label: 'Venue Factor', val: 'Home advantage strong', impact: 'pos' },
+  { icon: '🤕', label: 'Injuries',      val: '2 key away players out', impact: 'neg' },
+  { icon: '🌦️', label: 'Conditions',   val: 'Clear — no impact',     impact: 'neu' },
 ];
 
 function isSel(key: string) {
@@ -294,4 +380,84 @@ function addBet(team: string, odds: number, key: string) {
 .mdp__bar-home { height: 100%; background: #c026d3; border-radius: 3px; }
 .mdp__bar-away { height: 100%; background: #16a34a; border-radius: 3px; margin-left: auto; }
 .mdp__stat-lbl { font-size: 10px; color: #6a6f7a; font-weight: 500; }
+
+/* ── AI Prediction ── */
+.mdp__ai { padding: 10px 8px 20px; display: flex; flex-direction: column; gap: 10px; }
+
+.ai-header {
+  display: flex; align-items: center; gap: 12px;
+  background: linear-gradient(135deg, #1e1b4b, #312e81);
+  border-radius: 12px; padding: 14px 16px;
+}
+.ai-badge {
+  font-size: 22px; width: 44px; height: 44px;
+  background: rgba(255,255,255,0.12); border-radius: 10px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.ai-title { font-size: 14px; font-weight: 800; color: #fff; }
+.ai-sub   { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+
+.ai-verdict {
+  background: #fff; border-radius: 12px; padding: 14px 16px;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.07);
+}
+.ai-verdict-label { font-size: 10px; font-weight: 700; color: #9599a4; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+.ai-verdict-pick  { font-size: 16px; font-weight: 900; color: #292a33; margin-bottom: 10px; }
+.ai-verdict-conf  { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #6a6f7a; }
+.ai-conf-bar { flex: 1; height: 7px; background: #f0f0f4; border-radius: 4px; overflow: hidden; }
+.ai-conf-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+.ai-conf-pct  { font-weight: 800; color: #292a33; min-width: 32px; text-align: right; }
+
+.ai-probs { background: #fff; border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 1px 5px rgba(0,0,0,0.07); }
+.ai-prob-head { display: flex; justify-content: space-between; margin-bottom: 4px; }
+.ai-prob-label { font-size: 12px; font-weight: 600; color: #292a33; }
+.ai-prob-pct   { font-size: 12px; font-weight: 800; color: #292a33; }
+.ai-prob-bar   { height: 6px; background: #f0f0f4; border-radius: 4px; overflow: hidden; }
+.ai-prob-fill  { height: 100%; border-radius: 4px; }
+
+.ai-factors { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 5px rgba(0,0,0,0.07); }
+.ai-factors-title {
+  padding: 10px 14px; font-size: 12px; font-weight: 800; color: #292a33;
+  border-bottom: 1px solid #f0f0f4; background: #fafbfc;
+}
+.ai-factor {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; border-bottom: 1px solid #f4f4f6;
+}
+.ai-factor:last-child { border-bottom: none; }
+.ai-factor-icon { font-size: 16px; flex-shrink: 0; width: 24px; text-align: center; }
+.ai-factor-info { flex: 1; }
+.ai-factor-label { font-size: 11px; font-weight: 600; color: #292a33; }
+.ai-factor-val   { font-size: 10px; color: #9599a4; margin-top: 1px; }
+.ai-factor-impact {
+  font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 999px; flex-shrink: 0;
+}
+.ai-factor-impact.pos { background: #dcfce7; color: #16a34a; }
+.ai-factor-impact.neg { background: #fee2e2; color: #dc2626; }
+.ai-factor-impact.neu { background: #f0f0f4; color: #6a6f7a; }
+
+.ai-score-pred { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 5px rgba(0,0,0,0.07); }
+.ai-score-row {
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+  padding: 16px 14px 10px;
+}
+.ai-score-team {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; font-weight: 600; color: #6a6f7a;
+}
+.ai-score-team--right { flex-direction: row-reverse; }
+.ai-score-num {
+  font-size: 28px; font-weight: 900; color: #292a33;
+  background: #f2f3f5; width: 42px; height: 42px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px;
+}
+.ai-score-sep { font-size: 20px; font-weight: 900; color: #c0c4cd; }
+.ai-score-note { text-align: center; font-size: 10px; color: #9599a4; padding-bottom: 12px; }
+
+.ai-disclaimer {
+  font-size: 10px; color: #9599a4; text-align: center;
+  padding: 8px 12px; background: #fefce8; border-radius: 8px;
+  border: 1px solid #fde68a;
+}
 </style>

@@ -11,6 +11,7 @@ const router = createRouter({
     { path: "/account", name: "account", component: () => import("@/views/AccountView.vue") },
     { path: "/jackpot", name: "jackpot", component: () => import("@/views/JackpotView.vue") },
     { path: "/match/:id", name: "match", component: () => import("@/views/MatchDetailView.vue") },
+    { path: "/profile", name: "profile", component: () => import("@/views/UserProfileView.vue") },
   ],
   scrollBehavior: () => ({ top: 0 }),
 });

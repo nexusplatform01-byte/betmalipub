@@ -679,16 +679,6 @@ const promos = [
     cursor: default;
     pointer-events: none;
   }
-  .dtmt__odd-btn--hot {
-    background: #fff8f0;
-    border-color: #f97316;
-    color: #c2410c;
-  }
-  .dtmt__odd-btn--hot:hover {
-    background: rgba(249,115,22,0.12);
-    border-color: #ea580c;
-    color: #c2410c;
-  }
   .dtmt__odd-inner {
     display: flex;
     align-items: center;
