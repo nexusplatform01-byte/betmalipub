@@ -27,6 +27,12 @@
           </div>
         </div>
 
+        <!-- ── Ticket ID strip ── -->
+        <div class="tkt-idstrip">
+          <span>Type: <strong>{{ bet.type }}</strong></span>
+          <span>{{ bet.selections.length }} {{ bet.selections.length === 1 ? 'Selection' : 'Selections' }}</span>
+        </div>
+
         <!-- ── Selections ── -->
         <div class="tkt-sels">
           <div
@@ -54,38 +60,36 @@
           </div>
         </div>
 
-        <!-- ── Summary gradient box ── -->
-        <div class="tkt-grad-box" :class="'grad--' + bet.status">
-          <div class="tkt-grad-grid">
-            <div class="tkt-grad-item">
-              <span class="tkt-grad-lbl">Odds:</span>
-              <span class="tkt-grad-val">{{ bet.totalOdds.toFixed(2) }}</span>
-            </div>
-            <div class="tkt-grad-item">
-              <span class="tkt-grad-lbl">Stake:</span>
-              <span class="tkt-grad-val">UGX {{ bet.stake.toLocaleString() }}</span>
-            </div>
-            <div class="tkt-grad-item">
-              <span class="tkt-grad-lbl">Potential Winnings:</span>
-              <span class="tkt-grad-val">UGX {{ bet.potentialWin.toLocaleString() }}</span>
-            </div>
-            <div v-if="bet.winBonus" class="tkt-grad-item">
-              <span class="tkt-grad-lbl">Win Bonus:</span>
-              <span class="tkt-grad-val">UGX {{ bet.winBonus.toLocaleString() }}</span>
-            </div>
-            <div class="tkt-grad-item tkt-grad-item--payout">
-              <span class="tkt-grad-lbl tkt-grad-lbl--payout">Payout:</span>
-              <span class="tkt-grad-val tkt-grad-val--payout">
-                {{ payoutLabel }} UGX {{ (bet.status === 'won' ? bet.payout : bet.potentialWin).toLocaleString() }}
-              </span>
-            </div>
+        <!-- ── Summary box (white + cyan border) ── -->
+        <div class="tkt-summary-box">
+          <div class="tkt-sb-row">
+            <span class="tkt-sb-lbl">Odds:</span>
+            <span class="tkt-sb-val">{{ bet.totalOdds.toFixed(2) }}</span>
+          </div>
+          <div class="tkt-sb-row">
+            <span class="tkt-sb-lbl">Stake:</span>
+            <span class="tkt-sb-val">UGX {{ bet.stake.toLocaleString() }}.00</span>
+          </div>
+          <div class="tkt-sb-row">
+            <span class="tkt-sb-lbl tkt-sb-lbl--bold">Potential Winnings:</span>
+            <span class="tkt-sb-val">UGX {{ bet.potentialWin.toLocaleString() }}</span>
+          </div>
+          <div v-if="bet.winBonus" class="tkt-sb-row">
+            <span class="tkt-sb-lbl">Win Bonus:</span>
+            <span class="tkt-sb-val">UGX {{ bet.winBonus.toLocaleString() }}</span>
+          </div>
+          <div class="tkt-sb-row tkt-sb-row--payout">
+            <span class="tkt-sb-lbl tkt-sb-lbl--bold">Payout:</span>
+            <span class="tkt-sb-val tkt-sb-val--payout" :class="'pv--' + bet.status">
+              {{ payoutLabel }} UGX {{ (bet.status === 'won' ? bet.payout : bet.potentialWin).toLocaleString() }}
+            </span>
           </div>
         </div>
 
         <!-- ── Cash Out button (pending only) ── -->
         <div v-if="bet.status === 'pending'" class="tkt-cashout">
           <button class="tkt-cashout__btn">
-            💰 Cash Out
+            💰 Cash Out &nbsp;·&nbsp; UGX {{ cashoutAmount.toLocaleString() }}
           </button>
         </div>
 
@@ -135,6 +139,10 @@ const payoutLabel = computed(() => {
   return 'POTENTIAL';
 });
 
+const cashoutAmount = computed(() =>
+  Math.round(props.bet.stake * props.bet.totalOdds * 0.72)
+);
+
 function selResult(sel: Selection): string {
   return sel.result ?? (props.bet.status === 'pending' ? 'pending' : 'lost');
 }
@@ -154,25 +162,25 @@ function selResult(sel: Selection): string {
   padding: 16px;
 }
 
-/* ── Sheet (square card) ── */
+/* ── Sheet (compact square card) ── */
 .tkt-sheet {
   width: 100%;
-  max-width: 420px;
-  max-height: 92vh;
+  max-width: 360px;
+  max-height: 90vh;
   background: #fff;
-  border-radius: 16px;
+  border-radius: 14px;
   overflow-y: auto;
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
-  animation: tkt-pop 0.22s cubic-bezier(0.34, 1.3, 0.64, 1);
+  animation: tkt-pop 0.2s cubic-bezier(0.34, 1.3, 0.64, 1);
   scrollbar-width: none;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
 }
 .tkt-sheet::-webkit-scrollbar { display: none; }
 
 @keyframes tkt-pop {
-  from { opacity: 0; transform: scale(0.92); }
+  from { opacity: 0; transform: scale(0.9); }
   to   { opacity: 1; transform: scale(1); }
 }
 
@@ -181,68 +189,70 @@ function selResult(sel: Selection): string {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 11px 14px;
+  padding: 9px 12px;
   background: #1a1b22;
   flex-shrink: 0;
 }
-.tkt-topbar__inner { display: flex; align-items: center; gap: 8px; }
-.tkt-topbar__icon { font-size: 17px; line-height: 1; }
+.tkt-topbar__inner { display: flex; align-items: center; gap: 7px; }
+.tkt-topbar__icon  { font-size: 15px; line-height: 1; }
 .tkt-topbar__id {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
   color: #fff;
   letter-spacing: 0.4px;
 }
 .tkt-topbar__close {
-  width: 26px;
-  height: 26px;
+  width: 24px; height: 24px;
   border-radius: 50%;
   border: 1.5px solid rgba(255,255,255,0.3);
   background: rgba(255,255,255,0.1);
   color: #fff;
-  font-size: 11px;
+  font-size: 10px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
   transition: background 0.15s;
 }
 .tkt-topbar__close:hover { background: rgba(255,255,255,0.2); }
 
-/* ── Heading ── */
+/* ── Heading image / bar ── */
 .tkt-heading { flex-shrink: 0; }
 .tkt-heading__img {
   width: 100%;
   display: block;
-  max-height: 200px;
+  height: 90px;
   object-fit: cover;
-  object-position: center;
+  object-position: center 30%;
 }
 .tkt-heading__bar {
-  padding: 18px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 12px 14px;
+  display: flex; align-items: center; justify-content: center;
 }
 .hbar--lost    { background: linear-gradient(135deg, #b91c1c, #dc2626); }
 .hbar--pending { background: linear-gradient(135deg, #92400e, #d97706); }
 .tkt-heading__bar-text {
-  font-size: 16px;
-  font-weight: 900;
-  color: #fff;
-  letter-spacing: 0.5px;
+  font-size: 13px; font-weight: 900; color: #fff; letter-spacing: 0.4px;
 }
+
+/* ── ID strip ── */
+.tkt-idstrip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #eef0f2;
+  font-size: 10px;
+  color: #6b7280;
+  flex-shrink: 0;
+}
+.tkt-idstrip strong { color: #1a1b22; }
 
 /* ── Selections ── */
-.tkt-sels {
-  flex: 1;
-  background: #fff;
-  border-bottom: 1px solid #f0f1f3;
-}
+.tkt-sels { flex: 1; background: #fff; }
 
 .tkt-sel {
-  padding: 10px 14px;
+  padding: 8px 12px;
   border-bottom: 1px solid #f3f4f6;
 }
 .tkt-sel:last-child { border-bottom: none; }
@@ -251,167 +261,115 @@ function selResult(sel: Selection): string {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
 }
+.tkt-sel__time { font-size: 9px; color: #9ca3af; font-weight: 500; }
 
-.tkt-sel__time {
-  font-size: 10px;
-  color: #9ca3af;
-  font-weight: 500;
-}
-
-/* ── Status box badge ── */
+/* Status box */
 .tkt-sel__status-box {
-  font-size: 9px;
-  font-weight: 900;
-  letter-spacing: 0.6px;
-  padding: 3px 8px;
-  border-radius: 4px;
+  font-size: 8px; font-weight: 900;
+  letter-spacing: 0.5px;
+  padding: 2px 7px;
+  border-radius: 3px;
   text-transform: uppercase;
 }
 .sbox--won     { background: #16a34a; color: #fff; }
 .sbox--lost    { background: #dc2626; color: #fff; }
 .sbox--pending { background: #92400e; color: #fef3c7; }
 
-.tkt-sel__main {
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
-}
+.tkt-sel__main { display: flex; gap: 8px; align-items: flex-start; }
 
 .tkt-sel__left {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; gap: 1px;
 }
-.tkt-sel__match {
-  font-size: 13px;
-  font-weight: 800;
-  color: #1a1b22;
-  line-height: 1.3;
-}
-.tkt-sel__league {
-  font-size: 10px;
-  color: #9ca3af;
-  font-weight: 500;
-}
-.tkt-sel__market {
-  font-size: 10px;
-  color: #6b7280;
-  font-weight: 500;
-}
+.tkt-sel__match  { font-size: 12px; font-weight: 800; color: #1a1b22; line-height: 1.3; }
+.tkt-sel__league { font-size: 9px; color: #9ca3af; font-weight: 500; }
+.tkt-sel__market { font-size: 9px; color: #6b7280; font-weight: 500; }
 
 .tkt-sel__right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 5px;
-  flex-shrink: 0;
+  display: flex; flex-direction: column; align-items: flex-end;
+  gap: 4px; flex-shrink: 0;
 }
-.tkt-sel__score {
-  font-size: 11px;
-  font-weight: 700;
-  color: #6b7280;
-  min-height: 14px;
-}
+.tkt-sel__score { font-size: 10px; font-weight: 700; color: #6b7280; min-height: 12px; }
 .tkt-sel__odds {
-  font-size: 12px;
-  font-weight: 900;
-  border-radius: 6px;
-  padding: 3px 9px;
-  min-width: 36px;
-  text-align: center;
-  color: #fff;
+  font-size: 11px; font-weight: 900;
+  border-radius: 5px; padding: 2px 8px;
+  min-width: 32px; text-align: center; color: #fff;
 }
 .odds--won     { background: #16a34a; }
 .odds--lost    { background: #dc2626; }
 .odds--pending { background: #92400e; }
 
-/* ── Gradient summary box ── */
-.tkt-grad-box {
-  margin: 0;
-  padding: 16px 16px 14px;
+/* ── Summary box — white + cyan border ── */
+.tkt-summary-box {
+  margin: 10px 12px;
+  border: 1.5px solid #22d3ee;
+  border-radius: 8px;
+  overflow: hidden;
   flex-shrink: 0;
-}
-.grad--won     { background: linear-gradient(145deg, #064e3b, #047857, #059669); }
-.grad--lost    { background: linear-gradient(145deg, #7f1d1d, #991b1b, #b91c1c); }
-.grad--pending { background: linear-gradient(145deg, #78350f, #92400e, #b45309); }
-
-.tkt-grad-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
+  background: #fff;
 }
 
-.tkt-grad-item {
+.tkt-sb-row {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  padding: 6px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 7px 12px;
+  border-bottom: 1px solid #f0fdff;
 }
-.tkt-grad-item:last-child { border-bottom: none; }
+.tkt-sb-row:last-child { border-bottom: none; }
 
-.tkt-grad-lbl {
+.tkt-sb-lbl {
   font-size: 12px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.75);
+  color: #374151;
+  font-weight: 400;
 }
-.tkt-grad-val {
-  font-size: 13px;
-  font-weight: 800;
-  color: #fff;
+.tkt-sb-lbl--bold { font-weight: 700; color: #111827; }
+
+.tkt-sb-val {
+  font-size: 12px;
+  font-weight: 700;
+  color: #111827;
   text-align: right;
 }
 
-.tkt-grad-item--payout {
-  margin-top: 4px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.25);
-  border-bottom: none;
+.tkt-sb-row--payout {
+  background: #f0fdff;
+  padding: 9px 12px;
 }
-.tkt-grad-lbl--payout {
-  font-size: 13px;
-  font-weight: 700;
-  color: #fff;
-}
-.tkt-grad-val--payout {
-  font-size: 15px;
-  font-weight: 900;
-  color: #fef08a;
-}
+.tkt-sb-val--payout { font-size: 13px; font-weight: 900; }
+.pv--won     { color: #16a34a; }
+.pv--lost    { color: #dc2626; }
+.pv--pending { color: #b45309; }
 
 /* ── Cash Out ── */
 .tkt-cashout {
-  padding: 12px 16px;
-  background: #fff;
-  border-top: 1px solid #f0f1f3;
+  padding: 0 12px 10px;
   flex-shrink: 0;
 }
 .tkt-cashout__btn {
   width: 100%;
-  padding: 13px;
+  padding: 11px;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   background: linear-gradient(135deg, #f59e0b, #d97706);
   color: #1a1b22;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 900;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
   cursor: pointer;
   transition: opacity 0.15s, transform 0.1s;
-  box-shadow: 0 3px 10px rgba(217, 119, 6, 0.45);
+  box-shadow: 0 3px 8px rgba(217, 119, 6, 0.4);
 }
 .tkt-cashout__btn:hover  { opacity: 0.9; }
 .tkt-cashout__btn:active { transform: scale(0.98); }
 
 /* ── Footer ── */
 .tkt-footer {
-  padding: 10px 16px;
+  padding: 8px 12px;
   text-align: center;
-  font-size: 10px;
+  font-size: 9px;
   color: #9ca3af;
   font-weight: 500;
   background: #f8f9fa;
