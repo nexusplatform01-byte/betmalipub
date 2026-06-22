@@ -1,4 +1,5 @@
 <template>
+  <DepositModal v-if="showDepositModal" @close="showDepositModal = false" />
   <header class="header">
     <img :src="'/static/images/Img_Logo_Yellow_66.png'" alt="Bangbet" class="header__logo" />
 
@@ -38,14 +39,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject } from "vue";
+import { ref, computed, inject } from "vue";
 import { useRouter } from "vue-router";
 import { useAppStore } from "@/stores/app";
+import DepositModal from "@/components/DepositModal.vue";
 
 const store = useAppStore();
 const router = useRouter();
 const openLogin    = inject<() => void>("openLogin",    () => {});
 const openRegister = inject<() => void>("openRegister", () => {});
+
+const showDepositModal = ref(false);
 
 const initials = computed(() => {
   const name = store.userName || "U";
@@ -57,8 +61,7 @@ function goProfile() {
 }
 
 function doDeposit() {
-  const amt = prompt("Deposit amount (UGX):");
-  if (amt && !isNaN(Number(amt)) && Number(amt) > 0) store.deposit(Number(amt));
+  showDepositModal.value = true;
 }
 function doWithdraw() {
   const amt = prompt("Withdraw amount (UGX):");
