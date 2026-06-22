@@ -171,31 +171,30 @@
 
         <!-- ── MY BETS ── -->
         <section v-if="activeTab === 'mybets'" class="tab-section">
+          <BetTicketModal v-if="viewingBet" :bet="viewingBet" @close="viewingBet = null" />
           <h2 class="tab-title">My Bets</h2>
           <div class="bets-filter">
             <button v-for="f in betFilters" :key="f" class="bf-btn" :class="{ active: betFilter === f }" @click="betFilter = f">{{ f }}</button>
           </div>
           <div class="bets-list">
-            <div class="bet-card" v-for="bet in filteredBets" :key="bet.id">
-              <div class="bet-header">
-                <span class="bet-type">{{ bet.type }}</span>
-                <span class="bet-status" :class="bet.status">{{ bet.status }}</span>
-              </div>
-              <div class="bet-match" v-for="sel in bet.selections" :key="sel.match">
-                <div class="bet-match-info">
-                  <span class="bet-match-name">{{ sel.match }}</span>
-                  <span class="bet-pick">{{ sel.pick }}</span>
+            <div class="tkt-row" v-for="bet in filteredBets" :key="bet.id">
+              <div class="tkt-row__left">
+                <div class="tkt-row__id">TICKET: <span>{{ bet.ticketId }}</span></div>
+                <div class="tkt-row__meta">
+                  <span class="tkt-row__type">{{ bet.type }}</span>
+                  <span class="tkt-row__dot">·</span>
+                  <span class="tkt-row__count">{{ bet.selections.length }} {{ bet.selections.length === 1 ? 'match' : 'matches' }}</span>
+                  <span class="tkt-row__dot">·</span>
+                  <span class="tkt-row__stake">UGX {{ bet.stake.toLocaleString() }}</span>
                 </div>
-                <span class="bet-odd">{{ sel.odd }}</span>
+                <div class="tkt-row__date">{{ bet.date }}</div>
               </div>
-              <div class="bet-footer">
-                <div class="bf-item"><span>Stake</span><strong>{{ store.currency }} {{ bet.stake.toLocaleString() }}</strong></div>
-                <div class="bf-item"><span>Total Odds</span><strong>{{ bet.totalOdds }}</strong></div>
-                <div class="bf-item"><span>{{ bet.status === 'won' ? 'Won' : bet.status === 'lost' ? 'Returned' : 'Potential' }}</span>
-                  <strong :class="bet.status">{{ store.currency }} {{ bet.payout.toLocaleString() }}</strong>
-                </div>
+              <div class="tkt-row__right">
+                <span class="tkt-row__status" :class="'tkt-s--' + bet.status">
+                  {{ bet.status === 'won' ? '🏆 Won' : bet.status === 'lost' ? '❌ Lost' : '⏳ Pending' }}
+                </span>
+                <button class="tkt-row__view-btn" @click="viewingBet = bet">View →</button>
               </div>
-              <div class="bet-date">{{ bet.date }}</div>
             </div>
             <div v-if="filteredBets.length === 0" class="bets-empty">No {{ betFilter.toLowerCase() }} bets found.</div>
           </div>
@@ -319,6 +318,7 @@ import { useAppStore } from "@/stores/app";
 import AppHeader from "@/components/AppHeader.vue";
 import DepositModal from "@/components/DepositModal.vue";
 import WithdrawModal from "@/components/WithdrawModal.vue";
+import BetTicketModal from "@/components/BetTicketModal.vue";
 
 const store = useAppStore();
 const router = useRouter();
@@ -328,6 +328,7 @@ const txFilter = ref("All");
 const realityCheck = ref(false);
 const showDepositModal  = ref(false);
 const showWithdrawModal = ref(false);
+const viewingBet = ref<null | typeof allBets[0]>(null);
 
 const uid = computed(() => String(Math.abs(store.userName.split("").reduce((a, c) => a + c.charCodeAt(0), 0) * 137)).slice(0, 6));
 
@@ -368,14 +369,48 @@ const betFilters = ["All", "Pending", "Won", "Lost"];
 const txFilters  = ["All", "Deposits", "Withdrawals"];
 
 const allBets = [
-  { id: 1, type: "Single", status: "won",     stake: 5000,  totalOdds: "4.10", payout: 20500, date: "Jun 20, 2026 14:32",
-    selections: [{ match: "Arsenal vs Chelsea", pick: "Arsenal Win", odd: "4.10" }] },
-  { id: 2, type: "Double", status: "lost",    stake: 2000,  totalOdds: "7.80", payout: 0,     date: "Jun 18, 2026 19:05",
-    selections: [{ match: "KCCA FC vs Express FC", pick: "KCCA Win", odd: "2.10" }, { match: "Man Utd vs Liverpool", pick: "Draw", odd: "3.71" }] },
-  { id: 3, type: "Single", status: "pending", stake: 10000, totalOdds: "2.20", payout: 22000, date: "Jun 22, 2026 09:00",
-    selections: [{ match: "AC Milan vs Juventus", pick: "Milan Win", odd: "2.20" }] },
-  { id: 4, type: "Triple", status: "won",     stake: 3000,  totalOdds: "12.30", payout: 36900, date: "Jun 15, 2026 21:00",
-    selections: [{ match: "Barcelona vs Real Madrid", pick: "Real Win", odd: "2.80" }, { match: "PSG vs Bayern", pick: "Over 2.5", odd: "1.75" }, { match: "Chelsea vs Arsenal", pick: "Chelsea Win", odd: "2.52" }] },
+  {
+    id: 1, ticketId: "441823", type: "Single", status: "won" as const,
+    stake: 5000, totalOdds: 4.10, potentialWin: 20500, payout: 20500,
+    date: "Jun 20, 2026 14:32",
+    selections: [
+      { match: "Arsenal vs Chelsea", team: "Arsenal Win", market: "Full Time Result", odds: 4.10,
+        time: "2:00 pm Sat 20/06", league: "English Premier League", score: "2-0", result: "won" as const },
+    ],
+  },
+  {
+    id: 2, ticketId: "389104", type: "Double", status: "lost" as const,
+    stake: 2000, totalOdds: 7.80, potentialWin: 15600, payout: 0,
+    date: "Jun 18, 2026 19:05",
+    selections: [
+      { match: "KCCA FC vs Express FC", team: "KCCA Win", market: "Full Time (1X2)", odds: 2.10,
+        time: "7:00 pm Wed 18/06", league: "Uganda Premier League", score: "0-1", result: "lost" as const },
+      { match: "Man Utd vs Liverpool", team: "Draw", market: "Full Time (1X2)", odds: 3.71,
+        time: "9:00 pm Wed 18/06", league: "English Premier League", score: "1-1", result: "won" as const },
+    ],
+  },
+  {
+    id: 3, ticketId: "512677", type: "Single", status: "pending" as const,
+    stake: 10000, totalOdds: 2.20, potentialWin: 22000, payout: 0,
+    date: "Jun 22, 2026 09:00",
+    selections: [
+      { match: "AC Milan vs Juventus", team: "AC Milan Win", market: "Full Time Result", odds: 2.20,
+        time: "9:00 am Sun 22/06", league: "Serie A", score: "", result: "pending" as const },
+    ],
+  },
+  {
+    id: 4, ticketId: "298341", type: "Accumulator", status: "won" as const,
+    stake: 3000, totalOdds: 12.30, potentialWin: 36900, payout: 36900,
+    date: "Jun 15, 2026 21:00",
+    selections: [
+      { match: "Barcelona vs Real Madrid", team: "Real Madrid Win", market: "Full Time Result", odds: 2.80,
+        time: "9:00 pm Sun 15/06", league: "La Liga", score: "1-2", result: "won" as const },
+      { match: "PSG vs Bayern Munich",    team: "Over 2.5 Goals",  market: "Both Teams To Score / Full Time Over", odds: 1.75,
+        time: "11:00 pm Sun 15/06", league: "Champions League", score: "3-2", result: "won" as const },
+      { match: "Chelsea vs Arsenal",      team: "Chelsea Win",     market: "Full Time Result", odds: 2.52,
+        time: "1:00 am Mon 16/06", league: "English Premier League", score: "2-1", result: "won" as const },
+    ],
+  },
 ];
 
 const filteredBets = computed(() => {
@@ -682,47 +717,61 @@ function saveSettings() {
 }
 .bf-btn.active, .bf-btn:hover { background: #c026d3; border-color: #c026d3; color: #fff; }
 
-.bets-list { display: flex; flex-direction: column; gap: 12px; }
-.bet-card {
-  background: #fff; border-radius: 14px;
+.bets-list { display: flex; flex-direction: column; gap: 10px; }
+
+/* Ticket row */
+.tkt-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px;
+  background: #fff; border-radius: 12px;
   box-shadow: 0 1px 6px rgba(0,0,0,0.07);
-  overflow: hidden;
+  padding: 12px 14px;
+  border-left: 4px solid #e5e7eb;
+  transition: box-shadow 0.15s;
 }
-.bet-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 16px; background: #fafbfc; border-bottom: 1px solid #f0f0f4;
-}
-.bet-type { font-size: 12px; font-weight: 700; color: #292a33; }
-.bet-status {
-  font-size: 11px; font-weight: 700; padding: 2px 10px; border-radius: 999px;
-  text-transform: capitalize;
-}
-.bet-status.won     { background: #dcfce7; color: #16a34a; }
-.bet-status.lost    { background: #fee2e2; color: #dc2626; }
-.bet-status.pending { background: #fef9c3; color: #ca8a04; }
+.tkt-row:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.11); }
 
-.bet-match {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 9px 16px; border-bottom: 1px solid #f4f4f6;
-}
-.bet-match:last-of-type { border-bottom: none; }
-.bet-match-info { display: flex; flex-direction: column; gap: 2px; }
-.bet-match-name { font-size: 12px; font-weight: 600; color: #292a33; }
-.bet-pick { font-size: 11px; color: #9599a4; }
-.bet-odd { font-size: 12px; font-weight: 800; color: #c026d3; }
+/* status accent colors */
+.tkt-row:has(.tkt-s--won)     { border-left-color: #16a34a; }
+.tkt-row:has(.tkt-s--lost)    { border-left-color: #dc2626; }
+.tkt-row:has(.tkt-s--pending) { border-left-color: #d97706; }
 
-.bet-footer {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 16px; background: #fafbfc; border-top: 1px solid #f0f0f4;
-  gap: 8px;
+.tkt-row__left { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
+
+.tkt-row__id {
+  font-size: 11px; font-weight: 600; color: #9ca3af; letter-spacing: 0.3px;
 }
-.bf-item { display: flex; flex-direction: column; gap: 2px; align-items: center; }
-.bf-item span { font-size: 10px; color: #9599a4; text-transform: uppercase; letter-spacing: .3px; }
-.bf-item strong { font-size: 13px; font-weight: 800; color: #292a33; }
-.bf-item strong.won    { color: #16a34a; }
-.bf-item strong.lost   { color: #dc2626; }
-.bf-item strong.pending { color: #ca8a04; }
-.bet-date { padding: 6px 16px; font-size: 10px; color: #b0b3bc; border-top: 1px solid #f4f4f6; }
+.tkt-row__id span { font-size: 13px; font-weight: 900; color: #111827; letter-spacing: 0.5px; }
+
+.tkt-row__meta {
+  display: flex; align-items: center; gap: 5px; flex-wrap: wrap;
+}
+.tkt-row__type  { font-size: 11px; font-weight: 700; color: #c026d3; }
+.tkt-row__count { font-size: 11px; font-weight: 600; color: #374151; }
+.tkt-row__stake { font-size: 11px; font-weight: 700; color: #374151; }
+.tkt-row__dot   { font-size: 11px; color: #d1d5db; }
+.tkt-row__date  { font-size: 10px; color: #9ca3af; margin-top: 1px; }
+
+.tkt-row__right {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0;
+}
+
+.tkt-row__status {
+  font-size: 11px; font-weight: 800; border-radius: 999px; padding: 3px 10px;
+  white-space: nowrap;
+}
+.tkt-s--won     { background: #dcfce7; color: #15803d; }
+.tkt-s--lost    { background: #fee2e2; color: #dc2626; }
+.tkt-s--pending { background: #fef3c7; color: #b45309; }
+
+.tkt-row__view-btn {
+  font-size: 11px; font-weight: 800; color: #fff;
+  background: #1c1e24; border: none; border-radius: 7px;
+  padding: 6px 14px; cursor: pointer; white-space: nowrap;
+  transition: opacity 0.15s;
+}
+.tkt-row__view-btn:hover { opacity: 0.8; }
+
 .bets-empty {
   text-align: center; padding: 40px; color: #9599a4; font-size: 14px;
   background: #fff; border-radius: 14px;
