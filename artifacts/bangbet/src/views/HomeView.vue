@@ -75,7 +75,7 @@
             <span class="dt-sidebar__league-flag">🏆</span>
             <span class="dt-sidebar__item-name">Jackpot</span>
           </RouterLink>
-          <RouterLink to="/sports/virtuals" class="dt-sidebar__item dt-sidebar__item--link">
+          <RouterLink to="/virtuals" class="dt-sidebar__item dt-sidebar__item--link">
             <span class="dt-sidebar__league-flag">🎮</span>
             <span class="dt-sidebar__item-name">Virtual Sports</span>
           </RouterLink>
@@ -731,7 +731,7 @@
             <div class="sff__col-head">Games</div>
             <RouterLink to="/casino" class="sff__link">Live Casino</RouterLink>
             <RouterLink to="/jackpot" class="sff__link">Jackpot</RouterLink>
-            <RouterLink to="/sports/virtuals" class="sff__link">Virtuals</RouterLink>
+            <RouterLink to="/virtuals" class="sff__link">Virtuals</RouterLink>
             <a href="#" class="sff__link">Pick 12</a>
             <a href="#" class="sff__link">Lucky 777</a>
             <a href="#" class="sff__link">EKIVULU</a>
@@ -940,7 +940,7 @@ const desktopNavTabs = [
   { label: 'Live',       icon: '🔴', route: '/sports/Football', badge: '24' },
   { label: 'Casino',     icon: '🎰', route: '/casino' },
   { label: 'Jackpot',    icon: '🏆', route: '/jackpot' },
-  { label: 'Virtuals',   icon: '🎮', route: '/sports/virtuals' },
+  { label: 'Virtuals',   icon: '🎮', route: '/virtuals' },
   { label: 'Results',    icon: '📋', route: '/results' },
 ];
 
