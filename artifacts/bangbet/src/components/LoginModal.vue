@@ -2,7 +2,7 @@
   <div class="modal-overlay" @click.self="$emit('close')">
     <div class="modal" style="position:relative">
       <button class="modal__close" @click="$emit('close')">✕</button>
-      <img src="/static/images/Img_Logo_Yellow_66.png" alt="Bangbet" class="modal__logo" />
+      <img :src="'/static/images/Img_Logo_Yellow_66.png'" alt="Bangbet" class="modal__logo" />
       <h2 class="modal__title">Welcome Back</h2>
       <div class="form-group">
         <label class="form-label">Phone Number</label>

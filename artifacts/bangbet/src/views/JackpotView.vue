@@ -13,7 +13,7 @@
     </div>
 
     <div style="padding:10px 10px 0;background:var(--bg-main);">
-      <img src="/static/img/Bg_SportsJackpot_Up_36.b6e66f7.png" alt="Jackpot" style="width:100%;border-radius:8px;display:block;margin-bottom:8px;" />
+      <img :src="'/static/img/Bg_SportsJackpot_Up_36.b6e66f7.png'" alt="Jackpot" style="width:100%;border-radius:8px;display:block;margin-bottom:8px;" />
     </div>
 
     <div class="section">

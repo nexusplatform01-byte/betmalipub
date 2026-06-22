@@ -134,18 +134,18 @@
             <RouterLink to="/jackpot" class="section-more">Play ›</RouterLink>
           </div>
           <div style="margin:0 10px 8px;border-radius:8px;overflow:hidden;cursor:pointer" @click="$router.push('/jackpot')">
-            <img src="/static/img/Bg_SpotsJP_H5.83a074b.png" alt="Jackpot" style="width:100%;display:block;border-radius:8px" />
+            <img :src="'/static/img/Bg_SpotsJP_H5.83a074b.png'" alt="Jackpot" style="width:100%;display:block;border-radius:8px" />
           </div>
         </div>
 
         <div class="site-footer">
-          <img src="/static/img/Logo_HomeFooter_Bangbet.db450bf.png" alt="Bangbet" class="footer-logo" />
+          <img :src="'/static/img/Logo_HomeFooter_Bangbet.db450bf.png'" alt="Bangbet" class="footer-logo" />
           <div class="footer-social">
-            <img src="/static/img/Icon_Facebook_48.636a718.png" alt="Facebook" />
-            <img src="/static/img/Icon_Twitter_48.6ec2c11.png" alt="Twitter" />
-            <img src="/static/img/Icon_Instagram_48.bd94330.png" alt="Instagram" />
-            <img src="/static/img/Icon_TikTok_48.3ee5e3d.png" alt="TikTok" />
-            <img src="/static/img/Icon_LiveHelp_48.deda86e.png" alt="Live Help" />
+            <img :src="'/static/img/Icon_Facebook_48.636a718.png'" alt="Facebook" />
+            <img :src="'/static/img/Icon_Twitter_48.6ec2c11.png'" alt="Twitter" />
+            <img :src="'/static/img/Icon_Instagram_48.bd94330.png'" alt="Instagram" />
+            <img :src="'/static/img/Icon_TikTok_48.3ee5e3d.png'" alt="TikTok" />
+            <img :src="'/static/img/Icon_LiveHelp_48.deda86e.png'" alt="Live Help" />
           </div>
           <p class="footer-text">Bangbet is licensed and regulated by the National Gaming Board of Uganda.<br/>Gambling is for adults 18+. Please gamble responsibly.</p>
         </div>

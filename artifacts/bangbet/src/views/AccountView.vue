@@ -4,7 +4,7 @@
 
     <!-- Logged out state -->
     <div v-if="!store.isLoggedIn" style="background:var(--bg-white);padding:40px 20px;text-align:center;flex:1">
-      <img src="/static/images/Img_Logo_Yellow_66.png" alt="Bangbet" style="height:44px;margin-bottom:24px;" />
+      <img :src="'/static/images/Img_Logo_Yellow_66.png'" alt="Bangbet" style="height:44px;margin-bottom:24px;" />
       <h2 style="font-size:19px;font-weight:700;margin-bottom:8px;color:var(--text-dark)">My Account</h2>
       <p style="color:var(--text-grey);font-size:13px;margin-bottom:28px;line-height:1.5">
         Login to view your account, check your bets, and manage your balance.

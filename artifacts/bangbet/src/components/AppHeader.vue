@@ -1,6 +1,6 @@
 <template>
   <header class="header">
-    <img src="/static/images/Img_Logo_Yellow_66.png" alt="Bangbet" class="header__logo" />
+    <img :src="'/static/images/Img_Logo_Yellow_66.png'" alt="Bangbet" class="header__logo" />
 
     <!-- Desktop centre: quick stats -->
     <div class="header__dt-stats">
