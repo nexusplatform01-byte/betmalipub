@@ -27,16 +27,16 @@
 
         <div class="dt-sidebar__section">
           <div class="dt-sidebar__head">🏅 Sports</div>
-          <RouterLink
+          <button
             v-for="s in sidebarSports" :key="s.name"
-            :to="s.route"
             class="dt-sidebar__item"
-            :class="{ active: s.name === 'Football' }"
+            :class="{ active: s.name === store.activeSport }"
+            @click="store.activeSport = s.name"
           >
             <img :src="s.icon" class="dt-sidebar__item-icon" onerror="this.style.display='none'" />
             <span class="dt-sidebar__item-name">{{ s.name }}</span>
             <span class="dt-sidebar__item-count">{{ s.count }}</span>
-          </RouterLink>
+          </button>
         </div>
 
         <div class="dt-sidebar__section">
@@ -100,7 +100,7 @@
       <main class="dt-center">
         <template v-if="!selectedMatch">
         <div class="dt-banner-wrap"><BannerSlider /></div>
-        <SportMenu active-name="Football" />
+        <SportMenu />
         <JackpotSection />
 
         <div class="section">
@@ -226,7 +226,7 @@
         </div>
 
         <!-- ── WORLD CUP 2026 FIXTURES ── -->
-        <div class="section dt-only">
+        <div class="section dt-only" v-show="['Football','World Cup'].includes(store.activeSport)">
           <div class="section-header">
             <div class="section-title">🌍 World Cup 2026</div>
             <span class="section-more">See All ›</span>
@@ -258,7 +258,7 @@
         </div>
 
         <!-- ── PREMIER LEAGUE FIXTURES ── -->
-        <div class="section dt-only">
+        <div class="section dt-only" v-show="store.activeSport === 'Football'">
           <div class="section-header">
             <div class="section-title">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League</div>
             <span class="section-more">See All ›</span>
@@ -290,7 +290,7 @@
         </div>
 
         <!-- ── CHAMPIONS LEAGUE ── -->
-        <div class="section dt-only">
+        <div class="section dt-only" v-show="store.activeSport === 'Football'">
           <div class="section-header">
             <div class="section-title">🇪🇺 Champions League</div>
             <span class="section-more">See All ›</span>
@@ -322,7 +322,7 @@
         </div>
 
         <!-- ── BASKETBALL NBA ── -->
-        <div class="section dt-only">
+        <div class="section dt-only" v-show="store.activeSport === 'Basketball'">
           <div class="section-header">
             <div class="section-title">🏀 Basketball — NBA</div>
             <span class="section-more">See All ›</span>
@@ -354,7 +354,7 @@
         </div>
 
         <!-- ── UGANDA PREMIER LEAGUE ── -->
-        <div class="section dt-only">
+        <div class="section dt-only" v-show="store.activeSport === 'Football'">
           <div class="section-header">
             <div class="section-title">🇺🇬 Uganda Premier League</div>
             <span class="section-more">See All ›</span>
@@ -384,6 +384,111 @@
             </div>
           </div>
         </div>
+        <!-- ── TENNIS ── -->
+        <div class="section dt-only" v-show="['Tennis','Table Tennis'].includes(store.activeSport)">
+          <div class="section-header">
+            <div class="section-title">🎾 {{ store.activeSport }} — ATP Tour</div>
+            <span class="section-more">See All ›</span>
+          </div>
+          <div class="dt-match-table">
+            <div class="dtmt__head">
+              <div class="dtmt__col-match">Match</div>
+              <div class="dtmt__col-odd">1</div><div class="dtmt__col-odd">2</div>
+              <div class="dtmt__col-odd">HDP</div><div class="dtmt__col-odd">O3.5</div><div class="dtmt__col-odd">U3.5</div><div class="dtmt__col-odd">-</div>
+            </div>
+            <div v-for="m in tennisMatches" :key="m.id" class="dtmt__row">
+              <div class="dtmt__col-match">
+                <div class="dtmt__league">{{ m.league }}</div>
+                <div class="dtmt__teams">
+                  <span class="dtmt__team-name">{{ m.homeTeam }}</span>
+                  <span class="dtmt__vs">vs</span>
+                  <span class="dtmt__team-name">{{ m.awayTeam }}</span>
+                </div>
+                <div class="dtmt__time">{{ m.startTime }}</div>
+              </div>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'1',m.markets.home)">{{ m.markets.home }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'2',m.markets.away)">{{ m.markets.away }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'HDP',m.markets.hdp)">{{ m.markets.hdp }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'O3.5',m.markets.over)">{{ m.markets.over }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'U3.5',m.markets.under)">{{ m.markets.under }}</button>
+              <button class="dtmt__odd-btn dtmt__odd-btn--na">-</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── VOLLEYBALL ── -->
+        <div class="section dt-only" v-show="['Volleyball','Handball'].includes(store.activeSport)">
+          <div class="section-header">
+            <div class="section-title">🏐 {{ store.activeSport }} — International</div>
+            <span class="section-more">See All ›</span>
+          </div>
+          <div class="dt-match-table">
+            <div class="dtmt__head">
+              <div class="dtmt__col-match">Match</div>
+              <div class="dtmt__col-odd">1</div><div class="dtmt__col-odd">2</div>
+              <div class="dtmt__col-odd">HDP</div><div class="dtmt__col-odd">O4.5</div><div class="dtmt__col-odd">U4.5</div><div class="dtmt__col-odd">-</div>
+            </div>
+            <div v-for="m in volleyMatches" :key="m.id" class="dtmt__row">
+              <div class="dtmt__col-match">
+                <div class="dtmt__league">{{ m.league }}</div>
+                <div class="dtmt__teams">
+                  <span class="dtmt__team-name">{{ m.homeTeam }}</span>
+                  <span class="dtmt__vs">vs</span>
+                  <span class="dtmt__team-name">{{ m.awayTeam }}</span>
+                </div>
+                <div class="dtmt__time">{{ m.startTime }}</div>
+              </div>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'1',m.markets.home)">{{ m.markets.home }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'2',m.markets.away)">{{ m.markets.away }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'HDP',m.markets.hdp)">{{ m.markets.hdp }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'O4.5',m.markets.over)">{{ m.markets.over }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'U4.5',m.markets.under)">{{ m.markets.under }}</button>
+              <button class="dtmt__odd-btn dtmt__odd-btn--na">-</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── ICE HOCKEY ── -->
+        <div class="section dt-only" v-show="store.activeSport === 'Ice Hockey'">
+          <div class="section-header">
+            <div class="section-title">🏒 Ice Hockey — NHL</div>
+            <span class="section-more">See All ›</span>
+          </div>
+          <div class="dt-match-table">
+            <div class="dtmt__head">
+              <div class="dtmt__col-match">Match</div>
+              <div class="dtmt__col-odd">1</div><div class="dtmt__col-odd">X</div><div class="dtmt__col-odd">2</div>
+              <div class="dtmt__col-odd">1X</div><div class="dtmt__col-odd">X2</div><div class="dtmt__col-odd">12</div>
+            </div>
+            <div v-for="m in iceHockeyMatches" :key="m.id" class="dtmt__row">
+              <div class="dtmt__col-match">
+                <div class="dtmt__league">{{ m.league }}</div>
+                <div class="dtmt__teams">
+                  <span class="dtmt__team-name">{{ m.homeTeam }}</span>
+                  <span class="dtmt__vs">vs</span>
+                  <span class="dtmt__team-name">{{ m.awayTeam }}</span>
+                </div>
+                <div class="dtmt__time">{{ m.startTime }}</div>
+              </div>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'1',m.markets.home)">{{ m.markets.home }}</button>
+              <button class="dtmt__odd-btn" @click.stop="m.markets.draw && addOdd(m,'X',m.markets.draw)">{{ m.markets.draw ?? '-' }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'2',m.markets.away)">{{ m.markets.away }}</button>
+              <button class="dtmt__odd-btn" @click.stop="m.markets.draw && addOdd(m,'1X',dc(m.markets.home,m.markets.draw))">{{ dc(m.markets.home,m.markets.draw) }}</button>
+              <button class="dtmt__odd-btn" @click.stop="m.markets.draw && addOdd(m,'X2',dc(m.markets.draw,m.markets.away))">{{ dc(m.markets.draw,m.markets.away) }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'12',dc(m.markets.home,m.markets.away))">{{ dc(m.markets.home,m.markets.away) }}</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── OTHER SPORTS PLACEHOLDER ── -->
+        <div class="section dt-only" v-show="!['Football','World Cup','Basketball','Tennis','Table Tennis','Volleyball','Handball','Ice Hockey'].includes(store.activeSport)">
+          <div style="text-align:center;padding:40px 20px;color:#9599a4;">
+            <div style="font-size:32px;margin-bottom:10px;">⚽</div>
+            <div style="font-weight:700;font-size:14px;color:#292a33;margin-bottom:6px;">{{ store.activeSport }} markets loading…</div>
+            <div style="font-size:12px;">More {{ store.activeSport }} fixtures will appear here shortly.</div>
+          </div>
+        </div>
+
         </template>
         <MatchDetailPanel v-else :match="(selectedMatch as any)" @close="selectedMatch = null" />
       </main>
@@ -393,46 +498,74 @@
         <!-- Betslip widget -->
         <div class="dt-bs">
           <div class="dt-bs__header">
-            <button class="dt-bs__tab active">🎟 Bet Slip</button>
-            <button class="dt-bs__tab">My Bets</button>
+            <button class="dt-bs__tab" :class="{ active: betslipTab === 'slip' }" @click="betslipTab = 'slip'">🎟 Bet Slip</button>
+            <button class="dt-bs__tab" :class="{ active: betslipTab === 'mybets' }" @click="betslipTab = 'mybets'">My Bets <span v-if="store.myBets.length" class="dt-bs__mybets-count">{{ store.myBets.length }}</span></button>
           </div>
 
-          <div v-if="store.betslip.length === 0" class="dt-bs__empty">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="36" height="36"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-            <p>Add events from the list to create a bet slip</p>
-          </div>
-
-          <div v-else>
-            <div class="dt-bs__items-scroll">
-              <div v-for="bet in store.betslip" :key="bet.matchId" class="dt-bs__item">
-                <div class="dt-bs__item-left">
-                  <div class="dt-bs__item-team">{{ bet.team }}</div>
-                  <div class="dt-bs__item-mkt">{{ bet.market }}</div>
+          <!-- BET SLIP TAB -->
+          <template v-if="betslipTab === 'slip'">
+            <div v-if="store.betslip.length === 0" class="dt-bs__empty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="36" height="36"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+              <p>Add events from the list to create a bet slip</p>
+            </div>
+            <div v-else>
+              <div class="dt-bs__items-scroll">
+                <div v-for="bet in store.betslip" :key="bet.matchId" class="dt-bs__item">
+                  <div class="dt-bs__item-left">
+                    <div class="dt-bs__item-team">{{ bet.team }}</div>
+                    <div class="dt-bs__item-mkt">{{ bet.market }}</div>
+                  </div>
+                  <div class="dt-bs__item-right">
+                    <span class="dt-bs__item-odds">{{ bet.odds }}</span>
+                    <button class="dt-bs__item-del" @click="store.betslip.splice(store.betslip.findIndex(b=>b.matchId===bet.matchId),1)">✕</button>
+                  </div>
                 </div>
-                <div class="dt-bs__item-right">
-                  <span class="dt-bs__item-odds">{{ bet.odds }}</span>
-                  <button class="dt-bs__item-del" @click="store.betslip.splice(store.betslip.findIndex(b=>b.matchId===bet.matchId),1)">✕</button>
+              </div>
+              <div class="dt-bs__stake-row">
+                <label>Stake (UGX)</label>
+                <input v-model="stakeAmount" type="number" placeholder="Min 500" />
+              </div>
+              <div class="dt-bs__summary">
+                <div class="dt-bs__summary-row">
+                  <span>Total Odds</span>
+                  <strong>{{ totalOdds.toFixed(2) }}</strong>
+                </div>
+                <div class="dt-bs__summary-row">
+                  <span>Potential Win</span>
+                  <strong class="win">UGX {{ potentialWin }}</strong>
+                </div>
+              </div>
+              <button class="dt-bs__place-btn" @click="placeBet">Place Bet</button>
+              <button class="dt-bs__clear-btn" @click="store.betslip.splice(0)">Clear All</button>
+            </div>
+          </template>
+
+          <!-- MY BETS TAB -->
+          <template v-else>
+            <div v-if="store.myBets.length === 0" class="dt-bs__empty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="36" height="36"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+              <p>No bets placed yet</p>
+            </div>
+            <div v-else class="dt-mybets-list">
+              <div v-for="b in store.myBets" :key="b.id" class="dt-mybet">
+                <div class="dt-mybet__head">
+                  <span class="dt-mybet__date">{{ b.date }}</span>
+                  <span class="dt-mybet__status" :class="`dt-mybet__status--${b.status}`">{{ b.status }}</span>
+                </div>
+                <div v-for="sel in b.selections" :key="sel.market" class="dt-mybet__sel">
+                  <div class="dt-mybet__sel-team">{{ sel.team }}</div>
+                  <div class="dt-mybet__sel-row">
+                    <span class="dt-mybet__sel-mkt">{{ sel.market }}</span>
+                    <span class="dt-mybet__sel-odds">@ {{ sel.odds }}</span>
+                  </div>
+                </div>
+                <div class="dt-mybet__footer">
+                  <span>Stake: <strong>UGX {{ b.stake.toLocaleString() }}</strong></span>
+                  <span>To Win: <strong class="win">UGX {{ b.potentialWin.toLocaleString() }}</strong></span>
                 </div>
               </div>
             </div>
-
-            <div class="dt-bs__stake-row">
-              <label>Stake (UGX)</label>
-              <input v-model="stakeAmount" type="number" placeholder="Min 500" />
-            </div>
-            <div class="dt-bs__summary">
-              <div class="dt-bs__summary-row">
-                <span>Total Odds</span>
-                <strong>{{ totalOdds.toFixed(2) }}</strong>
-              </div>
-              <div class="dt-bs__summary-row">
-                <span>Potential Win</span>
-                <strong class="win">UGX {{ potentialWin }}</strong>
-              </div>
-            </div>
-            <button class="dt-bs__place-btn" @click="placeBet">Place Bet</button>
-            <button class="dt-bs__clear-btn" @click="store.betslip.splice(0)">Clear All</button>
-          </div>
+          </template>
         </div>
 
         <!-- Promotions widget -->
@@ -699,11 +832,19 @@ function openMatch(match: any) {
 const totalOdds = computed(() => store.betslip.reduce((acc, b) => acc * b.odds, 1));
 const potentialWin = computed(() => Math.round(Number(stakeAmount.value || 0) * totalOdds.value).toLocaleString());
 
+const betslipTab = ref<'slip' | 'mybets'>('slip');
+
 function placeBet() {
+  if (!stakeAmount.value || Number(stakeAmount.value) < 500) {
+    alert('Minimum stake is UGX 500');
+    return;
+  }
+  store.saveBet([...store.betslip], Number(stakeAmount.value), totalOdds.value);
   alert(`Bet placed! Potential win: UGX ${potentialWin.value}`);
   store.betslip.splice(0);
   showBetslip.value = false;
   stakeAmount.value = 1000;
+  betslipTab.value = 'mybets';
 }
 
 function getMaxOdd(match: any): number {
@@ -850,6 +991,28 @@ const uplMatches = [
   { id:'upl3', league:'Uganda Premier League · GW 28', homeTeam:'Onduparaka',    awayTeam:'URA FC',        startTime:'Sun 14:00', markets:{ home:2.80, draw:2.90, away:2.40 } },
   { id:'upl4', league:'Uganda Premier League · GW 28', homeTeam:'Police FC',     awayTeam:'BUL FC',        startTime:'Sun 16:00', markets:{ home:2.10, draw:3.10, away:3.20 } },
   { id:'upl5', league:'Uganda Premier League · GW 28', homeTeam:'Wakiso Giants', awayTeam:'Mbarara City',  startTime:'Sun 16:00', markets:{ home:1.85, draw:3.30, away:3.80 } },
+];
+
+const tennisMatches = [
+  { id:'ten1', league:'ATP Roland Garros · R16', homeTeam:'Djokovic, N.',  awayTeam:'Alcaraz, C.',   startTime:'Today 13:00', markets:{ home:1.65, away:2.15, hdp:1.88, over:1.82, under:1.98 } },
+  { id:'ten2', league:'ATP Roland Garros · R16', homeTeam:'Sinner, J.',    awayTeam:'Zverev, A.',    startTime:'Today 15:30', markets:{ home:1.55, away:2.40, hdp:1.90, over:1.85, under:1.95 } },
+  { id:'ten3', league:'WTA Roland Garros · QF',  homeTeam:'Swiatek, I.',   awayTeam:'Gauff, C.',     startTime:'Today 17:00', markets:{ home:1.45, away:2.65, hdp:1.88, over:1.80, under:2.00 } },
+  { id:'ten4', league:'ATP Roland Garros · R16', homeTeam:'Medvedev, D.',  awayTeam:'Tsitsipas, S.', startTime:'Tomorrow 12:00', markets:{ home:1.80, away:1.95, hdp:1.90, over:1.88, under:1.92 } },
+  { id:'ten5', league:'ATP Challenger · Final',  homeTeam:'Norrie, C.',    awayTeam:'Wawrinka, S.',  startTime:'Tomorrow 14:00', markets:{ home:1.70, away:2.10, hdp:1.88, over:1.85, under:1.95 } },
+];
+
+const volleyMatches = [
+  { id:'vol1', league:'CEV Champions League · SF', homeTeam:'Lube Civitanova', awayTeam:'Zenit Kazan',   startTime:'Today 18:00', markets:{ home:1.75, away:2.00, hdp:1.88, over:1.82, under:1.98 } },
+  { id:'vol2', league:'CEV Champions League · SF', homeTeam:'Perugia',         awayTeam:'Trentino',      startTime:'Today 20:30', markets:{ home:1.90, away:1.85, hdp:1.88, over:1.85, under:1.95 } },
+  { id:'vol3', league:'FIVB Nations League',       homeTeam:'Brazil',           awayTeam:'Poland',        startTime:'Tomorrow 16:00', markets:{ home:1.65, away:2.15, hdp:1.88, over:1.80, under:2.00 } },
+  { id:'vol4', league:'FIVB Nations League',       homeTeam:'USA',              awayTeam:'France',        startTime:'Tomorrow 18:00', markets:{ home:1.60, away:2.25, hdp:1.88, over:1.85, under:1.95 } },
+];
+
+const iceHockeyMatches = [
+  { id:'ih1', league:'NHL Playoffs · Conference Final', homeTeam:'Florida Panthers', awayTeam:'NY Rangers',   startTime:'Today 02:00', markets:{ home:1.80, draw:4.50, away:2.00 } },
+  { id:'ih2', league:'NHL Playoffs · Conference Final', homeTeam:'Edmonton Oilers',  awayTeam:'Dallas Stars', startTime:'Today 03:00', markets:{ home:2.05, draw:4.20, away:1.75 } },
+  { id:'ih3', league:'KHL · Playoff',                   homeTeam:'CSKA Moscow',      awayTeam:'SKA St. Pete', startTime:'Tomorrow 18:00', markets:{ home:1.70, draw:4.60, away:2.10 } },
+  { id:'ih4', league:'NHL Regular',                     homeTeam:'Boston Bruins',    awayTeam:'Toronto Leafs',startTime:'Tomorrow 01:00', markets:{ home:1.75, draw:4.40, away:2.05 } },
 ];
 </script>
 
@@ -1235,6 +1398,40 @@ const uplMatches = [
     font-size: 12px; font-weight: 600; border: 1px solid #e6e7eb;
     border-radius: 8px; cursor: pointer;
   }
+  .dt-bs__mybets-count {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: #c026d3; color: #fff; font-size: 9px; font-weight: 800;
+    border-radius: 8px; padding: 1px 5px; margin-left: 4px; line-height: 1.4;
+  }
+
+  /* My Bets list */
+  .dt-mybets-list { padding: 8px 10px; display: flex; flex-direction: column; gap: 8px; }
+  .dt-mybet {
+    border: 1px solid #f0f0f4; border-radius: 8px; overflow: hidden;
+    font-size: 11px;
+  }
+  .dt-mybet__head {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 10px; background: #f5f6f9; border-bottom: 1px solid #f0f0f4;
+  }
+  .dt-mybet__date { color: #6a6f7a; font-size: 10px; }
+  .dt-mybet__status {
+    font-size: 9px; font-weight: 800; text-transform: uppercase;
+    border-radius: 4px; padding: 2px 6px;
+  }
+  .dt-mybet__status--pending { background: #fff3cd; color: #856404; }
+  .dt-mybet__status--won     { background: #d1fae5; color: #065f46; }
+  .dt-mybet__status--lost    { background: #fee2e2; color: #991b1b; }
+  .dt-mybet__sel { padding: 6px 10px; border-bottom: 1px solid #f5f6f9; }
+  .dt-mybet__sel-team { font-weight: 600; color: #292a33; margin-bottom: 2px; }
+  .dt-mybet__sel-row { display: flex; justify-content: space-between; }
+  .dt-mybet__sel-mkt { color: #6a6f7a; }
+  .dt-mybet__sel-odds { font-weight: 700; color: #c026d3; }
+  .dt-mybet__footer {
+    display: flex; justify-content: space-between;
+    padding: 6px 10px; background: #fafafa; font-size: 10px; color: #6a6f7a;
+  }
+  .dt-mybet__footer .win { color: #10a310; }
 
   /* Promotions */
   .dt-promo {

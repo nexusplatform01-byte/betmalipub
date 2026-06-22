@@ -19,6 +19,18 @@ export const useAppStore = defineStore("app", () => {
     market: string;
   }
 
+  interface PlacedBet {
+    id: string;
+    date: string;
+    selections: { team: string; market: string; odds: number }[];
+    stake: number;
+    totalOdds: number;
+    potentialWin: number;
+    status: "pending" | "won" | "lost";
+  }
+
+  const myBets = ref<PlacedBet[]>([]);
+
   function login(phone: string, name?: string) {
     isLoggedIn.value = true;
     balance.value = 50000;
@@ -51,6 +63,18 @@ export const useAppStore = defineStore("app", () => {
     }
   }
 
+  function saveBet(selections: BetItem[], stake: number, totalOdds: number) {
+    myBets.value.unshift({
+      id: `bet_${Date.now()}`,
+      date: new Date().toLocaleString("en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }),
+      selections: selections.map((s) => ({ team: s.team, market: s.market, odds: s.odds })),
+      stake,
+      totalOdds: Number(totalOdds.toFixed(2)),
+      potentialWin: Math.round(stake * totalOdds),
+      status: "pending",
+    });
+  }
+
   return {
     isLoggedIn,
     balance,
@@ -59,6 +83,7 @@ export const useAppStore = defineStore("app", () => {
     userName,
     betslip,
     activeSport,
+    myBets,
     sportsMenu,
     liveMatches,
     topMatches,
@@ -68,5 +93,6 @@ export const useAppStore = defineStore("app", () => {
     deposit,
     withdraw,
     addToBetslip,
+    saveBet,
   };
 });

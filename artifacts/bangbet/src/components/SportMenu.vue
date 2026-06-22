@@ -4,7 +4,7 @@
       v-for="item in store.sportsMenu"
       :key="item.id"
       class="sport-menu__item"
-      :class="{ active: activeName === item.name }"
+      :class="{ active: store.activeSport === item.name }"
       @click="select(item)"
     >
       <div class="sport-menu__icon-wrap">
@@ -21,11 +21,20 @@
 import { useAppStore } from "@/stores/app";
 import { useRouter } from "vue-router";
 
-const props = defineProps<{ activeName?: string }>();
 const store = useAppStore();
 const router = useRouter();
 
+const FILTER_SPORTS = new Set([
+  "Football", "World Cup", "Basketball", "Tennis", "Table Tennis",
+  "Ice Hockey", "Volleyball", "Handball", "Rugby", "Baseball",
+  "Am.Football", "Darts", "Cricket",
+]);
+
 function select(item: { name: string; route: string }) {
-  router.push(item.route);
+  if (FILTER_SPORTS.has(item.name)) {
+    store.activeSport = item.name;
+  } else {
+    router.push(item.route);
+  }
 }
 </script>
