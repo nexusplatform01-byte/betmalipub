@@ -14,6 +14,8 @@ const router = createRouter({
     { path: "/pick12", name: "pick12", component: () => import("@/views/Pick12View.vue") },
     { path: "/match/:id", name: "match", component: () => import("@/views/MatchDetailView.vue") },
     { path: "/profile", name: "profile", component: () => import("@/views/UserProfileView.vue") },
+    { path: "/results", name: "results", component: () => import("@/views/ResultsView.vue") },
+    { path: "/results/:id", name: "result-detail", component: () => import("@/views/ResultDetailView.vue") },
   ],
   scrollBehavior: () => ({ top: 0 }),
 });

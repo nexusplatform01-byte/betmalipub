@@ -941,8 +941,7 @@ const desktopNavTabs = [
   { label: 'Casino',     icon: '🎰', route: '/casino' },
   { label: 'Jackpot',    icon: '🏆', route: '/jackpot' },
   { label: 'Virtuals',   icon: '🎮', route: '/sports/virtuals' },
-  { label: 'Statistics', icon: '📊', route: null },
-  { label: 'Results',    icon: '📋', route: null },
+  { label: 'Results',    icon: '📋', route: '/results' },
 ];
 
 const sidebarSports = [
