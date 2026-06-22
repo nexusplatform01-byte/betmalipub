@@ -12,7 +12,7 @@ version = "1.0.0"
 [[services]]
 name = "web"
 paths = [ "/" ]
-localPort = 5173
+localPort = 25562
 
 [services.development]
 run = "pnpm --filter @workspace/bangbet run dev"
@@ -27,5 +27,5 @@ from = "/*"
 to = "/index.html"
 
 [services.env]
-PORT = "5173"
+PORT = "25562"
 BASE_PATH = "/"
