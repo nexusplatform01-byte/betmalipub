@@ -46,6 +46,54 @@
             <span class="dt-sidebar__item-name">{{ l.name }}</span>
           </button>
         </div>
+
+        <div class="dt-sidebar__section">
+          <div class="dt-sidebar__head">🔥 More Sports</div>
+          <button v-for="s in moreSports" :key="s.name" class="dt-sidebar__item">
+            <span class="dt-sidebar__league-flag">{{ s.icon }}</span>
+            <span class="dt-sidebar__item-name">{{ s.name }}</span>
+            <span class="dt-sidebar__item-count">{{ s.count }}</span>
+          </button>
+        </div>
+
+        <div class="dt-sidebar__section">
+          <div class="dt-sidebar__head">🏟 Competitions</div>
+          <button v-for="c in popularComps" :key="c.name" class="dt-sidebar__item">
+            <span class="dt-sidebar__league-flag">{{ c.flag }}</span>
+            <span class="dt-sidebar__item-name">{{ c.name }}</span>
+            <span v-if="c.live" class="dt-sidebar__live-chip">LIVE</span>
+          </button>
+        </div>
+
+        <div class="dt-sidebar__section">
+          <div class="dt-sidebar__head">⚡ Quick Links</div>
+          <RouterLink to="/casino" class="dt-sidebar__item dt-sidebar__item--link">
+            <span class="dt-sidebar__league-flag">🎰</span>
+            <span class="dt-sidebar__item-name">Casino Games</span>
+          </RouterLink>
+          <RouterLink to="/jackpot" class="dt-sidebar__item dt-sidebar__item--link">
+            <span class="dt-sidebar__league-flag">🏆</span>
+            <span class="dt-sidebar__item-name">Jackpot</span>
+          </RouterLink>
+          <RouterLink to="/sports/virtuals" class="dt-sidebar__item dt-sidebar__item--link">
+            <span class="dt-sidebar__league-flag">🎮</span>
+            <span class="dt-sidebar__item-name">Virtual Sports</span>
+          </RouterLink>
+          <RouterLink to="/promotions" class="dt-sidebar__item dt-sidebar__item--link">
+            <span class="dt-sidebar__league-flag">🎁</span>
+            <span class="dt-sidebar__item-name">Promotions</span>
+          </RouterLink>
+        </div>
+
+        <div class="dt-sidebar__resp">
+          <div class="dt-sidebar__resp-title">🛡 Responsible Gaming</div>
+          <p class="dt-sidebar__resp-text">Bet within your limits. 18+ only.</p>
+          <div class="dt-sidebar__resp-logos">
+            <span class="dt-sidebar__resp-badge">18+</span>
+            <span class="dt-sidebar__resp-badge">NGB</span>
+            <span class="dt-sidebar__resp-badge">GamCare</span>
+          </div>
+        </div>
       </aside>
 
       <!-- CENTER CONTENT -->
@@ -256,7 +304,7 @@
           <div class="dt-livescores__head">
             <span class="live-dot"></span> Live Scores
           </div>
-          <div v-for="m in store.liveMatches.slice(0,3)" :key="m.id" class="dt-livescores__row" @click="openMatch(m)">
+          <div v-for="m in store.liveMatches" :key="m.id" class="dt-livescores__row" @click="openMatch(m)">
             <div class="dt-livescores__teams">
               <span>{{ m.homeTeam }}</span>
               <span>{{ m.awayTeam }}</span>
@@ -267,6 +315,77 @@
             </div>
             <span class="dt-livescores__min">{{ m.minute }}'</span>
           </div>
+        </div>
+
+        <!-- Today's Tips widget -->
+        <div class="dt-tips">
+          <div class="dt-tips__head">🎯 Today's Tips</div>
+          <div v-for="t in todaysTips" :key="t.match" class="dt-tips__item">
+            <div class="dt-tips__match">{{ t.match }}</div>
+            <div class="dt-tips__row">
+              <span class="dt-tips__pick">{{ t.pick }}</span>
+              <span class="dt-tips__odds">{{ t.odds }}</span>
+            </div>
+            <div class="dt-tips__confidence">
+              <span class="dt-tips__conf-label">Confidence</span>
+              <div class="dt-tips__conf-bar">
+                <div class="dt-tips__conf-fill" :style="{ width: t.confidence + '%', background: t.confidence >= 75 ? '#10a310' : t.confidence >= 55 ? '#f59e0b' : '#e04040' }"></div>
+              </div>
+              <span class="dt-tips__conf-pct">{{ t.confidence }}%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Results widget -->
+        <div class="dt-results">
+          <div class="dt-results__head">📋 Recent Results</div>
+          <div v-for="r in recentResults" :key="r.match" class="dt-results__item">
+            <div class="dt-results__teams">
+              <span>{{ r.home }}</span>
+              <span class="dt-results__score-box">{{ r.score }}</span>
+              <span>{{ r.away }}</span>
+            </div>
+            <div class="dt-results__meta">{{ r.league }} · {{ r.time }}</div>
+          </div>
+        </div>
+
+        <!-- Casino Highlights widget -->
+        <div class="dt-casino-widget">
+          <div class="dt-casino-widget__head">🎰 Casino Highlights</div>
+          <div v-for="g in casinoHighlights" :key="g.name" class="dt-casino-widget__item" @click="$router.push('/casino')">
+            <span class="dt-casino-widget__emoji">{{ g.emoji }}</span>
+            <div class="dt-casino-widget__info">
+              <div class="dt-casino-widget__name">{{ g.name }}</div>
+              <div class="dt-casino-widget__players">{{ g.players }} playing now</div>
+            </div>
+            <span class="dt-casino-widget__hot" v-if="g.hot">🔥</span>
+          </div>
+          <button class="dt-casino-widget__cta" @click="$router.push('/casino')">Play Casino →</button>
+        </div>
+
+        <!-- Jackpot countdown widget -->
+        <div class="dt-jackpot-widget">
+          <div class="dt-jackpot-widget__head">🏆 Next Jackpot Draw</div>
+          <div class="dt-jackpot-widget__prize">UGX 856,241,380</div>
+          <div class="dt-jackpot-widget__label">Gold Jackpot Pool</div>
+          <div class="dt-jackpot-widget__timer">
+            <div class="dt-jackpot-widget__unit"><span class="dt-jackpot-widget__num">02</span><span class="dt-jackpot-widget__lbl">HRS</span></div>
+            <span class="dt-jackpot-widget__sep">:</span>
+            <div class="dt-jackpot-widget__unit"><span class="dt-jackpot-widget__num">37</span><span class="dt-jackpot-widget__lbl">MIN</span></div>
+            <span class="dt-jackpot-widget__sep">:</span>
+            <div class="dt-jackpot-widget__unit"><span class="dt-jackpot-widget__num">14</span><span class="dt-jackpot-widget__lbl">SEC</span></div>
+          </div>
+          <button class="dt-jackpot-widget__btn" @click="$router.push('/jackpot')">Join Jackpot</button>
+        </div>
+
+        <!-- App Download Banner -->
+        <div class="dt-app-banner">
+          <div class="dt-app-banner__icon">📱</div>
+          <div class="dt-app-banner__text">
+            <div class="dt-app-banner__title">Get the Bangbet App</div>
+            <div class="dt-app-banner__sub">Bet anytime, anywhere</div>
+          </div>
+          <button class="dt-app-banner__btn">Download</button>
         </div>
       </aside>
     </div>
@@ -409,6 +528,50 @@ const promos = [
   { icon: '⚡', title: 'Live Betting Boost',   sub: 'Extra 5% on winnings' },
   { icon: '🏆', title: 'Weekly Jackpot',        sub: 'Win UGX 50,000,000' },
 ];
+
+const moreSports = [
+  { icon: '🏐', name: 'Handball',        count: 12 },
+  { icon: '🏉', name: 'Rugby',           count: 8  },
+  { icon: '🥊', name: 'Boxing / MMA',   count: 5  },
+  { icon: '⛳', name: 'Golf',            count: 3  },
+  { icon: '🏏', name: 'Table Tennis',   count: 22 },
+  { icon: '🎱', name: 'Snooker',        count: 7  },
+  { icon: '🏈', name: 'Am. Football',   count: 6  },
+  { icon: '🏇', name: 'Horse Racing',   count: 14 },
+];
+
+const popularComps = [
+  { flag: '🇺🇬', name: 'Uganda Premier League', live: true  },
+  { flag: '🇪🇺', name: 'UEFA Europa League',    live: true  },
+  { flag: '🇧🇷', name: 'Brasileirão',            live: false },
+  { flag: '🇫🇷', name: 'Ligue 1',               live: false },
+  { flag: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', name: 'Scottish Premiership',  live: false },
+  { flag: '🌍', name: 'AFCON Qualifiers',        live: true  },
+  { flag: '🌎', name: 'CONCACAF Nations',        live: false },
+];
+
+const todaysTips = [
+  { match: 'Arsenal vs Chelsea',        pick: 'Arsenal Win',  odds: '1.85', confidence: 78 },
+  { match: 'Real Madrid vs Atletico',   pick: 'Both Score',   odds: '1.72', confidence: 65 },
+  { match: 'Man City vs Liverpool',     pick: 'Over 2.5',     odds: '1.64', confidence: 82 },
+  { match: 'AC Milan vs Inter',         pick: 'Draw',         odds: '3.10', confidence: 51 },
+];
+
+const recentResults = [
+  { home: 'KCCA FC',   score: '2 - 1', away: 'Express FC', league: 'UPL',      time: 'FT' },
+  { home: 'Barcelona', score: '3 - 0', away: 'Sevilla',    league: 'La Liga',  time: 'FT' },
+  { home: 'Bayern',    score: '1 - 1', away: 'Dortmund',   league: 'Bundesliga', time: 'FT' },
+  { home: 'PSG',       score: '4 - 1', away: 'Lyon',       league: 'Ligue 1',  time: 'FT' },
+  { home: 'Juventus',  score: '0 - 2', away: 'Napoli',     league: 'Serie A',  time: 'FT' },
+];
+
+const casinoHighlights = [
+  { emoji: '🎰', name: 'Mega Fortune Slots',  players: '1,240', hot: true  },
+  { emoji: '🃏', name: 'Live Blackjack VIP',  players: '876',   hot: false },
+  { emoji: '🎡', name: 'Lightning Roulette',  players: '2,105', hot: true  },
+  { emoji: '🎲', name: 'Crash Multiplier',    players: '3,421', hot: true  },
+  { emoji: '🎴', name: 'Teen Patti Live',     players: '598',   hot: false },
+];
 </script>
 
 <style scoped>
@@ -491,7 +654,11 @@ const promos = [
     border-radius: 10px;
     box-shadow: 0 1px 6px rgba(0,0,0,.08);
     margin: 10px 0 10px 8px;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: sticky;
+    top: 8px;
+    max-height: calc(100vh - 80px);
   }
   .dt-sidebar__search {
     display: flex; align-items: center; gap: 8px;
@@ -706,6 +873,11 @@ const promos = [
     gap: 10px;
     background: transparent;
     padding: 10px 8px 10px 0;
+    position: sticky;
+    top: 8px;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
   /* Betslip panel */
@@ -845,6 +1017,191 @@ const promos = [
   }
   :deep(.header__logo) {
     height: 36px;
+  }
+
+  /* ── LEFT SIDEBAR: live chip ── */
+  .dt-sidebar__live-chip {
+    font-size: 8px; font-weight: 800; color: #fff;
+    background: #e04040; border-radius: 4px; padding: 1px 4px;
+    letter-spacing: .4px; flex-shrink: 0;
+  }
+  .dt-sidebar__item--link { color: #444; }
+
+  /* ── LEFT SIDEBAR: responsible gaming block ── */
+  .dt-sidebar__resp {
+    margin: 8px 10px 12px;
+    background: #f5f6f9;
+    border-radius: 8px;
+    padding: 10px 12px;
+    border: 1px solid #e6e7eb;
+  }
+  .dt-sidebar__resp-title {
+    font-size: 10px; font-weight: 800; color: #6a6f7a;
+    text-transform: uppercase; letter-spacing: .6px; margin-bottom: 4px;
+  }
+  .dt-sidebar__resp-text {
+    font-size: 10px; color: #9599a4; margin: 0 0 8px; line-height: 1.4;
+  }
+  .dt-sidebar__resp-logos {
+    display: flex; gap: 5px; flex-wrap: wrap;
+  }
+  .dt-sidebar__resp-badge {
+    font-size: 9px; font-weight: 800; color: #6a6f7a;
+    border: 1.5px solid #d0d2db; border-radius: 4px;
+    padding: 2px 6px; background: #fff;
+  }
+
+  /* ── RIGHT: Today's Tips ── */
+  .dt-tips {
+    background: #fff; border-radius: 10px;
+    overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,.06);
+  }
+  .dt-tips__head {
+    font-size: 11px; font-weight: 800; color: #292a33;
+    padding: 10px 14px; border-bottom: 1px solid #f0f0f4;
+    text-transform: uppercase; letter-spacing: .5px;
+  }
+  .dt-tips__item {
+    padding: 9px 14px; border-bottom: 1px solid #f5f6f9;
+  }
+  .dt-tips__item:last-child { border-bottom: none; }
+  .dt-tips__match { font-size: 11px; font-weight: 700; color: #292a33; margin-bottom: 4px; }
+  .dt-tips__row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+  .dt-tips__pick {
+    font-size: 10px; color: #c026d3; font-weight: 700;
+    background: rgba(192,38,211,0.08); border-radius: 4px; padding: 2px 6px;
+  }
+  .dt-tips__odds {
+    font-size: 13px; font-weight: 800; color: #292a33;
+  }
+  .dt-tips__confidence {
+    display: flex; align-items: center; gap: 6px;
+  }
+  .dt-tips__conf-label { font-size: 9px; color: #9599a4; white-space: nowrap; }
+  .dt-tips__conf-bar {
+    flex: 1; height: 4px; background: #eee; border-radius: 2px; overflow: hidden;
+  }
+  .dt-tips__conf-fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
+  .dt-tips__conf-pct { font-size: 9px; font-weight: 700; color: #6a6f7a; white-space: nowrap; }
+
+  /* ── RIGHT: Recent Results ── */
+  .dt-results {
+    background: #fff; border-radius: 10px;
+    overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,.06);
+  }
+  .dt-results__head {
+    font-size: 11px; font-weight: 800; color: #292a33;
+    padding: 10px 14px; border-bottom: 1px solid #f0f0f4;
+    text-transform: uppercase; letter-spacing: .5px;
+  }
+  .dt-results__item {
+    padding: 7px 14px; border-bottom: 1px solid #f5f6f9;
+  }
+  .dt-results__item:last-child { border-bottom: none; }
+  .dt-results__teams {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 11px; font-weight: 700; color: #292a33; gap: 6px;
+  }
+  .dt-results__score-box {
+    background: #1e1f28; color: #fff;
+    font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .dt-results__meta { font-size: 9px; color: #9599a4; margin-top: 2px; }
+
+  /* ── RIGHT: Casino Highlights ── */
+  .dt-casino-widget {
+    background: #fff; border-radius: 10px;
+    overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,.06);
+  }
+  .dt-casino-widget__head {
+    font-size: 11px; font-weight: 800; color: #292a33;
+    padding: 10px 14px; border-bottom: 1px solid #f0f0f4;
+    text-transform: uppercase; letter-spacing: .5px;
+  }
+  .dt-casino-widget__item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 14px; border-bottom: 1px solid #f5f6f9;
+    cursor: pointer; transition: background 0.12s;
+  }
+  .dt-casino-widget__item:hover { background: #fafbfc; }
+  .dt-casino-widget__emoji { font-size: 18px; flex-shrink: 0; }
+  .dt-casino-widget__info { flex: 1; }
+  .dt-casino-widget__name { font-size: 11px; font-weight: 700; color: #292a33; }
+  .dt-casino-widget__players { font-size: 9px; color: #9599a4; margin-top: 1px; }
+  .dt-casino-widget__hot { font-size: 13px; flex-shrink: 0; }
+  .dt-casino-widget__cta {
+    display: block; width: calc(100% - 28px); margin: 10px 14px;
+    padding: 9px; background: linear-gradient(90deg, #1e1f28, #2d2e3d);
+    color: #fff; font-size: 12px; font-weight: 700; border: none;
+    border-radius: 7px; cursor: pointer; transition: opacity 0.15s; text-align: center;
+  }
+  .dt-casino-widget__cta:hover { opacity: 0.85; }
+
+  /* ── RIGHT: Jackpot Countdown ── */
+  .dt-jackpot-widget {
+    background: linear-gradient(135deg, #1e1f28 0%, #2d1a3a 100%);
+    border-radius: 10px; overflow: hidden;
+    box-shadow: 0 1px 6px rgba(0,0,0,.15);
+    padding: 14px; text-align: center;
+  }
+  .dt-jackpot-widget__head {
+    font-size: 10px; font-weight: 800; color: #d4a843;
+    text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px;
+  }
+  .dt-jackpot-widget__prize {
+    font-size: 16px; font-weight: 900; color: #f5c842;
+    margin-bottom: 2px; line-height: 1.2;
+  }
+  .dt-jackpot-widget__label {
+    font-size: 9px; color: #9599a4; margin-bottom: 10px;
+  }
+  .dt-jackpot-widget__timer {
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+    margin-bottom: 12px;
+  }
+  .dt-jackpot-widget__unit {
+    display: flex; flex-direction: column; align-items: center;
+    background: rgba(255,255,255,0.08); border-radius: 6px; padding: 5px 8px;
+    min-width: 38px;
+  }
+  .dt-jackpot-widget__num { font-size: 18px; font-weight: 900; color: #fff; line-height: 1; }
+  .dt-jackpot-widget__lbl { font-size: 8px; color: #9599a4; font-weight: 700; letter-spacing: .4px; margin-top: 2px; }
+  .dt-jackpot-widget__sep { font-size: 18px; font-weight: 900; color: #f5c842; margin-bottom: 10px; }
+  .dt-jackpot-widget__btn {
+    display: block; width: 100%; padding: 10px;
+    background: linear-gradient(90deg, #d4a843, #f5c842);
+    color: #1e1f28; font-size: 13px; font-weight: 800; border: none;
+    border-radius: 7px; cursor: pointer; transition: opacity 0.15s;
+  }
+  .dt-jackpot-widget__btn:hover { opacity: 0.9; }
+
+  /* ── RIGHT: App Download Banner ── */
+  .dt-app-banner {
+    background: linear-gradient(135deg, #c026d3, #7c3aed);
+    border-radius: 10px; padding: 12px 14px;
+    display: flex; align-items: center; gap: 10px;
+    box-shadow: 0 1px 6px rgba(192,38,211,0.25);
+  }
+  .dt-app-banner__icon { font-size: 24px; flex-shrink: 0; }
+  .dt-app-banner__text { flex: 1; }
+  .dt-app-banner__title { font-size: 12px; font-weight: 800; color: #fff; }
+  .dt-app-banner__sub { font-size: 10px; color: rgba(255,255,255,0.75); margin-top: 1px; }
+  .dt-app-banner__btn {
+    background: #fff; color: #c026d3;
+    font-size: 11px; font-weight: 800; border: none;
+    border-radius: 6px; padding: 6px 10px; cursor: pointer;
+    white-space: nowrap; flex-shrink: 0;
+    transition: opacity 0.15s;
+  }
+  .dt-app-banner__btn:hover { opacity: 0.9; }
+
+  /* make both sidebars stretch full height */
+  .dt-sidebar {
+    align-self: stretch;
+  }
+  .dt-right {
+    align-self: stretch;
   }
 }
 </style>
