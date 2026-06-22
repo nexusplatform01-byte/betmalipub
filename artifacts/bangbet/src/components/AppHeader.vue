@@ -17,14 +17,15 @@
     <div class="header__user" v-else>
       <button class="header__wallet-btn header__wallet-btn--minus" @click="doWithdraw" title="Withdraw">−</button>
 
-      <div class="header__balance-wrap">
-        <span class="header__balance-label">Balance</span>
-        <span class="header__balance-amount">{{ store.currency }} {{ store.balance.toLocaleString() }}</span>
+      <div class="header__pill">
+        <div class="header__pill-avatar">{{ initials }}</div>
+        <div class="header__pill-text">
+          <span class="header__pill-label">Balance</span>
+          <span class="header__pill-amount">{{ store.currency }} {{ store.balance.toLocaleString() }}</span>
+        </div>
       </div>
 
       <button class="header__wallet-btn header__wallet-btn--plus" @click="doDeposit" title="Deposit">+</button>
-
-      <div class="header__avatar" :title="store.userName">{{ initials }}</div>
     </div>
   </header>
 </template>
@@ -89,25 +90,53 @@ function doWithdraw() {
   margin-left: auto;
 }
 
-.header__balance-wrap {
+/* Gold pill */
+.header__pill {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: #ffe60f;
+  border-radius: 999px;
+  padding: 2px 10px 2px 2px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.18);
+  cursor: pointer;
+}
+
+.header__pill-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #16a34a;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: 7px;
+}
+
+.header__pill-text {
   display: flex;
   flex-direction: column;
-  align-items: center;
   line-height: 1.1;
 }
-.header__balance-label {
+.header__pill-label {
   font-size: 8px;
-  color: rgba(255,255,255,0.55);
+  color: rgba(0,0,0,0.5);
   text-transform: uppercase;
   letter-spacing: 0.4px;
+  font-weight: 600;
 }
-.header__balance-amount {
+.header__pill-amount {
   font-size: 12px;
   font-weight: 800;
-  color: #ffe60f;
+  color: #1c1e24;
   white-space: nowrap;
 }
 
+/* +/- buttons */
 .header__wallet-btn {
   width: 24px;
   height: 24px;
@@ -124,7 +153,6 @@ function doWithdraw() {
   transition: transform 0.15s, opacity 0.15s;
 }
 .header__wallet-btn:active { transform: scale(0.9); opacity: 0.8; }
-
 .header__wallet-btn--plus {
   background: #16a34a;
   color: #fff;
@@ -132,21 +160,5 @@ function doWithdraw() {
 .header__wallet-btn--minus {
   background: rgba(255,255,255,0.18);
   color: #fff;
-}
-
-.header__avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #ffe60f, #f59e0b);
-  color: #1c1e24;
-  font-size: 11px;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  cursor: pointer;
-  border: 2px solid rgba(255,255,255,0.25);
 }
 </style>
