@@ -856,9 +856,21 @@ import BannerSlider from "@/components/BannerSlider.vue";
 import MatchCard from "@/components/MatchCard.vue";
 import MatchDetailPanel from "@/components/MatchDetailPanel.vue";
 import { useAppStore } from "@/stores/app";
+import { useHomeMatches, leagueFlag } from "@/composables/useHomeMatches";
 
 const router = useRouter();
 const store = useAppStore();
+const {
+  wcMatches,
+  plMatches,
+  uclMatches,
+  uplMatches,
+  nbaMatches,
+  tennisMatches,
+  volleyMatches,
+  soccerMatches,
+  basketballMatches,
+} = useHomeMatches();
 const showBetslip = ref(false);
 const stakeAmount = ref<number | string>(1000);
 const selectedMatch = ref<any | null>(null);
@@ -935,34 +947,51 @@ function isDtSel(match: any, market: string) {
   return store.betslip.some(b => b.matchId === `${match.id}_${market}`);
 }
 
-const desktopNavTabs = [
+const desktopNavTabs = computed(() => [
   { label: 'Sportsbook', icon: '⚽', route: '/' },
-  { label: 'Live',       icon: '🔴', route: '/sports/Football', badge: '24' },
+  { label: 'Live',       icon: '🔴', route: '/sports/Football', badge: store.liveMatches.length ? String(store.liveMatches.length) : '' },
   { label: 'Casino',     icon: '🎰', route: '/casino' },
   { label: 'Jackpot',    icon: '🏆', route: '/jackpot' },
   { label: 'Virtuals',   icon: '🎮', route: '/virtuals' },
   { label: 'Results',    icon: '📋', route: '/results' },
-];
+]);
 
-const sidebarSports = [
-  { name: 'Football',    icon: '/images/icon/Icon_Football_40.svg',         route: '/sports/Football',   count: 251 },
-  { name: 'Basketball',  icon: '/images/icon/Icon_Basketball_40.svg',       route: '/sports/Basketball', count: 18  },
-  { name: 'Tennis',      icon: '/images/icon/Icon_Tennis_40.svg',           route: '/sports/Tennis',     count: 47  },
-  { name: 'Volleyball',  icon: '/images/icon/Icon_Volleyball_40.svg',       route: '/sports/Volleyball', count: 9   },
-  { name: 'Ice Hockey',  icon: '/images/icon/Icon_IceHockey_40.svg',        route: '/sports/Ice Hockey', count: 6   },
-  { name: 'Baseball',    icon: '/images/icon/Icon_Baseball_40.svg',         route: '/sports/Baseball',   count: 4   },
-  { name: 'Cricket',     icon: '/images/icon/Icon_Cricket_40.svg',          route: '/sports/Cricket',    count: 3   },
-];
+const SIDEBAR_SPORT_CODES = ['S','B','T','V','HB','BB','TT','SN','R','BO','MM','F1','IH','W','E','AF'];
+const sidebarSports = computed(() =>
+  store.sports?.length
+    ? store.sports
+        .filter((s) => SIDEBAR_SPORT_CODES.includes(s.id))
+        .sort((a, b) => SIDEBAR_SPORT_CODES.indexOf(a.id) - SIDEBAR_SPORT_CODES.indexOf(b.id))
+        .map((s) => ({ name: s.name, icon: s.icon, route: `/sports/${s.name}`, count: s.count }))
+    : [
+        { name: 'Football',   icon: 'https://www.topbet.ug/face/assets/sports-desk/sport_S.svg',  route: '/sports/Football',   count: 0 },
+        { name: 'Basketball', icon: 'https://www.topbet.ug/face/assets/sports-desk/sport_B.svg',  route: '/sports/Basketball', count: 0 },
+        { name: 'Tennis',     icon: 'https://www.topbet.ug/face/assets/sports-desk/sport_T.svg',  route: '/sports/Tennis',     count: 0 },
+      ]
+);
 
-const topLeagues = [
-  { name: 'UEFA Champions League', flag: '🇪🇺' },
-  { name: 'Premier League',        flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
-  { name: 'La Liga',               flag: '🇪🇸' },
-  { name: 'Serie A',               flag: '🇮🇹' },
-  { name: 'Bundesliga',            flag: '🇩🇪' },
-  { name: 'Uganda Premier League', flag: '🇺🇬' },
-  { name: 'FIFA World Cup',        flag: '🌍' },
-];
+const topLeagues = computed(() => {
+  const seen = new Set<string>();
+  const result: { name: string; flag: string }[] = [];
+  for (const m of store.topMatches) {
+    if (!seen.has(m.league) && m.league) {
+      seen.add(m.league);
+      result.push({ name: m.league, flag: leagueFlag(m.league) });
+    }
+  }
+  if (!result.length) {
+    return [
+      { name: 'FIFA World Cup 2026',     flag: '🌍' },
+      { name: 'UEFA Champions League',   flag: '🇪🇺' },
+      { name: 'Premier League',          flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
+      { name: 'La Liga',                 flag: '🇪🇸' },
+      { name: 'Serie A',                 flag: '🇮🇹' },
+      { name: 'Bundesliga',              flag: '🇩🇪' },
+      { name: 'Uganda Premier League',   flag: '🇺🇬' },
+    ];
+  }
+  return result.slice(0, 12);
+});
 
 const promos = [
   { icon: '💰', title: '100% First Deposit',   sub: 'Up to UGX 500,000' },
@@ -1014,59 +1043,6 @@ const casinoHighlights = [
   { emoji: '🎴', name: 'Teen Patti Live',     players: '598',   hot: false },
 ];
 
-const wcMatches = [
-  { id:'wc1', league:'FIFA World Cup 2026 · Group A', homeTeam:'Uganda',    awayTeam:'Morocco',    startTime:'Today 18:00', markets:{ home:4.50, draw:3.20, away:1.75 } },
-  { id:'wc2', league:'FIFA World Cup 2026 · Group B', homeTeam:'Senegal',   awayTeam:'Ghana',      startTime:'Today 20:30', markets:{ home:2.10, draw:3.00, away:3.20 } },
-  { id:'wc3', league:'FIFA World Cup 2026 · Group C', homeTeam:'Nigeria',   awayTeam:'Cameroon',   startTime:'Today 21:00', markets:{ home:1.95, draw:3.10, away:3.60 } },
-  { id:'wc4', league:'FIFA World Cup 2026 · Group D', homeTeam:'Egypt',     awayTeam:'Algeria',    startTime:'Tomorrow 17:00', markets:{ home:2.30, draw:2.90, away:2.80 } },
-  { id:'wc5', league:'FIFA World Cup 2026 · Group E', homeTeam:'Brazil',    awayTeam:'Argentina',  startTime:'Tomorrow 20:00', markets:{ home:2.05, draw:3.20, away:3.10 } },
-  { id:'wc6', league:'FIFA World Cup 2026 · Group F', homeTeam:'France',    awayTeam:'Germany',    startTime:'Tomorrow 21:00', markets:{ home:1.85, draw:3.40, away:3.80 } },
-];
-
-const plMatches = [
-  { id:'pl1', league:'Premier League · Matchday 38', homeTeam:'Man City',    awayTeam:'Arsenal',    startTime:'Today 14:00', markets:{ home:1.75, draw:3.60, away:4.20 } },
-  { id:'pl2', league:'Premier League · Matchday 38', homeTeam:'Liverpool',   awayTeam:'Chelsea',    startTime:'Today 14:00', markets:{ home:1.60, draw:3.80, away:5.00 } },
-  { id:'pl3', league:'Premier League · Matchday 38', homeTeam:'Tottenham',   awayTeam:'Man Utd',    startTime:'Today 16:30', markets:{ home:1.90, draw:3.40, away:3.80 } },
-  { id:'pl4', league:'Premier League · Matchday 38', homeTeam:'Everton',     awayTeam:'Aston Villa',startTime:'Today 16:30', markets:{ home:2.50, draw:3.10, away:2.60 } },
-  { id:'pl5', league:'Premier League · Matchday 38', homeTeam:'Brighton',    awayTeam:'Newcastle',  startTime:'Today 16:30', markets:{ home:2.20, draw:3.20, away:3.00 } },
-];
-
-const uclMatches = [
-  { id:'ucl1', league:'UEFA Champions League · QF', homeTeam:'Real Madrid',  awayTeam:'Bayern',     startTime:'Wed 21:00', markets:{ home:1.85, draw:3.50, away:3.90 } },
-  { id:'ucl2', league:'UEFA Champions League · QF', homeTeam:'PSG',          awayTeam:'Barcelona',  startTime:'Wed 21:00', markets:{ home:2.10, draw:3.20, away:3.30 } },
-  { id:'ucl3', league:'UEFA Champions League · QF', homeTeam:'Man City',     awayTeam:'Inter',      startTime:'Thu 21:00', markets:{ home:1.70, draw:3.70, away:4.50 } },
-  { id:'ucl4', league:'UEFA Champions League · QF', homeTeam:'Atletico',     awayTeam:'Dortmund',   startTime:'Thu 21:00', markets:{ home:2.20, draw:3.10, away:3.00 } },
-];
-
-const nbaMatches = [
-  { id:'nba1', league:'NBA · Playoffs', homeTeam:'Lakers',    awayTeam:'Celtics',   startTime:'Today 02:30', markets:{ home:2.10, draw:null, away:1.70, hdp:1.88, over:1.85, under:1.95 } },
-  { id:'nba2', league:'NBA · Playoffs', homeTeam:'Warriors',  awayTeam:'Nets',      startTime:'Today 05:00', markets:{ home:1.65, draw:null, away:2.20, hdp:1.90, over:1.82, under:1.98 } },
-  { id:'nba3', league:'NBA · Playoffs', homeTeam:'Heat',      awayTeam:'Bucks',     startTime:'Today 05:30', markets:{ home:2.40, draw:null, away:1.55, hdp:1.92, over:1.88, under:1.92 } },
-  { id:'nba4', league:'NBA · Playoffs', homeTeam:'76ers',     awayTeam:'Raptors',   startTime:'Tomorrow 02:00', markets:{ home:1.80, draw:null, away:2.00, hdp:1.88, over:1.85, under:1.95 } },
-];
-
-const uplMatches = [
-  { id:'upl1', league:'Uganda Premier League · GW 28', homeTeam:'Vipers SC',     awayTeam:'KCCA FC',       startTime:'Sat 16:00', markets:{ home:1.95, draw:3.20, away:3.60 } },
-  { id:'upl2', league:'Uganda Premier League · GW 28', homeTeam:'SC Villa',      awayTeam:'Express FC',    startTime:'Sat 14:00', markets:{ home:2.30, draw:3.00, away:2.80 } },
-  { id:'upl3', league:'Uganda Premier League · GW 28', homeTeam:'Onduparaka',    awayTeam:'URA FC',        startTime:'Sun 14:00', markets:{ home:2.80, draw:2.90, away:2.40 } },
-  { id:'upl4', league:'Uganda Premier League · GW 28', homeTeam:'Police FC',     awayTeam:'BUL FC',        startTime:'Sun 16:00', markets:{ home:2.10, draw:3.10, away:3.20 } },
-  { id:'upl5', league:'Uganda Premier League · GW 28', homeTeam:'Wakiso Giants', awayTeam:'Mbarara City',  startTime:'Sun 16:00', markets:{ home:1.85, draw:3.30, away:3.80 } },
-];
-
-const tennisMatches = [
-  { id:'ten1', league:'ATP Roland Garros · R16', homeTeam:'Djokovic, N.',  awayTeam:'Alcaraz, C.',   startTime:'Today 13:00', markets:{ home:1.65, away:2.15, hdp:1.88, over:1.82, under:1.98 } },
-  { id:'ten2', league:'ATP Roland Garros · R16', homeTeam:'Sinner, J.',    awayTeam:'Zverev, A.',    startTime:'Today 15:30', markets:{ home:1.55, away:2.40, hdp:1.90, over:1.85, under:1.95 } },
-  { id:'ten3', league:'WTA Roland Garros · QF',  homeTeam:'Swiatek, I.',   awayTeam:'Gauff, C.',     startTime:'Today 17:00', markets:{ home:1.45, away:2.65, hdp:1.88, over:1.80, under:2.00 } },
-  { id:'ten4', league:'ATP Roland Garros · R16', homeTeam:'Medvedev, D.',  awayTeam:'Tsitsipas, S.', startTime:'Tomorrow 12:00', markets:{ home:1.80, away:1.95, hdp:1.90, over:1.88, under:1.92 } },
-  { id:'ten5', league:'ATP Challenger · Final',  homeTeam:'Norrie, C.',    awayTeam:'Wawrinka, S.',  startTime:'Tomorrow 14:00', markets:{ home:1.70, away:2.10, hdp:1.88, over:1.85, under:1.95 } },
-];
-
-const volleyMatches = [
-  { id:'vol1', league:'CEV Champions League · SF', homeTeam:'Lube Civitanova', awayTeam:'Zenit Kazan',   startTime:'Today 18:00', markets:{ home:1.75, away:2.00, hdp:1.88, over:1.82, under:1.98 } },
-  { id:'vol2', league:'CEV Champions League · SF', homeTeam:'Perugia',         awayTeam:'Trentino',      startTime:'Today 20:30', markets:{ home:1.90, away:1.85, hdp:1.88, over:1.85, under:1.95 } },
-  { id:'vol3', league:'FIVB Nations League',       homeTeam:'Brazil',           awayTeam:'Poland',        startTime:'Tomorrow 16:00', markets:{ home:1.65, away:2.15, hdp:1.88, over:1.80, under:2.00 } },
-  { id:'vol4', league:'FIVB Nations League',       homeTeam:'USA',              awayTeam:'France',        startTime:'Tomorrow 18:00', markets:{ home:1.60, away:2.25, hdp:1.88, over:1.85, under:1.95 } },
-];
 
 const iceHockeyMatches = [
   { id:'ih1', league:'NHL Playoffs · Conference Final', homeTeam:'Florida Panthers', awayTeam:'NY Rangers',   startTime:'Today 02:00', markets:{ home:1.80, draw:4.50, away:2.00 } },

@@ -1,6 +1,13 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import { sportsMenu, liveMatches, topMatches, promotions } from "./mockData";
+import { sportsMenu, promotions } from "./mockData";
+import {
+  fetchLiveEvents,
+  fetchTopMatches,
+  fetchAllSports,
+  type Match,
+  type SportCategory,
+} from "@/services/topbetApi";
 
 export const useAppStore = defineStore("app", () => {
   const isLoggedIn = ref(false);
@@ -31,6 +38,61 @@ export const useAppStore = defineStore("app", () => {
 
   const myBets = ref<PlacedBet[]>([]);
 
+  const liveMatches = ref<Match[]>([]);
+  const topMatches = ref<Match[]>([]);
+  const sports = ref<SportCategory[]>([]);
+  const liveSportsData = ref<any[]>([]);
+  const liveLoading = ref(false);
+  const topLoading = ref(false);
+  const sportsLoading = ref(false);
+
+  let liveTimer: ReturnType<typeof setInterval> | null = null;
+
+  async function loadLiveMatches() {
+    liveLoading.value = true;
+    try {
+      const { liveSports, matches } = await fetchLiveEvents();
+      liveMatches.value = matches;
+      liveSportsData.value = liveSports;
+    } catch (e) {
+      console.error("[Bangbet] live fetch error:", e);
+    } finally {
+      liveLoading.value = false;
+    }
+  }
+
+  async function loadTopMatches(sportCode = "S") {
+    topLoading.value = true;
+    try {
+      topMatches.value = await fetchTopMatches(sportCode);
+    } catch (e) {
+      console.error("[Bangbet] top matches fetch error:", e);
+    } finally {
+      topLoading.value = false;
+    }
+  }
+
+  async function loadSports() {
+    sportsLoading.value = true;
+    try {
+      sports.value = await fetchAllSports();
+    } catch (e) {
+      console.error("[Bangbet] sports fetch error:", e);
+    } finally {
+      sportsLoading.value = false;
+    }
+  }
+
+  function startLiveRefresh() {
+    if (liveTimer) return;
+    liveTimer = setInterval(loadLiveMatches, 30_000);
+  }
+
+  loadLiveMatches();
+  loadTopMatches("S");
+  loadSports();
+  startLiveRefresh();
+
   function login(phone: string, name?: string) {
     isLoggedIn.value = true;
     balance.value = 50000;
@@ -53,9 +115,9 @@ export const useAppStore = defineStore("app", () => {
   }
 
   function addToBetslip(item: BetItem) {
-    const sameSelection = betslip.value.findIndex((b) => b.matchId === item.matchId);
-    if (sameSelection !== -1) {
-      betslip.value.splice(sameSelection, 1);
+    const same = betslip.value.findIndex((b) => b.matchId === item.matchId);
+    if (same !== -1) {
+      betslip.value.splice(same, 1);
     } else {
       const idx = betslip.value.findIndex((b) => b.baseMatchId === item.baseMatchId);
       if (idx !== -1) betslip.value.splice(idx, 1);
@@ -66,7 +128,12 @@ export const useAppStore = defineStore("app", () => {
   function saveBet(selections: BetItem[], stake: number, totalOdds: number) {
     myBets.value.unshift({
       id: `bet_${Date.now()}`,
-      date: new Date().toLocaleString("en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }),
+      date: new Date().toLocaleString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
       selections: selections.map((s) => ({ team: s.team, market: s.market, odds: s.odds })),
       stake,
       totalOdds: Number(totalOdds.toFixed(2)),
@@ -88,11 +155,19 @@ export const useAppStore = defineStore("app", () => {
     liveMatches,
     topMatches,
     promotions,
+    sports,
+    liveSportsData,
+    liveLoading,
+    topLoading,
+    sportsLoading,
     login,
     logout,
     deposit,
     withdraw,
     addToBetslip,
     saveBet,
+    loadLiveMatches,
+    loadTopMatches,
+    loadSports,
   };
 });
