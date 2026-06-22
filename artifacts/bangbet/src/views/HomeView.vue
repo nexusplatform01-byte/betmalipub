@@ -933,11 +933,7 @@ const uplMatches = [
     border-radius: 10px;
     box-shadow: 0 1px 6px rgba(0,0,0,.08);
     margin: 10px 0 10px 8px;
-    overflow-x: hidden;
-    overflow-y: auto;
-    position: sticky;
-    top: 8px;
-    max-height: calc(100vh - 80px);
+    overflow: hidden;
   }
   .dt-sidebar__search {
     display: flex; align-items: center; gap: 8px;
@@ -1152,11 +1148,6 @@ const uplMatches = [
     gap: 10px;
     background: transparent;
     padding: 10px 8px 10px 0;
-    position: sticky;
-    top: 8px;
-    max-height: calc(100vh - 80px);
-    overflow-y: auto;
-    overflow-x: hidden;
   }
 
   /* Betslip panel */
