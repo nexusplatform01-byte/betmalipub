@@ -1,5 +1,5 @@
 <template>
-  <div class="page virt-page">
+  <div class="virt-page">
     <AppHeader />
 
     <!-- Top bar -->
@@ -35,112 +35,115 @@
           class="virt-col"
           :class="{ 'virt-col--active': activeCol === mi }"
         >
-          <!-- Match header -->
-          <div class="virt-col__hdr">
-            <span class="virt-col__num">#{{ match.id }}</span>
-            <div class="virt-col__teams">
-              <span class="virt-col__team">{{ match.home }}</span>
-              <span class="virt-col__vs">vs</span>
-              <span class="virt-col__team">{{ match.away }}</span>
+          <!-- Match card wrapper -->
+          <div class="virt-match-card">
+            <!-- Match header -->
+            <div class="virt-col__hdr">
+              <span class="virt-col__num">#{{ match.id }}</span>
+              <div class="virt-col__teams">
+                <span class="virt-col__team">{{ match.home }}</span>
+                <span class="virt-col__vs">vs</span>
+                <span class="virt-col__team">{{ match.away }}</span>
+              </div>
+            </div>
+
+            <!-- Full Time Result -->
+            <div class="virt-sec">FULL TIME RESULT</div>
+            <div class="virt-row virt-row--3">
+              <button
+                v-for="o in ftrOdds(match)"
+                :key="o.fk"
+                class="virt-odd"
+                :class="{ 'virt-odd--sel': isSel(match.id, o.fk) }"
+                @click="pick(match.id, o.gk, o.fk, `FT:${o.lbl}`, o.val)"
+              >
+                <span class="virt-odd__lbl">{{ o.lbl }}</span>
+                <span class="virt-odd__val">{{ o.val }}</span>
+              </button>
+            </div>
+
+            <!-- 1st Half Result -->
+            <div class="virt-sec">1ST HALF RESULT</div>
+            <div class="virt-row virt-row--3">
+              <button
+                v-for="o in htrOdds(match)"
+                :key="o.fk"
+                class="virt-odd"
+                :class="{ 'virt-odd--sel': isSel(match.id, o.fk) }"
+                @click="pick(match.id, o.gk, o.fk, `HT:${o.lbl}`, o.val)"
+              >
+                <span class="virt-odd__lbl">{{ o.lbl }}</span>
+                <span class="virt-odd__val">{{ o.val }}</span>
+              </button>
+            </div>
+
+            <!-- Total Goals -->
+            <div class="virt-sec">TOTAL GOALS</div>
+            <div v-for="pair in match.mkts.goalPairs" :key="pair[0].lbl" class="virt-row virt-row--2">
+              <button
+                v-for="o in pair" :key="`${match.id}_goal_${o.lbl}`"
+                class="virt-odd"
+                :class="{ 'virt-odd--sel': isSel(match.id, `${match.id}_goal_${o.lbl}`) }"
+                @click="pick(match.id, `${match.id}_goals_${o.line}`, `${match.id}_goal_${o.lbl}`, o.lbl, o.val)"
+              >
+                <span class="virt-odd__lbl">{{ o.lbl }}</span>
+                <span class="virt-odd__val">{{ o.val }}</span>
+              </button>
+            </div>
+
+            <!-- Correct Score -->
+            <div class="virt-sec">CORRECT SCORE</div>
+            <div class="virt-cs-grid">
+              <button
+                v-for="cs in match.mkts.cs" :key="`${match.id}_cs_${cs.score}`"
+                class="virt-odd virt-odd--cs"
+                :class="{ 'virt-odd--sel': isSel(match.id, `${match.id}_cs_${cs.score}`) }"
+                @click="pick(match.id, `${match.id}_cs`, `${match.id}_cs_${cs.score}`, cs.score, cs.val)"
+              >
+                <span class="virt-odd__score">{{ cs.score }}</span>
+                <span class="virt-odd__val">{{ cs.val }}</span>
+              </button>
+            </div>
+            <button
+              class="virt-odd virt-odd--full"
+              :class="{ 'virt-odd--sel': isSel(match.id, `${match.id}_cs_other`) }"
+              @click="pick(match.id, `${match.id}_cs`, `${match.id}_cs_other`, 'Any other', match.mkts.csOther)"
+            >
+              <span class="virt-odd__lbl">Any other result</span>
+              <span class="virt-odd__val">{{ match.mkts.csOther }}</span>
+            </button>
+
+            <!-- BTTS Full Time -->
+            <div class="virt-sec">BOTH TEAMS TO SCORE: FULL TIME</div>
+            <div class="virt-row virt-row--2">
+              <button
+                class="virt-odd"
+                :class="{ 'virt-odd--sel': isSel(match.id, `${match.id}_bttsft_y`) }"
+                @click="pick(match.id, `${match.id}_bttsft`, `${match.id}_bttsft_y`, 'BTTS Yes', match.mkts.bttsft.y)"
+              ><span class="virt-odd__lbl">Yes</span><span class="virt-odd__val">{{ match.mkts.bttsft.y }}</span></button>
+              <button
+                class="virt-odd"
+                :class="{ 'virt-odd--sel': isSel(match.id, `${match.id}_bttsft_n`) }"
+                @click="pick(match.id, `${match.id}_bttsft`, `${match.id}_bttsft_n`, 'BTTS No', match.mkts.bttsft.n)"
+              ><span class="virt-odd__lbl">No</span><span class="virt-odd__val">{{ match.mkts.bttsft.n }}</span></button>
+            </div>
+
+            <!-- BTTS 1st Half -->
+            <div class="virt-sec">BOTH TEAMS TO SCORE: 1ST HALF</div>
+            <div class="virt-row virt-row--2">
+              <button
+                class="virt-odd"
+                :class="{ 'virt-odd--sel': isSel(match.id, `${match.id}_bttshf_y`) }"
+                @click="pick(match.id, `${match.id}_bttshf`, `${match.id}_bttshf_y`, 'HT BTTS Yes', match.mkts.bttshf.y)"
+              ><span class="virt-odd__lbl">Yes</span><span class="virt-odd__val">{{ match.mkts.bttshf.y }}</span></button>
+              <button
+                class="virt-odd"
+                :class="{ 'virt-odd--sel': isSel(match.id, `${match.id}_bttshf_n`) }"
+                @click="pick(match.id, `${match.id}_bttshf`, `${match.id}_bttshf_n`, 'HT BTTS No', match.mkts.bttshf.n)"
+              ><span class="virt-odd__lbl">No</span><span class="virt-odd__val">{{ match.mkts.bttshf.n }}</span></button>
             </div>
           </div>
-
-          <!-- Full Time Result -->
-          <div class="virt-sec">FULL TIME RESULT</div>
-          <div class="virt-row virt-row--3">
-            <button
-              v-for="o in ftrOdds(match)"
-              :key="o.fk"
-              class="virt-odd"
-              :class="{ 'virt-odd--sel': isSel(o.fk) }"
-              @click="pick(o.gk, o.fk, `FT:${o.lbl}`, o.val, match.id)"
-            >
-              <span class="virt-odd__lbl">{{ o.lbl }}</span>
-              <span class="virt-odd__val">{{ o.val }}</span>
-            </button>
-          </div>
-
-          <!-- 1st Half Result -->
-          <div class="virt-sec">1ST HALF RESULT</div>
-          <div class="virt-row virt-row--3">
-            <button
-              v-for="o in htrOdds(match)"
-              :key="o.fk"
-              class="virt-odd"
-              :class="{ 'virt-odd--sel': isSel(o.fk) }"
-              @click="pick(o.gk, o.fk, `HT:${o.lbl}`, o.val, match.id)"
-            >
-              <span class="virt-odd__lbl">{{ o.lbl }}</span>
-              <span class="virt-odd__val">{{ o.val }}</span>
-            </button>
-          </div>
-
-          <!-- Total Goals -->
-          <div class="virt-sec">TOTAL GOALS</div>
-          <div v-for="pair in match.mkts.goalPairs" :key="pair[0].lbl" class="virt-row virt-row--2">
-            <button
-              v-for="o in pair" :key="`${match.id}_goal_${o.lbl}`"
-              class="virt-odd"
-              :class="{ 'virt-odd--sel': isSel(`${match.id}_goal_${o.lbl}`) }"
-              @click="pick(`${match.id}_goals_${o.line}`, `${match.id}_goal_${o.lbl}`, o.lbl, o.val, match.id)"
-            >
-              <span class="virt-odd__lbl">{{ o.lbl }}</span>
-              <span class="virt-odd__val">{{ o.val }}</span>
-            </button>
-          </div>
-
-          <!-- Correct Score -->
-          <div class="virt-sec">CORRECT SCORE</div>
-          <div class="virt-cs-grid">
-            <button
-              v-for="cs in match.mkts.cs" :key="`${match.id}_cs_${cs.score}`"
-              class="virt-odd virt-odd--cs"
-              :class="{ 'virt-odd--sel': isSel(`${match.id}_cs_${cs.score}`) }"
-              @click="pick(`${match.id}_cs`, `${match.id}_cs_${cs.score}`, cs.score, cs.val, match.id)"
-            >
-              <span class="virt-odd__score">{{ cs.score }}</span>
-              <span class="virt-odd__val">{{ cs.val }}</span>
-            </button>
-          </div>
-          <button
-            class="virt-odd virt-odd--full"
-            :class="{ 'virt-odd--sel': isSel(`${match.id}_cs_other`) }"
-            @click="pick(`${match.id}_cs`, `${match.id}_cs_other`, 'Any other', match.mkts.csOther, match.id)"
-          >
-            <span class="virt-odd__lbl">Any other result</span>
-            <span class="virt-odd__val">{{ match.mkts.csOther }}</span>
-          </button>
-
-          <!-- BTTS Full Time -->
-          <div class="virt-sec">BOTH TEAMS TO SCORE: FULL TIME</div>
-          <div class="virt-row virt-row--2">
-            <button
-              class="virt-odd"
-              :class="{ 'virt-odd--sel': isSel(`${match.id}_bttsft_y`) }"
-              @click="pick(`${match.id}_bttsft`, `${match.id}_bttsft_y`, 'BTTS Yes', match.mkts.bttsft.y, match.id)"
-            ><span class="virt-odd__lbl">Yes</span><span class="virt-odd__val">{{ match.mkts.bttsft.y }}</span></button>
-            <button
-              class="virt-odd"
-              :class="{ 'virt-odd--sel': isSel(`${match.id}_bttsft_n`) }"
-              @click="pick(`${match.id}_bttsft`, `${match.id}_bttsft_n`, 'BTTS No', match.mkts.bttsft.n, match.id)"
-            ><span class="virt-odd__lbl">No</span><span class="virt-odd__val">{{ match.mkts.bttsft.n }}</span></button>
-          </div>
-
-          <!-- BTTS 1st Half -->
-          <div class="virt-sec">BOTH TEAMS TO SCORE: 1ST HALF</div>
-          <div class="virt-row virt-row--2">
-            <button
-              class="virt-odd"
-              :class="{ 'virt-odd--sel': isSel(`${match.id}_bttshf_y`) }"
-              @click="pick(`${match.id}_bttshf`, `${match.id}_bttshf_y`, 'HT BTTS Yes', match.mkts.bttshf.y, match.id)"
-            ><span class="virt-odd__lbl">Yes</span><span class="virt-odd__val">{{ match.mkts.bttshf.y }}</span></button>
-            <button
-              class="virt-odd"
-              :class="{ 'virt-odd--sel': isSel(`${match.id}_bttshf_n`) }"
-              @click="pick(`${match.id}_bttshf`, `${match.id}_bttshf_n`, 'HT BTTS No', match.mkts.bttshf.n, match.id)"
-            ><span class="virt-odd__lbl">No</span><span class="virt-odd__val">{{ match.mkts.bttshf.n }}</span></button>
-          </div>
-
+          <!-- end virt-match-card -->
         </div>
       </div>
 
@@ -159,7 +162,7 @@
           </div>
         </div>
         <div v-show="sideTab === 'tracker'" class="virt-stream">
-          <div class="virt-stream__inner" style="font-size:11px;color:rgba(255,255,255,.45);text-align:center;padding:20px 10px;">
+          <div class="virt-stream__inner" style="font-size:11px;color:#aaa;text-align:center;padding:20px 10px;">
             Match tracker starts at kickoff
           </div>
         </div>
@@ -177,7 +180,7 @@
                 <div class="virt-bs__item-lbl">{{ e.label }}</div>
               </div>
               <span class="virt-bs__item-odds">{{ e.odds }}</span>
-              <button class="virt-bs__item-del" @click="removeSel(e.gk)">✕</button>
+              <button class="virt-bs__item-del" @click="removeSel(e.mid)">✕</button>
             </div>
             <div class="virt-bs__stake-row">
               <label class="virt-bs__stake-lbl">Stake (UGX)</label>
@@ -232,7 +235,7 @@
                   <div class="virt-bs__item-lbl">{{ e.label }}</div>
                 </div>
                 <span class="virt-bs__item-odds">{{ e.odds }}</span>
-                <button class="virt-bs__item-del" @click="removeSel(e.gk)">✕</button>
+                <button class="virt-bs__item-del" @click="removeSel(e.mid)">✕</button>
               </div>
               <div class="virt-bs__stake-row">
                 <label class="virt-bs__stake-lbl">Stake (UGX)</label>
@@ -372,28 +375,31 @@ function htrOdds(m: VirtMatch) {
   ];
 }
 
-// ─── Selection state ──────────────────────────────────────────────────────────
-interface SelEntry { label: string; odds: number; fullKey: string; mid: number; }
-const sels = reactive<Record<string, SelEntry>>({});
+// ─── Selection state — one pick per match ─────────────────────────────────────
+// keyed by match id, value = { label, odds, fullKey }
+interface SelEntry { label: string; odds: number; fullKey: string; mid: number; gk: string; }
+const sels = reactive<Record<number, SelEntry>>({});
 
-function pick(gk: string, fk: string, label: string, odds: number, mid: number) {
-  if (sels[gk]?.fullKey === fk) {
-    delete sels[gk];
+function pick(mid: number, gk: string, fk: string, label: string, odds: number) {
+  // Toggle off if same odd is tapped again
+  if (sels[mid]?.fullKey === fk) {
+    delete sels[mid];
   } else {
-    sels[gk] = { label, odds, fullKey: fk, mid };
+    // Replace any existing selection for this match with the new one
+    sels[mid] = { label, odds, fullKey: fk, mid, gk };
   }
 }
 
-function isSel(fk: string): boolean {
-  return Object.values(sels).some(v => v.fullKey === fk);
+function isSel(mid: number, fk: string): boolean {
+  return sels[mid]?.fullKey === fk;
 }
 
-function removeSel(gk: string) {
-  delete sels[gk];
+function removeSel(mid: number) {
+  delete sels[mid];
 }
 
 const slipEntries = computed(() =>
-  Object.entries(sels).map(([gk, v]) => ({ gk, ...v }))
+  Object.values(sels).map(v => ({ gk: v.gk, mid: v.mid, label: v.label, odds: v.odds }))
 );
 
 const totalOdds = computed(() =>
@@ -408,7 +414,7 @@ function placeVirtBet() {
   if (!store.isLoggedIn) { alert('Please login to place bets'); return; }
   if (store.balance < virtStake.value) { alert('Insufficient balance'); return; }
   store.withdraw(virtStake.value);
-  Object.keys(sels).forEach(k => delete sels[k]);
+  Object.keys(sels).forEach(k => delete (sels as Record<string, unknown>)[k]);
   showMobileSlip.value = false;
   alert('Virtual bet placed! Good luck! 🎉');
 }
@@ -437,9 +443,9 @@ onUnmounted(() => clearInterval(timer));
 <style scoped>
 /* ─── Page ─────────────────────────────────────────────────────────────────── */
 .virt-page {
-  background: #0d0e14;
+  background: #f2f3f7;
   min-height: 100vh;
-  color: #fff;
+  color: #1a1a2e;
 }
 
 /* ─── Top bar ───────────────────────────────────────────────────────────────── */
@@ -448,20 +454,20 @@ onUnmounted(() => clearInterval(timer));
   align-items: center;
   justify-content: space-between;
   padding: 8px 14px;
-  background: #0d0e14;
-  border-bottom: 1px solid rgba(255,255,255,.08);
+  background: #fff;
+  border-bottom: 1px solid #e8e9ef;
 }
 .virt-topbar__kick { display: flex; align-items: center; gap: 6px; }
-.virt-topbar__kick-lbl { font-size: 11px; color: rgba(255,255,255,.55); }
-.virt-topbar__kick-time { font-size: 15px; font-weight: 900; color: #d946ef; font-variant-numeric: tabular-nums; }
-.virt-topbar__title { font-size: 16px; font-weight: 900; color: #fff; letter-spacing: .5px; }
-.virt-topbar__note { font-size: 10px; color: rgba(255,255,255,.5); font-style: italic; text-align: right; }
+.virt-topbar__kick-lbl { font-size: 11px; color: #888; }
+.virt-topbar__kick-time { font-size: 15px; font-weight: 900; color: #c026d3; font-variant-numeric: tabular-nums; }
+.virt-topbar__title { font-size: 16px; font-weight: 900; color: #1a1a2e; letter-spacing: .5px; }
+.virt-topbar__note { font-size: 10px; color: #aaa; font-style: italic; text-align: right; }
 
 /* ─── Mobile match tabs ─────────────────────────────────────────────────────── */
 .virt-mtabs {
   display: flex;
-  background: #1c1e24;
-  border-bottom: 2px solid #d946ef;
+  background: #fff;
+  border-bottom: 2px solid #e8e9ef;
   overflow-x: auto;
 }
 .virt-mtab {
@@ -478,15 +484,17 @@ onUnmounted(() => clearInterval(timer));
   border-bottom: 3px solid transparent;
   transition: background .15s;
 }
-.virt-mtab--active { background: rgba(217,70,239,.12); border-bottom-color: #d946ef; }
-.virt-mtab__num { font-size: 9px; font-weight: 700; color: #ffe60f; }
-.virt-mtab__teams { font-size: 8.5px; color: rgba(255,255,255,.7); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
+.virt-mtab--active { background: rgba(192,38,211,.07); border-bottom-color: #c026d3; }
+.virt-mtab__num { font-size: 9px; font-weight: 700; color: #c026d3; }
+.virt-mtab__teams { font-size: 8.5px; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
 
 /* ─── Layout ────────────────────────────────────────────────────────────────── */
 .virt-layout {
   display: flex;
   min-height: 0;
   flex: 1;
+  padding: 10px 8px;
+  gap: 8px;
 }
 
 .virt-cols {
@@ -499,77 +507,110 @@ onUnmounted(() => clearInterval(timer));
 .virt-col { display: none; }
 .virt-col--active { display: block; }
 
-/* ─── Match column ──────────────────────────────────────────────────────────── */
+/* ─── Match card wrapper ─────────────────────────────────────────────────────── */
+.virt-match-card {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 1px 6px rgba(0,0,0,.07), 0 0 1px rgba(0,0,0,.06);
+  margin-bottom: 10px;
+}
+
+/* ─── Match column header ───────────────────────────────────────────────────── */
 .virt-col__hdr {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 12px;
-  background: #1c1e24;
-  border-bottom: 2px solid #d946ef;
-  position: sticky;
-  top: 0;
-  z-index: 5;
+  padding: 10px 14px;
+  background: #fff;
+  border-bottom: 1px solid #f0f1f5;
 }
-.virt-col__num { font-size: 12px; font-weight: 900; color: #ffe60f; flex-shrink: 0; }
+.virt-col__num { font-size: 12px; font-weight: 900; color: #c026d3; flex-shrink: 0; }
 .virt-col__teams { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
-.virt-col__team { font-size: 12px; font-weight: 800; color: #fff; }
-.virt-col__vs { font-size: 9px; color: rgba(255,255,255,.4); }
+.virt-col__team { font-size: 13px; font-weight: 800; color: #1a1a2e; }
+.virt-col__vs { font-size: 9px; color: #bbb; }
 
 /* ─── Section header ────────────────────────────────────────────────────────── */
 .virt-sec {
   font-size: 9px;
   font-weight: 800;
   letter-spacing: .6px;
-  color: rgba(255,255,255,.55);
-  background: #13141a;
-  padding: 5px 12px;
+  color: #999;
+  background: #f8f8fb;
+  padding: 5px 14px;
   text-align: center;
-  border-top: 1px solid rgba(255,255,255,.05);
-  border-bottom: 1px solid rgba(255,255,255,.05);
+  border-top: 1px solid #f0f1f5;
+  border-bottom: 1px solid #f0f1f5;
 }
 
 /* ─── Odds rows ─────────────────────────────────────────────────────────────── */
 .virt-row {
   display: grid;
-  gap: 1px;
-  background: rgba(255,255,255,.04);
-  padding: 2px;
+  gap: 6px;
+  padding: 8px 10px;
+  background: #fff;
 }
 .virt-row--3 { grid-template-columns: repeat(3, 1fr); }
 .virt-row--2 { grid-template-columns: repeat(2, 1fr); }
 
-/* ─── Odds button ───────────────────────────────────────────────────────────── */
+/* ─── Odds button — mobile style ────────────────────────────────────────────── */
 .virt-odd {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 7px 10px;
-  background: #1e2028;
-  border: none;
+  padding: 8px 11px;
+  background: #f5f6fa;
+  border: 1.5px solid #e8e9ef;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background .12s;
+  transition: background .12s, border-color .12s, transform .08s;
   gap: 4px;
-  min-height: 34px;
+  min-height: 38px;
+  position: relative;
 }
-.virt-odd:hover { background: #2a2c38; }
+.virt-odd:hover {
+  background: #ede8f8;
+  border-color: #c026d3;
+}
+.virt-odd:active { transform: scale(.97); }
 
 .virt-odd--sel {
-  background: linear-gradient(135deg, rgba(217,70,239,.25), rgba(162,28,175,.25));
-  border: 1px solid rgba(217,70,239,.5);
+  background: linear-gradient(135deg, #f3e8ff, #ede0fc);
+  border-color: #c026d3;
+  box-shadow: 0 0 0 1px rgba(192,38,211,.2);
 }
 
-.virt-odd__lbl { font-size: 11px; font-weight: 700; color: rgba(255,255,255,.7); }
-.virt-odd__val { font-size: 12px; font-weight: 900; color: #d946ef; }
-.virt-odd--sel .virt-odd__val { color: #f0a0ff; }
+.virt-odd__lbl {
+  font-size: 11px;
+  font-weight: 700;
+  color: #555;
+}
+.virt-odd__val {
+  font-size: 12px;
+  font-weight: 900;
+  color: #c026d3;
+}
+.virt-odd--sel .virt-odd__lbl { color: #7e22ce; }
+.virt-odd--sel .virt-odd__val { color: #7e22ce; }
+
+/* Selected checkmark */
+.virt-odd--sel::after {
+  content: '✓';
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  font-size: 8px;
+  font-weight: 900;
+  color: #c026d3;
+}
 
 /* Correct score grid */
 .virt-cs-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  background: rgba(255,255,255,.04);
-  padding: 2px;
+  gap: 6px;
+  padding: 8px 10px;
+  background: #fff;
 }
 .virt-odd--cs {
   flex-direction: row;
@@ -578,91 +619,94 @@ onUnmounted(() => clearInterval(timer));
 .virt-odd__score {
   font-size: 11px;
   font-weight: 700;
-  color: rgba(255,255,255,.8);
+  color: #555;
 }
 
 /* Full-width "Any other result" button */
 .virt-odd--full {
-  width: 100%;
-  border-top: 1px solid rgba(255,255,255,.04);
+  width: calc(100% - 20px);
+  margin: 0 10px 8px;
+  border-radius: 8px;
 }
 
 /* ─── Right side panel ──────────────────────────────────────────────────────── */
 .virt-side { display: none; }
 
 /* ─── Stream placeholder ────────────────────────────────────────────────────── */
-.virt-stream { background: #111218; flex: 1; min-height: 120px; }
+.virt-stream { background: #f8f8fb; flex: 1; min-height: 120px; border-bottom: 1px solid #eee; }
 .virt-stream__inner { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 12px; gap: 8px; }
 .virt-stream__live { font-size: 10px; font-weight: 700; color: #ff4c4c; letter-spacing: 1px; }
 .virt-stream__pitch { font-size: 36px; opacity: .3; }
-.virt-stream__msg { font-size: 10px; color: rgba(255,255,255,.4); text-align: center; }
+.virt-stream__msg { font-size: 10px; color: #aaa; text-align: center; }
 .virt-stream__expand {
   margin-top: 8px;
-  background: #d946ef;
+  background: #c026d3;
   color: #fff;
   border: none;
   padding: 8px 14px;
   font-size: 10px;
   font-weight: 700;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   letter-spacing: .5px;
 }
 
 /* ─── Bet slip ──────────────────────────────────────────────────────────────── */
-.virt-bs { background: #1a1b22; }
+.virt-bs { background: #fff; }
 .virt-bs__hdr {
   font-size: 10px; font-weight: 800; letter-spacing: .5px;
-  color: #d946ef;
+  color: #c026d3;
   padding: 8px 12px;
-  background: #13141a;
-  border-top: 2px solid #d946ef;
+  background: #fdf4ff;
+  border-top: 2px solid #c026d3;
+  border-bottom: 1px solid #f0e6ff;
 }
 .virt-bs__empty {
   display: flex; flex-direction: column; align-items: center; gap: 6px;
   padding: 20px 12px;
-  color: rgba(255,255,255,.4); font-size: 11px; text-align: center;
+  color: #bbb; font-size: 11px; text-align: center;
 }
 .virt-bs__empty-icon { font-size: 22px; }
 
 .virt-bs__item {
   display: flex; align-items: center; gap: 6px;
   padding: 7px 10px;
-  border-bottom: 1px solid rgba(255,255,255,.05);
+  border-bottom: 1px solid #f5f5f8;
 }
 .virt-bs__item-left { flex: 1; min-width: 0; }
-.virt-bs__item-mid { font-size: 9px; color: rgba(255,255,255,.4); }
-.virt-bs__item-lbl { font-size: 11px; font-weight: 700; color: #fff; }
-.virt-bs__item-odds { font-size: 12px; font-weight: 900; color: #d946ef; flex-shrink: 0; }
-.virt-bs__item-del { background: none; border: none; color: rgba(255,255,255,.4); font-size: 12px; cursor: pointer; padding: 2px 4px; flex-shrink: 0; }
+.virt-bs__item-mid { font-size: 9px; color: #aaa; }
+.virt-bs__item-lbl { font-size: 11px; font-weight: 700; color: #1a1a2e; }
+.virt-bs__item-odds { font-size: 12px; font-weight: 900; color: #c026d3; flex-shrink: 0; }
+.virt-bs__item-del { background: none; border: none; color: #ccc; font-size: 12px; cursor: pointer; padding: 2px 4px; flex-shrink: 0; }
 
 .virt-bs__stake-row {
   display: flex; align-items: center; justify-content: space-between;
   padding: 8px 10px;
-  border-top: 1px solid rgba(255,255,255,.07);
+  border-top: 1px solid #f5f5f8;
 }
-.virt-bs__stake-lbl { font-size: 10px; color: rgba(255,255,255,.55); }
+.virt-bs__stake-lbl { font-size: 10px; color: #888; }
 .virt-bs__stake-input {
   width: 90px;
-  background: #13141a; border: 1px solid rgba(217,70,239,.4); border-radius: 4px;
-  color: #fff; font-size: 12px; font-weight: 700;
+  background: #f8f8fb; border: 1.5px solid #e0c8f0; border-radius: 6px;
+  color: #1a1a2e; font-size: 12px; font-weight: 700;
   padding: 5px 8px; text-align: right;
   outline: none;
 }
+.virt-bs__stake-input:focus { border-color: #c026d3; }
 
 .virt-bs__totals {
   padding: 6px 10px 8px;
-  font-size: 10px; color: rgba(255,255,255,.6);
+  font-size: 10px; color: #888;
   display: flex; flex-direction: column; gap: 3px;
 }
-.virt-bs__totals strong { color: #fff; }
+.virt-bs__totals strong { color: #1a1a2e; }
 
 .virt-bs__btn {
   display: block; width: calc(100% - 20px);
   margin: 0 10px 10px;
-  background: linear-gradient(90deg, #d946ef, #a21caf);
+  background: linear-gradient(90deg, #c026d3, #7e22ce);
   color: #fff; border: none;
-  padding: 10px; border-radius: 6px;
+  padding: 10px; border-radius: 8px;
   font-size: 12px; font-weight: 800; cursor: pointer;
   letter-spacing: .3px;
 }
@@ -671,35 +715,35 @@ onUnmounted(() => clearInterval(timer));
 .virt-results-bar {
   display: flex; align-items: center; gap: 6px;
   padding: 8px 12px;
-  background: #13141a;
-  border-top: 2px solid #d946ef;
+  background: #fff;
+  border-top: 2px solid #e8e9ef;
   overflow-x: auto;
   flex-shrink: 0;
 }
 .virt-results-bar__btn {
-  background: #d946ef; color: #fff; border: none;
-  padding: 5px 12px; border-radius: 4px;
+  background: #c026d3; color: #fff; border: none;
+  padding: 5px 12px; border-radius: 5px;
   font-size: 10px; font-weight: 800; cursor: pointer;
   white-space: nowrap; flex-shrink: 0;
 }
-.virt-results-bar__sep { color: rgba(255,255,255,.25); font-size: 10px; flex-shrink: 0; }
-.virt-results-bar__lbl { font-size: 9px; font-weight: 700; color: rgba(255,255,255,.5); white-space: nowrap; flex-shrink: 0; }
-.virt-results-bar__item { font-size: 10px; color: rgba(255,255,255,.65); white-space: nowrap; flex-shrink: 0; }
-.virt-results-bar__score { color: #d946ef; font-weight: 700; }
+.virt-results-bar__sep { color: #ddd; font-size: 10px; flex-shrink: 0; }
+.virt-results-bar__lbl { font-size: 9px; font-weight: 700; color: #aaa; white-space: nowrap; flex-shrink: 0; }
+.virt-results-bar__item { font-size: 10px; color: #666; white-space: nowrap; flex-shrink: 0; }
+.virt-results-bar__score { color: #c026d3; font-weight: 700; }
 
 /* ─── Mobile bet slip FAB ───────────────────────────────────────────────────── */
 .virt-fab {
   position: fixed; bottom: 70px; right: 14px;
   z-index: 50;
   display: flex; align-items: center; gap: 6px;
-  background: linear-gradient(135deg, #d946ef, #a21caf);
+  background: linear-gradient(135deg, #c026d3, #7e22ce);
   color: #fff; border: none;
   padding: 10px 16px; border-radius: 24px;
   font-size: 13px; font-weight: 800; cursor: pointer;
-  box-shadow: 0 4px 16px rgba(217,70,239,.4);
+  box-shadow: 0 4px 16px rgba(192,38,211,.35);
 }
 .virt-fab__count {
-  background: #fff; color: #a21caf;
+  background: #fff; color: #7e22ce;
   font-size: 11px; font-weight: 900;
   border-radius: 10px; padding: 1px 6px; min-width: 18px; text-align: center;
 }
@@ -707,11 +751,11 @@ onUnmounted(() => clearInterval(timer));
 /* ─── Mobile slip overlay ───────────────────────────────────────────────────── */
 .virt-overlay {
   position: fixed; inset: 0; z-index: 100;
-  background: rgba(0,0,0,.6);
+  background: rgba(0,0,0,.4);
   display: flex; align-items: flex-end;
 }
 .virt-sheet {
-  background: #1a1b22;
+  background: #fff;
   width: 100%;
   border-radius: 16px 16px 0 0;
   overflow: hidden;
@@ -721,11 +765,11 @@ onUnmounted(() => clearInterval(timer));
 .virt-sheet__hdr {
   display: flex; align-items: center; justify-content: space-between;
   padding: 12px 16px;
-  background: #13141a;
-  border-bottom: 2px solid #d946ef;
-  font-size: 11px; font-weight: 800; color: #d946ef; letter-spacing: .5px;
+  background: #fdf4ff;
+  border-bottom: 2px solid #c026d3;
+  font-size: 11px; font-weight: 800; color: #c026d3; letter-spacing: .5px;
 }
-.virt-sheet__close { background: none; border: none; color: rgba(255,255,255,.5); font-size: 18px; cursor: pointer; }
+.virt-sheet__close { background: none; border: none; color: #bbb; font-size: 18px; cursor: pointer; }
 .virt-sheet__body { overflow-y: auto; flex: 1; }
 
 /* ─── Slide-up transition ───────────────────────────────────────────────────── */
@@ -737,48 +781,68 @@ onUnmounted(() => clearInterval(timer));
   .virt-mtabs { display: none; }
   .virt-fab   { display: none; }
 
-  .virt-layout { height: calc(100vh - 170px); overflow: hidden; }
+  .virt-layout {
+    height: calc(100vh - 170px);
+    overflow: hidden;
+    padding: 12px;
+    gap: 12px;
+    align-items: flex-start;
+  }
 
   .virt-cols {
     flex: 1;
     display: flex;
+    gap: 12px;
     overflow-y: auto;
-    border-right: 1px solid rgba(255,255,255,.06);
+    height: 100%;
+    align-items: flex-start;
   }
 
   .virt-col {
     display: block !important;
     flex: 1;
-    border-right: 1px solid rgba(255,255,255,.06);
-    overflow-y: auto;
     min-width: 240px;
+    height: 100%;
+    overflow-y: auto;
+  }
+
+  .virt-match-card {
+    margin-bottom: 0;
+    height: 100%;
+    overflow-y: auto;
+    border-radius: 14px;
   }
 
   .virt-side {
     display: flex;
     flex-direction: column;
-    width: 230px;
+    width: 240px;
     flex-shrink: 0;
     overflow-y: auto;
-    background: #111218;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 1px 6px rgba(0,0,0,.07);
+    height: 100%;
   }
 
   .virt-side__tabs {
     display: flex;
-    border-bottom: 1px solid rgba(255,255,255,.08);
+    border-bottom: 1px solid #eee;
+    border-radius: 14px 14px 0 0;
+    overflow: hidden;
   }
   .virt-side__tab {
     flex: 1;
-    background: none; border: none;
+    background: #f8f8fb; border: none;
     padding: 10px;
     font-size: 10px; font-weight: 800; letter-spacing: .5px;
-    color: rgba(255,255,255,.45);
+    color: #aaa;
     cursor: pointer;
     border-bottom: 2px solid transparent;
     transition: all .15s;
   }
-  .virt-side__tab--active { color: #fff; border-bottom-color: #d946ef; }
+  .virt-side__tab--active { color: #c026d3; border-bottom-color: #c026d3; background: #fff; }
 
-  .virt-col__hdr { position: sticky; top: 0; }
+  .virt-col__hdr { position: sticky; top: 0; z-index: 5; }
 }
 </style>
