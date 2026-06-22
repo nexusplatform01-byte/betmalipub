@@ -33,157 +33,236 @@
     <template v-for="t in tiers" :key="'panel-'+t.id">
       <div v-show="activeTier === t.id" class="jpt-panel" :data-tier="t.id">
 
-        <!-- Hero: prize + countdown -->
-        <div class="jpt-hero" :class="`jpt-hero--${t.id}`">
-          <div class="jpt-hero__prize-col">
-            <div class="jpt-hero__badge">{{ t.name }} JACKPOT</div>
-            <div class="jpt-hero__prize">{{ t.prizeDisplay }}</div>
-            <div class="jpt-hero__matches-badge">12 Matches · 1X2 Only</div>
-            <div class="jpt-hero__stake-tag">
-              <span class="jpt-hero__stake-lbl">Fixed Entry Stake</span>
-              <span class="jpt-hero__stake-val">UGX {{ t.stake.toLocaleString() }}</span>
-            </div>
-          </div>
-          <div class="jpt-hero__cdown-col">
-            <div class="jpt-hero__cdown-lbl">⏱ Jackpot closes in</div>
-            <div class="jpt-cdown" :class="`jpt-cdown--${t.id}`">
-              <div class="jpt-cdown__block">
-                <span class="jpt-cdown__val">{{ cd[t.id].h }}</span>
-                <span class="jpt-cdown__unit">HRS</span>
-              </div>
-              <span class="jpt-cdown__sep">:</span>
-              <div class="jpt-cdown__block">
-                <span class="jpt-cdown__val">{{ cd[t.id].m }}</span>
-                <span class="jpt-cdown__unit">MIN</span>
-              </div>
-              <span class="jpt-cdown__sep">:</span>
-              <div class="jpt-cdown__block">
-                <span class="jpt-cdown__val">{{ cd[t.id].s }}</span>
-                <span class="jpt-cdown__unit">SEC</span>
-              </div>
-            </div>
-            <div class="jpt-cdown__note">Last match ends {{ t.lastMatchDisplay }}</div>
-          </div>
-        </div>
+        <!-- Desktop 2-col layout wrapper -->
+        <div class="jpt-desktop-layout">
 
-        <!-- Pick progress -->
-        <div class="jpt-progress">
-          <div class="jpt-progress__row">
-            <span class="jpt-progress__count"><strong>{{ picksCount(t.id) }}</strong>/12 picks made</span>
-            <span v-if="picksCount(t.id) < 12" class="jpt-progress__hint">{{ 12 - picksCount(t.id) }} more to go</span>
-            <span v-else class="jpt-progress__done">✓ All picks done!</span>
-          </div>
-          <div class="jpt-progress__track">
-            <div
-              class="jpt-progress__fill"
-              :class="`jpt-progress__fill--${t.id}`"
-              :style="{ width: (picksCount(t.id)/12*100) + '%' }"
-            ></div>
-          </div>
-        </div>
+          <!-- LEFT: main content -->
+          <div class="jpt-main">
 
-        <!-- Match table -->
-        <div class="jpt-table">
-          <div class="jpt-table__hdr" :class="`jpt-table__hdr--${t.id}`">
-            <div class="jpt-th jpt-th--num">#</div>
-            <div class="jpt-th jpt-th--info">Match</div>
-            <div class="jpt-th jpt-th--odd">1</div>
-            <div class="jpt-th jpt-th--odd">X</div>
-            <div class="jpt-th jpt-th--odd">2</div>
-          </div>
-
-          <div
-            v-for="(match, idx) in t.matches" :key="match.id"
-            class="jpt-row"
-            :class="{ 'jpt-row--picked': picks[t.id][idx] !== null }"
-          >
-            <div class="jpt-row__num">{{ idx + 1 }}</div>
-            <div class="jpt-row__info">
-              <div class="jpt-row__league">{{ match.league }}</div>
-              <div class="jpt-row__teams">
-                <span class="jpt-row__team">{{ match.home }}</span>
-                <span class="jpt-row__vs">vs</span>
-                <span class="jpt-row__team">{{ match.away }}</span>
+            <!-- Hero: prize + countdown -->
+            <div class="jpt-hero" :class="`jpt-hero--${t.id}`">
+              <div class="jpt-hero__prize-col">
+                <div class="jpt-hero__badge">{{ t.name }} JACKPOT</div>
+                <div class="jpt-hero__prize">{{ t.prizeDisplay }}</div>
+                <div class="jpt-hero__matches-badge">12 Matches · 1X2 Only</div>
+                <div class="jpt-hero__stake-tag">
+                  <span class="jpt-hero__stake-lbl">Fixed Entry Stake</span>
+                  <span class="jpt-hero__stake-val">UGX {{ t.stake.toLocaleString() }}</span>
+                </div>
               </div>
-              <div class="jpt-row__time">{{ match.time }}</div>
-            </div>
-            <button
-              class="jpt-odd"
-              :class="{ 'jpt-odd--active': picks[t.id][idx] === '1' }"
-              :disabled="betPlaced[t.id]"
-              @click="setPick(t.id, idx, '1')"
-            >{{ match.odds[0] }}</button>
-            <button
-              class="jpt-odd"
-              :class="{ 'jpt-odd--active': picks[t.id][idx] === 'X' }"
-              :disabled="betPlaced[t.id]"
-              @click="setPick(t.id, idx, 'X')"
-            >{{ match.odds[1] }}</button>
-            <button
-              class="jpt-odd"
-              :class="{ 'jpt-odd--active': picks[t.id][idx] === '2' }"
-              :disabled="betPlaced[t.id]"
-              @click="setPick(t.id, idx, '2')"
-            >{{ match.odds[2] }}</button>
-          </div>
-        </div>
-
-        <!-- Footer action -->
-        <div class="jpt-footer">
-          <!-- Results after countdown -->
-          <template v-if="results[t.id]">
-            <div class="jpt-result" :class="results[t.id]!.won ? 'jpt-result--win' : 'jpt-result--loss'">
-              <div class="jpt-result__icon">{{ results[t.id]!.won ? '🎉' : '😔' }}</div>
-              <div class="jpt-result__title">
-                {{ results[t.id]!.won ? '🏆 JACKPOT WON!' : 'Better luck next time!' }}
-              </div>
-              <div v-if="results[t.id]!.won" class="jpt-result__prize">{{ t.prizeDisplay }}</div>
-              <div class="jpt-result__sub">
-                {{ results[t.id]!.won
-                   ? 'Prize has been credited to your account!'
-                   : `You got ${results[t.id]!.correct} out of 12 correct.` }}
+              <div class="jpt-hero__cdown-col">
+                <div class="jpt-hero__cdown-lbl">⏱ Jackpot closes in</div>
+                <div class="jpt-cdown" :class="`jpt-cdown--${t.id}`">
+                  <div class="jpt-cdown__block">
+                    <span class="jpt-cdown__val">{{ cd[t.id].h }}</span>
+                    <span class="jpt-cdown__unit">HRS</span>
+                  </div>
+                  <span class="jpt-cdown__sep">:</span>
+                  <div class="jpt-cdown__block">
+                    <span class="jpt-cdown__val">{{ cd[t.id].m }}</span>
+                    <span class="jpt-cdown__unit">MIN</span>
+                  </div>
+                  <span class="jpt-cdown__sep">:</span>
+                  <div class="jpt-cdown__block">
+                    <span class="jpt-cdown__val">{{ cd[t.id].s }}</span>
+                    <span class="jpt-cdown__unit">SEC</span>
+                  </div>
+                </div>
+                <div class="jpt-cdown__note">Last match ends {{ t.lastMatchDisplay }}</div>
               </div>
             </div>
-          </template>
 
-          <!-- Waiting for countdown -->
-          <template v-else-if="betPlaced[t.id]">
-            <div class="jpt-waiting">
-              <div class="jpt-waiting__icon">🎟</div>
-              <div class="jpt-waiting__title">Entry Confirmed!</div>
-              <div class="jpt-waiting__sub">Awaiting results when the jackpot closes.</div>
-              <div class="jpt-waiting__stake">Stake paid: <strong>UGX {{ t.stake.toLocaleString() }}</strong></div>
-            </div>
-          </template>
-
-          <!-- Place bet -->
-          <template v-else>
-            <div class="jpt-footer__summary">
-              <div class="jpt-footer__picks-info">
-                <span class="jpt-footer__picks-count">{{ picksCount(t.id) }}/12 picks</span>
-                <span class="jpt-footer__picks-dot">·</span>
-                <span class="jpt-footer__picks-note">{{ picksCount(t.id) < 12 ? 'Select all matches to play' : 'Ready to play!' }}</span>
+            <!-- Pick progress -->
+            <div class="jpt-progress">
+              <div class="jpt-progress__row">
+                <span class="jpt-progress__count"><strong>{{ picksCount(t.id) }}</strong>/12 picks made</span>
+                <span v-if="picksCount(t.id) < 12" class="jpt-progress__hint">{{ 12 - picksCount(t.id) }} more to go</span>
+                <span v-else class="jpt-progress__done">✓ All picks done!</span>
               </div>
-              <div class="jpt-footer__stake-display">
-                Stake: <strong>UGX {{ t.stake.toLocaleString() }}</strong>
+              <div class="jpt-progress__track">
+                <div
+                  class="jpt-progress__fill"
+                  :class="`jpt-progress__fill--${t.id}`"
+                  :style="{ width: (picksCount(t.id)/12*100) + '%' }"
+                ></div>
               </div>
             </div>
-            <button
-              class="jpt-btn"
-              :class="[`jpt-btn--${t.id}`, { 'jpt-btn--disabled': picksCount(t.id) < 12 }]"
-              :disabled="picksCount(t.id) < 12"
-              @click="placeBet(t.id, t)"
-            >
-              <template v-if="!store.isLoggedIn">🔐 Login to Play</template>
-              <template v-else-if="picksCount(t.id) < 12">
-                Select {{ 12 - picksCount(t.id) }} more match{{ 12 - picksCount(t.id) !== 1 ? 'es' : '' }}
+
+            <!-- Match table -->
+            <div class="jpt-table">
+              <div class="jpt-table__hdr" :class="`jpt-table__hdr--${t.id}`">
+                <div class="jpt-th jpt-th--num">#</div>
+                <div class="jpt-th jpt-th--info">Match</div>
+                <div class="jpt-th jpt-th--odd">1</div>
+                <div class="jpt-th jpt-th--odd">X</div>
+                <div class="jpt-th jpt-th--odd">2</div>
+              </div>
+
+              <div
+                v-for="(match, idx) in t.matches" :key="match.id"
+                class="jpt-row"
+                :class="{ 'jpt-row--picked': picks[t.id][idx] !== null }"
+              >
+                <div class="jpt-row__num">{{ idx + 1 }}</div>
+                <div class="jpt-row__info">
+                  <div class="jpt-row__league">{{ match.league }}</div>
+                  <div class="jpt-row__teams">
+                    <span class="jpt-row__team">{{ match.home }}</span>
+                    <span class="jpt-row__vs">vs</span>
+                    <span class="jpt-row__team">{{ match.away }}</span>
+                  </div>
+                  <div class="jpt-row__time">{{ match.time }}</div>
+                </div>
+                <button
+                  class="jpt-odd"
+                  :class="{ 'jpt-odd--active': picks[t.id][idx] === '1' }"
+                  :disabled="betPlaced[t.id]"
+                  @click="setPick(t.id, idx, '1')"
+                >{{ match.odds[0] }}</button>
+                <button
+                  class="jpt-odd"
+                  :class="{ 'jpt-odd--active': picks[t.id][idx] === 'X' }"
+                  :disabled="betPlaced[t.id]"
+                  @click="setPick(t.id, idx, 'X')"
+                >{{ match.odds[1] }}</button>
+                <button
+                  class="jpt-odd"
+                  :class="{ 'jpt-odd--active': picks[t.id][idx] === '2' }"
+                  :disabled="betPlaced[t.id]"
+                  @click="setPick(t.id, idx, '2')"
+                >{{ match.odds[2] }}</button>
+              </div>
+            </div>
+
+            <!-- Footer action -->
+            <div class="jpt-footer">
+              <template v-if="results[t.id]">
+                <div class="jpt-result" :class="results[t.id]!.won ? 'jpt-result--win' : 'jpt-result--loss'">
+                  <div class="jpt-result__icon">{{ results[t.id]!.won ? '🎉' : '😔' }}</div>
+                  <div class="jpt-result__title">
+                    {{ results[t.id]!.won ? '🏆 JACKPOT WON!' : 'Better luck next time!' }}
+                  </div>
+                  <div v-if="results[t.id]!.won" class="jpt-result__prize">{{ t.prizeDisplay }}</div>
+                  <div class="jpt-result__sub">
+                    {{ results[t.id]!.won
+                       ? 'Prize has been credited to your account!'
+                       : `You got ${results[t.id]!.correct} out of 12 correct.` }}
+                  </div>
+                </div>
+              </template>
+              <template v-else-if="betPlaced[t.id]">
+                <div class="jpt-waiting">
+                  <div class="jpt-waiting__icon">🎟</div>
+                  <div class="jpt-waiting__title">Entry Confirmed!</div>
+                  <div class="jpt-waiting__sub">Awaiting results when the jackpot closes.</div>
+                  <div class="jpt-waiting__stake">Stake paid: <strong>UGX {{ t.stake.toLocaleString() }}</strong></div>
+                </div>
               </template>
               <template v-else>
-                🎰 Play {{ t.name }} Jackpot — UGX {{ t.stake.toLocaleString() }}
+                <div class="jpt-footer__summary">
+                  <div class="jpt-footer__picks-info">
+                    <span class="jpt-footer__picks-count">{{ picksCount(t.id) }}/12 picks</span>
+                    <span class="jpt-footer__picks-dot">·</span>
+                    <span class="jpt-footer__picks-note">{{ picksCount(t.id) < 12 ? 'Select all matches to play' : 'Ready to play!' }}</span>
+                  </div>
+                  <div class="jpt-footer__stake-display">
+                    Stake: <strong>UGX {{ t.stake.toLocaleString() }}</strong>
+                  </div>
+                </div>
+                <button
+                  class="jpt-btn"
+                  :class="[`jpt-btn--${t.id}`, { 'jpt-btn--disabled': picksCount(t.id) < 12 }]"
+                  :disabled="picksCount(t.id) < 12"
+                  @click="placeBet(t.id, t)"
+                >
+                  <template v-if="!store.isLoggedIn">🔐 Login to Play</template>
+                  <template v-else-if="picksCount(t.id) < 12">
+                    Select {{ 12 - picksCount(t.id) }} more match{{ 12 - picksCount(t.id) !== 1 ? 'es' : '' }}
+                  </template>
+                  <template v-else>
+                    🎰 Play {{ t.name }} Jackpot — UGX {{ t.stake.toLocaleString() }}
+                  </template>
+                </button>
               </template>
-            </button>
-          </template>
-        </div>
+            </div>
+
+          </div><!-- end jpt-main -->
+
+          <!-- RIGHT: sidebar (desktop only) -->
+          <aside class="jpt-sidebar">
+
+            <!-- All prize pools -->
+            <div class="jpt-sb-card">
+              <div class="jpt-sb-card__hdr">🏆 Prize Pools</div>
+              <div class="jpt-sb-prize-list">
+                <div v-for="tier in tiers" :key="tier.id" class="jpt-sb-prize-row" :class="`jpt-sb-prize-row--${tier.id}`">
+                  <span class="jpt-sb-prize-row__medal">{{ tier.medal }}</span>
+                  <div class="jpt-sb-prize-row__info">
+                    <span class="jpt-sb-prize-row__name">{{ tier.name }}</span>
+                    <span class="jpt-sb-prize-row__stake">UGX {{ tier.stake.toLocaleString() }} entry</span>
+                  </div>
+                  <span class="jpt-sb-prize-row__amount">{{ tier.prizeDisplay.replace('UGX ', '') }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- How to play -->
+            <div class="jpt-sb-card">
+              <div class="jpt-sb-card__hdr">📖 How to Play</div>
+              <ol class="jpt-sb-steps">
+                <li class="jpt-sb-step">
+                  <span class="jpt-sb-step__num">1</span>
+                  <span>Choose your jackpot tier (Gold, Silver, Bronze or Premium)</span>
+                </li>
+                <li class="jpt-sb-step">
+                  <span class="jpt-sb-step__num">2</span>
+                  <span>Predict the result (1, X or 2) for all <strong>12 matches</strong></span>
+                </li>
+                <li class="jpt-sb-step">
+                  <span class="jpt-sb-step__num">3</span>
+                  <span>Pay the fixed stake and confirm your entry</span>
+                </li>
+                <li class="jpt-sb-step">
+                  <span class="jpt-sb-step__num">4</span>
+                  <span>Get all 12 correct → <strong>WIN THE JACKPOT!</strong></span>
+                </li>
+              </ol>
+              <div class="jpt-sb-note">
+                💡 Partial wins: 11 correct wins 50%, 10 correct wins 20% of the pool.
+              </div>
+            </div>
+
+            <!-- Recent winners -->
+            <div class="jpt-sb-card">
+              <div class="jpt-sb-card__hdr">🎉 Recent Winners</div>
+              <div class="jpt-sb-winner" v-for="w in recentWinners" :key="w.name">
+                <div class="jpt-sb-winner__avatar">{{ w.avatar }}</div>
+                <div class="jpt-sb-winner__info">
+                  <div class="jpt-sb-winner__name">{{ w.name }}</div>
+                  <div class="jpt-sb-winner__tier">{{ w.tier }} · {{ w.date }}</div>
+                </div>
+                <div class="jpt-sb-winner__prize">{{ w.prize }}</div>
+              </div>
+            </div>
+
+            <!-- Entry stats -->
+            <div class="jpt-sb-card jpt-sb-card--stat">
+              <div class="jpt-sb-card__hdr">📊 Today's Entries</div>
+              <div class="jpt-sb-stats">
+                <div class="jpt-sb-stat">
+                  <span class="jpt-sb-stat__val">4,821</span>
+                  <span class="jpt-sb-stat__lbl">Total entries</span>
+                </div>
+                <div class="jpt-sb-stat">
+                  <span class="jpt-sb-stat__val">{{ picksCount(t.id) }}/12</span>
+                  <span class="jpt-sb-stat__lbl">Your picks</span>
+                </div>
+              </div>
+            </div>
+
+          </aside>
+
+        </div><!-- end jpt-desktop-layout -->
 
       </div>
     </template>
@@ -338,6 +417,13 @@ const tiers: JpTier[] = [
       { id: 'p12', league: 'Uganda PL',    home: 'Arua Hill SC',    away: 'MYDA FC',         time: 'Today 16:00', odds: [1.90, 3.50, 3.95] },
     ],
   },
+];
+
+// ─── Recent winners (static demo data) ───────────────────
+const recentWinners = [
+  { name: 'John K.', avatar: '🧑', tier: '🥇 Gold', date: 'Yesterday', prize: 'UGX 856M' },
+  { name: 'Amina W.', avatar: '👩', tier: '🥈 Silver', date: '2 days ago', prize: 'UGX 432M' },
+  { name: 'David O.', avatar: '👨', tier: '🥉 Bronze', date: '3 days ago', prize: 'UGX 287M' },
 ];
 
 // ─── Reactive state ───────────────────────────────────────
@@ -727,17 +813,39 @@ onUnmounted(() => clearInterval(timer));
 }
 .jpt-result__sub { font-size: 12px; color: #6a6f7a; line-height: 1.5; }
 
-/* ─── desktop tweaks ────────────────────────────────────── */
+/* ─── desktop layout ────────────────────────────────────── */
+.jpt-desktop-layout { display: flex; flex-direction: column; }
+.jpt-sidebar { display: none; }
+
 @media (min-width: 1024px) {
+  .jpt-desktop-layout {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 14px 20px;
+  }
+
+  .jpt-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 6px rgba(0,0,0,.07);
+  }
+
   .jpt-hero { padding: 20px 24px 22px; }
   .jpt-hero__prize { font-size: 24px; }
   .jpt-cdown__val { font-size: 28px; }
   .jpt-cdown__block { min-width: 54px; padding: 6px 10px; }
 
-  .jpt-panel {
-    max-width: 860px;
-    margin: 0 auto;
-  }
+  .jpt-progress { border-radius: 0; }
+  .jpt-table { margin-top: 0; }
+  .jpt-footer { border-radius: 0; margin-top: 0; }
+
   .jpt-table__hdr,
   .jpt-row {
     grid-template-columns: 36px 1fr 72px 72px 72px;
@@ -748,5 +856,134 @@ onUnmounted(() => clearInterval(timer));
   .jpt-row__league { font-size: 10px; }
   .jpt-footer { padding: 16px 24px; }
   .jpt-btn { font-size: 15px; padding: 14px; }
+
+  /* ── Sidebar ── */
+  .jpt-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 280px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 56px;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+  }
+
+  .jpt-sb-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 6px rgba(0,0,0,.07);
+  }
+
+  .jpt-sb-card__hdr {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .4px;
+    color: #292a33;
+    padding: 10px 14px 8px;
+    border-bottom: 1px solid #f0f1f5;
+    background: #fafafa;
+  }
+
+  /* Prize list */
+  .jpt-sb-prize-list { padding: 6px 0; }
+  .jpt-sb-prize-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-bottom: 1px solid #f5f5f8;
+    cursor: pointer;
+    transition: background .12s;
+  }
+  .jpt-sb-prize-row:last-child { border-bottom: none; }
+  .jpt-sb-prize-row:hover { background: #fafafa; }
+
+  .jpt-sb-prize-row__medal { font-size: 20px; flex-shrink: 0; }
+  .jpt-sb-prize-row__info { flex: 1; min-width: 0; }
+  .jpt-sb-prize-row__name {
+    display: block;
+    font-size: 11px; font-weight: 800; color: #292a33;
+    letter-spacing: .3px;
+  }
+  .jpt-sb-prize-row__stake { font-size: 9px; color: #9599a4; }
+  .jpt-sb-prize-row__amount { font-size: 11px; font-weight: 900; color: #c026d3; text-align: right; }
+
+  .jpt-sb-prize-row--gold .jpt-sb-prize-row__amount    { color: #c87800; }
+  .jpt-sb-prize-row--silver .jpt-sb-prize-row__amount  { color: #5a6070; }
+  .jpt-sb-prize-row--bronze .jpt-sb-prize-row__amount  { color: #8c4210; }
+  .jpt-sb-prize-row--premium .jpt-sb-prize-row__amount { color: #7e22ce; }
+
+  /* How to play steps */
+  .jpt-sb-steps {
+    margin: 0;
+    padding: 10px 14px;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .jpt-sb-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 11px;
+    color: #6a6f7a;
+    line-height: 1.45;
+  }
+  .jpt-sb-step strong { color: #292a33; }
+  .jpt-sb-step__num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #c026d3;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 900;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .jpt-sb-note {
+    font-size: 10px;
+    color: #9599a4;
+    padding: 0 14px 12px;
+    line-height: 1.5;
+  }
+
+  /* Winners */
+  .jpt-sb-winner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-bottom: 1px solid #f5f5f8;
+  }
+  .jpt-sb-winner:last-child { border-bottom: none; }
+  .jpt-sb-winner__avatar { font-size: 22px; flex-shrink: 0; }
+  .jpt-sb-winner__info { flex: 1; min-width: 0; }
+  .jpt-sb-winner__name { font-size: 11px; font-weight: 700; color: #292a33; }
+  .jpt-sb-winner__tier { font-size: 9px; color: #9599a4; }
+  .jpt-sb-winner__prize { font-size: 11px; font-weight: 900; color: #10a310; }
+
+  /* Stats */
+  .jpt-sb-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 10px 14px 12px;
+    gap: 8px;
+  }
+  .jpt-sb-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+  .jpt-sb-stat__val { font-size: 18px; font-weight: 900; color: #292a33; }
+  .jpt-sb-stat__lbl { font-size: 9px; color: #9599a4; text-align: center; }
 }
 </style>

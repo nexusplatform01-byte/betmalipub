@@ -257,28 +257,27 @@ const filteredPromos = computed(() =>
 /* ─── Desktop layout ─────────────────────────────────────── */
 @media (min-width: 1024px) {
   .promo-hero {
-    max-width: 1100px;
-    margin: 12px auto 6px;
-    padding: 24px 28px;
+    margin: 12px 24px 6px;
+    padding: 28px 32px;
   }
-  .promo-hero__title { font-size: 24px; }
-  .promo-hero__badge { font-size: 72px; opacity: .15; }
+  .promo-hero__title { font-size: 26px; }
+  .promo-hero__sub   { font-size: 12px; }
+  .promo-hero__badge { font-size: 80px; opacity: .15; }
 
-  .promo-grid-wrap { max-width: 1100px; margin: 0 auto; padding: 8px 16px 16px; }
-
-  .promo-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
-
+  .promo-grid-wrap { padding: 10px 24px 20px; }
+  .promo-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
   .promo-card__img { height: 180px; }
 
   .promo-info-strip {
-    max-width: 1100px;
-    margin: 0 auto;
+    padding: 12px 24px;
     flex-direction: row;
     justify-content: space-between;
   }
 }
 
 @media (min-width: 1400px) {
-  .promo-grid { grid-template-columns: repeat(3, 1fr); }
+  .promo-grid { grid-template-columns: repeat(4, 1fr); }
+  .promo-hero { margin: 14px 32px 8px; }
+  .promo-grid-wrap { padding: 10px 32px 20px; }
 }
 </style>

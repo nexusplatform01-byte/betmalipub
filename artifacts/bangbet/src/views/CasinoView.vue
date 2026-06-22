@@ -191,16 +191,21 @@ const filteredGames = computed(() =>
 
 /* ─── Desktop grid ───────────────────────────────────────── */
 @media (min-width: 1024px) {
-  .cs-featured, .cs-section { max-width: 1100px; margin: 0 auto; padding: 12px 16px; }
+  .cs-featured, .cs-section { padding: 14px 24px; }
 
-  .cs-top-grid { grid-template-columns: repeat(4, 1fr); }
+  .cs-top-grid { grid-template-columns: repeat(4, 1fr); gap: 12px; }
   .cs-top-card { min-height: 160px; padding: 20px 16px 14px; }
   .cs-top-card__emoji { font-size: 44px; }
   .cs-top-card__name  { font-size: 14px; }
 
-  .cs-grid { grid-template-columns: repeat(5, 1fr); gap: 10px; }
+  .cs-grid { grid-template-columns: repeat(6, 1fr); gap: 12px; }
   .cs-card  { min-height: 130px; padding: 16px 10px 12px; }
   .cs-card__emoji { font-size: 32px; }
   .cs-card__name  { font-size: 11px; }
+}
+
+@media (min-width: 1400px) {
+  .cs-grid { grid-template-columns: repeat(8, 1fr); }
+  .cs-top-grid { grid-template-columns: repeat(6, 1fr); }
 }
 </style>
