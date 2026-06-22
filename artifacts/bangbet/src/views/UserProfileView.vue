@@ -1,5 +1,6 @@
 <template>
   <div class="profile-page">
+    <DepositModal v-if="showDepositModal" @close="showDepositModal = false" />
     <AppHeader />
 
     <div class="profile-wrap">
@@ -315,6 +316,7 @@ import { ref, computed, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { useAppStore } from "@/stores/app";
 import AppHeader from "@/components/AppHeader.vue";
+import DepositModal from "@/components/DepositModal.vue";
 
 const store = useAppStore();
 const router = useRouter();
@@ -322,6 +324,7 @@ const activeTab = ref("overview");
 const betFilter = ref("All");
 const txFilter = ref("All");
 const realityCheck = ref(false);
+const showDepositModal = ref(false);
 
 const uid = computed(() => String(Math.abs(store.userName.split("").reduce((a, c) => a + c.charCodeAt(0), 0) * 137)).slice(0, 6));
 
@@ -399,8 +402,7 @@ const recentActivity = [
 ];
 
 function doDeposit() {
-  const amt = prompt("Deposit amount (UGX):");
-  if (amt && !isNaN(Number(amt)) && Number(amt) > 0) store.deposit(Number(amt));
+  showDepositModal.value = true;
 }
 function doWithdraw() {
   const amt = prompt("Withdraw amount (UGX):");
