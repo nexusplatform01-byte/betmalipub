@@ -1,6 +1,7 @@
 <template>
   <div class="page">
-    <DepositModal v-if="showDepositModal" @close="showDepositModal = false" />
+    <DepositModal  v-if="showDepositModal"  @close="showDepositModal = false" />
+    <WithdrawModal v-if="showWithdrawModal" @close="showWithdrawModal = false" />
     <AppHeader />
 
     <!-- Logged out state -->
@@ -30,7 +31,7 @@
 
       <div class="action-btns">
         <button class="btn-deposit" @click="showDepositModal = true">💳 Deposit</button>
-        <button class="btn-withdraw">💸 Withdraw</button>
+        <button class="btn-withdraw" @click="showWithdrawModal = true">💸 Withdraw</button>
       </div>
 
       <div class="menu-list">
@@ -56,13 +57,15 @@ import { ref, inject } from "vue";
 import AppHeader from "@/components/AppHeader.vue";
 import BottomNav from "@/components/BottomNav.vue";
 import DepositModal from "@/components/DepositModal.vue";
+import WithdrawModal from "@/components/WithdrawModal.vue";
 import { useAppStore } from "@/stores/app";
 
 const store = useAppStore();
 const openLogin = inject<() => void>("openLogin", () => {});
 const openRegister = inject<() => void>("openRegister", () => {});
 
-const showDepositModal = ref(false);
+const showDepositModal  = ref(false);
+const showWithdrawModal = ref(false);
 
 const menuItems = [
   { icon: "📋", label: "My Bets" },

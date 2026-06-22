@@ -1,6 +1,7 @@
 <template>
   <div class="profile-page">
-    <DepositModal v-if="showDepositModal" @close="showDepositModal = false" />
+    <DepositModal  v-if="showDepositModal"  @close="showDepositModal = false" />
+    <WithdrawModal v-if="showWithdrawModal" @close="showWithdrawModal = false" />
     <AppHeader />
 
     <div class="profile-wrap">
@@ -317,6 +318,7 @@ import { useRouter } from "vue-router";
 import { useAppStore } from "@/stores/app";
 import AppHeader from "@/components/AppHeader.vue";
 import DepositModal from "@/components/DepositModal.vue";
+import WithdrawModal from "@/components/WithdrawModal.vue";
 
 const store = useAppStore();
 const router = useRouter();
@@ -324,7 +326,8 @@ const activeTab = ref("overview");
 const betFilter = ref("All");
 const txFilter = ref("All");
 const realityCheck = ref(false);
-const showDepositModal = ref(false);
+const showDepositModal  = ref(false);
+const showWithdrawModal = ref(false);
 
 const uid = computed(() => String(Math.abs(store.userName.split("").reduce((a, c) => a + c.charCodeAt(0), 0) * 137)).slice(0, 6));
 
@@ -405,8 +408,7 @@ function doDeposit() {
   showDepositModal.value = true;
 }
 function doWithdraw() {
-  const amt = prompt("Withdraw amount (UGX):");
-  if (amt && !isNaN(Number(amt)) && Number(amt) > 0) store.withdraw(Number(amt));
+  showWithdrawModal.value = true;
 }
 function doLogout() {
   if (confirm("Logout?")) { store.logout(); router.push("/"); }

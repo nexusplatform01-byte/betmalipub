@@ -1,5 +1,6 @@
 <template>
-  <DepositModal v-if="showDepositModal" @close="showDepositModal = false" />
+  <DepositModal  v-if="showDepositModal"  @close="showDepositModal = false" />
+  <WithdrawModal v-if="showWithdrawModal" @close="showWithdrawModal = false" />
   <header class="header">
     <img :src="'/static/images/Img_Logo_Yellow_66.png'" alt="Bangbet" class="header__logo" />
 
@@ -43,13 +44,15 @@ import { ref, computed, inject } from "vue";
 import { useRouter } from "vue-router";
 import { useAppStore } from "@/stores/app";
 import DepositModal from "@/components/DepositModal.vue";
+import WithdrawModal from "@/components/WithdrawModal.vue";
 
 const store = useAppStore();
 const router = useRouter();
 const openLogin    = inject<() => void>("openLogin",    () => {});
 const openRegister = inject<() => void>("openRegister", () => {});
 
-const showDepositModal = ref(false);
+const showDepositModal  = ref(false);
+const showWithdrawModal = ref(false);
 
 const initials = computed(() => {
   const name = store.userName || "U";
@@ -64,8 +67,7 @@ function doDeposit() {
   showDepositModal.value = true;
 }
 function doWithdraw() {
-  const amt = prompt("Withdraw amount (UGX):");
-  if (amt && !isNaN(Number(amt)) && Number(amt) > 0) store.withdraw(Number(amt));
+  showWithdrawModal.value = true;
 }
 function doLogout() {
   if (confirm("Are you sure you want to logout?")) store.logout();
