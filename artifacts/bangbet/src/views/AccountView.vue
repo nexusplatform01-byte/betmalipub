@@ -1,5 +1,6 @@
 <template>
   <div class="page">
+    <DepositModal v-if="showDepositModal" @close="showDepositModal = false" />
     <AppHeader />
 
     <!-- Logged out state -->
@@ -28,7 +29,7 @@
       </div>
 
       <div class="action-btns">
-        <button class="btn-deposit">💳 Deposit</button>
+        <button class="btn-deposit" @click="showDepositModal = true">💳 Deposit</button>
         <button class="btn-withdraw">💸 Withdraw</button>
       </div>
 
@@ -51,14 +52,17 @@
 </template>
 
 <script setup lang="ts">
-import { inject } from "vue";
+import { ref, inject } from "vue";
 import AppHeader from "@/components/AppHeader.vue";
 import BottomNav from "@/components/BottomNav.vue";
+import DepositModal from "@/components/DepositModal.vue";
 import { useAppStore } from "@/stores/app";
 
 const store = useAppStore();
 const openLogin = inject<() => void>("openLogin", () => {});
 const openRegister = inject<() => void>("openRegister", () => {});
+
+const showDepositModal = ref(false);
 
 const menuItems = [
   { icon: "📋", label: "My Bets" },
