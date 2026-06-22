@@ -225,16 +225,164 @@
           </div>
         </div>
 
-        <div class="site-footer">
-          <img :src="'/static/img/Logo_HomeFooter_Bangbet.db450bf.png'" alt="Bangbet" class="footer-logo" />
-          <div class="footer-social">
-            <img :src="'/static/img/Icon_Facebook_48.636a718.png'" alt="Facebook" />
-            <img :src="'/static/img/Icon_Twitter_48.6ec2c11.png'" alt="Twitter" />
-            <img :src="'/static/img/Icon_Instagram_48.bd94330.png'" alt="Instagram" />
-            <img :src="'/static/img/Icon_TikTok_48.3ee5e3d.png'" alt="TikTok" />
-            <img :src="'/static/img/Icon_LiveHelp_48.deda86e.png'" alt="Live Help" />
+        <!-- ── WORLD CUP 2026 FIXTURES ── -->
+        <div class="section dt-only">
+          <div class="section-header">
+            <div class="section-title">🌍 World Cup 2026</div>
+            <span class="section-more">See All ›</span>
           </div>
-          <p class="footer-text">Bangbet is licensed and regulated by the National Gaming Board of Uganda.<br/>Gambling is for adults 18+. Please gamble responsibly.</p>
+          <div class="dt-match-table">
+            <div class="dtmt__head">
+              <div class="dtmt__col-match">Match</div>
+              <div class="dtmt__col-odd">1</div><div class="dtmt__col-odd">X</div><div class="dtmt__col-odd">2</div>
+              <div class="dtmt__col-odd">1X</div><div class="dtmt__col-odd">X2</div><div class="dtmt__col-odd">12</div>
+            </div>
+            <div v-for="m in wcMatches" :key="m.id" class="dtmt__row" @click="addOdd(m,'1',m.markets.home)">
+              <div class="dtmt__col-match">
+                <div class="dtmt__league">{{ m.league }}</div>
+                <div class="dtmt__teams">
+                  <span class="dtmt__team-name">{{ m.homeTeam }}</span>
+                  <span class="dtmt__vs">vs</span>
+                  <span class="dtmt__team-name">{{ m.awayTeam }}</span>
+                </div>
+                <div class="dtmt__time">{{ m.startTime }}</div>
+              </div>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'1',m.markets.home)">{{ m.markets.home }}</button>
+              <button class="dtmt__odd-btn" @click.stop="m.markets.draw && addOdd(m,'X',m.markets.draw)">{{ m.markets.draw ?? '-' }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'2',m.markets.away)">{{ m.markets.away }}</button>
+              <button class="dtmt__odd-btn" @click.stop="m.markets.draw && addOdd(m,'1X',dc(m.markets.home,m.markets.draw))">{{ dc(m.markets.home,m.markets.draw) }}</button>
+              <button class="dtmt__odd-btn" @click.stop="m.markets.draw && addOdd(m,'X2',dc(m.markets.draw,m.markets.away))">{{ dc(m.markets.draw,m.markets.away) }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'12',dc(m.markets.home,m.markets.away))">{{ dc(m.markets.home,m.markets.away) }}</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── PREMIER LEAGUE FIXTURES ── -->
+        <div class="section dt-only">
+          <div class="section-header">
+            <div class="section-title">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League</div>
+            <span class="section-more">See All ›</span>
+          </div>
+          <div class="dt-match-table">
+            <div class="dtmt__head">
+              <div class="dtmt__col-match">Match</div>
+              <div class="dtmt__col-odd">1</div><div class="dtmt__col-odd">X</div><div class="dtmt__col-odd">2</div>
+              <div class="dtmt__col-odd">1X</div><div class="dtmt__col-odd">X2</div><div class="dtmt__col-odd">12</div>
+            </div>
+            <div v-for="m in plMatches" :key="m.id" class="dtmt__row">
+              <div class="dtmt__col-match">
+                <div class="dtmt__league">{{ m.league }}</div>
+                <div class="dtmt__teams">
+                  <span class="dtmt__team-name">{{ m.homeTeam }}</span>
+                  <span class="dtmt__vs">vs</span>
+                  <span class="dtmt__team-name">{{ m.awayTeam }}</span>
+                </div>
+                <div class="dtmt__time">{{ m.startTime }}</div>
+              </div>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'1',m.markets.home)">{{ m.markets.home }}</button>
+              <button class="dtmt__odd-btn" @click.stop="m.markets.draw && addOdd(m,'X',m.markets.draw)">{{ m.markets.draw ?? '-' }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'2',m.markets.away)">{{ m.markets.away }}</button>
+              <button class="dtmt__odd-btn" @click.stop="m.markets.draw && addOdd(m,'1X',dc(m.markets.home,m.markets.draw))">{{ dc(m.markets.home,m.markets.draw) }}</button>
+              <button class="dtmt__odd-btn" @click.stop="m.markets.draw && addOdd(m,'X2',dc(m.markets.draw,m.markets.away))">{{ dc(m.markets.draw,m.markets.away) }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'12',dc(m.markets.home,m.markets.away))">{{ dc(m.markets.home,m.markets.away) }}</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── CHAMPIONS LEAGUE ── -->
+        <div class="section dt-only">
+          <div class="section-header">
+            <div class="section-title">🇪🇺 Champions League</div>
+            <span class="section-more">See All ›</span>
+          </div>
+          <div class="dt-match-table">
+            <div class="dtmt__head">
+              <div class="dtmt__col-match">Match</div>
+              <div class="dtmt__col-odd">1</div><div class="dtmt__col-odd">X</div><div class="dtmt__col-odd">2</div>
+              <div class="dtmt__col-odd">1X</div><div class="dtmt__col-odd">X2</div><div class="dtmt__col-odd">12</div>
+            </div>
+            <div v-for="m in uclMatches" :key="m.id" class="dtmt__row">
+              <div class="dtmt__col-match">
+                <div class="dtmt__league">{{ m.league }}</div>
+                <div class="dtmt__teams">
+                  <span class="dtmt__team-name">{{ m.homeTeam }}</span>
+                  <span class="dtmt__vs">vs</span>
+                  <span class="dtmt__team-name">{{ m.awayTeam }}</span>
+                </div>
+                <div class="dtmt__time">{{ m.startTime }}</div>
+              </div>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'1',m.markets.home)">{{ m.markets.home }}</button>
+              <button class="dtmt__odd-btn" @click.stop="m.markets.draw && addOdd(m,'X',m.markets.draw)">{{ m.markets.draw ?? '-' }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'2',m.markets.away)">{{ m.markets.away }}</button>
+              <button class="dtmt__odd-btn" @click.stop="m.markets.draw && addOdd(m,'1X',dc(m.markets.home,m.markets.draw))">{{ dc(m.markets.home,m.markets.draw) }}</button>
+              <button class="dtmt__odd-btn" @click.stop="m.markets.draw && addOdd(m,'X2',dc(m.markets.draw,m.markets.away))">{{ dc(m.markets.draw,m.markets.away) }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'12',dc(m.markets.home,m.markets.away))">{{ dc(m.markets.home,m.markets.away) }}</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── BASKETBALL NBA ── -->
+        <div class="section dt-only">
+          <div class="section-header">
+            <div class="section-title">🏀 Basketball — NBA</div>
+            <span class="section-more">See All ›</span>
+          </div>
+          <div class="dt-match-table">
+            <div class="dtmt__head">
+              <div class="dtmt__col-match">Match</div>
+              <div class="dtmt__col-odd">1</div><div class="dtmt__col-odd">X</div><div class="dtmt__col-odd">2</div>
+              <div class="dtmt__col-odd">HDP</div><div class="dtmt__col-odd">O2.5</div><div class="dtmt__col-odd">U2.5</div>
+            </div>
+            <div v-for="m in nbaMatches" :key="m.id" class="dtmt__row">
+              <div class="dtmt__col-match">
+                <div class="dtmt__league">{{ m.league }}</div>
+                <div class="dtmt__teams">
+                  <span class="dtmt__team-name">{{ m.homeTeam }}</span>
+                  <span class="dtmt__vs">vs</span>
+                  <span class="dtmt__team-name">{{ m.awayTeam }}</span>
+                </div>
+                <div class="dtmt__time">{{ m.startTime }}</div>
+              </div>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'1',m.markets.home)">{{ m.markets.home }}</button>
+              <button class="dtmt__odd-btn dtmt__odd-btn--na">-</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'2',m.markets.away)">{{ m.markets.away }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'HDP',m.markets.hdp ?? 1.90)">{{ m.markets.hdp ?? '1.90' }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'O2.5',m.markets.over ?? 1.85)">{{ m.markets.over ?? '1.85' }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'U2.5',m.markets.under ?? 1.95)">{{ m.markets.under ?? '1.95' }}</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── UGANDA PREMIER LEAGUE ── -->
+        <div class="section dt-only">
+          <div class="section-header">
+            <div class="section-title">🇺🇬 Uganda Premier League</div>
+            <span class="section-more">See All ›</span>
+          </div>
+          <div class="dt-match-table">
+            <div class="dtmt__head">
+              <div class="dtmt__col-match">Match</div>
+              <div class="dtmt__col-odd">1</div><div class="dtmt__col-odd">X</div><div class="dtmt__col-odd">2</div>
+              <div class="dtmt__col-odd">1X</div><div class="dtmt__col-odd">X2</div><div class="dtmt__col-odd">12</div>
+            </div>
+            <div v-for="m in uplMatches" :key="m.id" class="dtmt__row">
+              <div class="dtmt__col-match">
+                <div class="dtmt__league">{{ m.league }}</div>
+                <div class="dtmt__teams">
+                  <span class="dtmt__team-name">{{ m.homeTeam }}</span>
+                  <span class="dtmt__vs">vs</span>
+                  <span class="dtmt__team-name">{{ m.awayTeam }}</span>
+                </div>
+                <div class="dtmt__time">{{ m.startTime }}</div>
+              </div>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'1',m.markets.home)">{{ m.markets.home }}</button>
+              <button class="dtmt__odd-btn" @click.stop="m.markets.draw && addOdd(m,'X',m.markets.draw)">{{ m.markets.draw ?? '-' }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'2',m.markets.away)">{{ m.markets.away }}</button>
+              <button class="dtmt__odd-btn" @click.stop="m.markets.draw && addOdd(m,'1X',dc(m.markets.home,m.markets.draw))">{{ dc(m.markets.home,m.markets.draw) }}</button>
+              <button class="dtmt__odd-btn" @click.stop="m.markets.draw && addOdd(m,'X2',dc(m.markets.draw,m.markets.away))">{{ dc(m.markets.draw,m.markets.away) }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(m,'12',dc(m.markets.home,m.markets.away))">{{ dc(m.markets.home,m.markets.away) }}</button>
+            </div>
+          </div>
         </div>
         </template>
         <MatchDetailPanel v-else :match="(selectedMatch as any)" @close="selectedMatch = null" />
@@ -389,6 +537,98 @@
         </div>
       </aside>
     </div>
+
+    <!-- ══════════════════════ FULL-WIDTH DARK FOOTER ══════════════════════ -->
+    <footer class="site-footer-full">
+      <div class="sff__top">
+        <div class="sff__brand">
+          <img :src="'/static/img/Logo_HomeFooter_Bangbet.db450bf.png'" alt="Bangbet" class="sff__logo" onerror="this.style.display='none'" />
+          <p class="sff__tagline">Uganda's #1 Sports Betting & Casino Platform</p>
+          <div class="sff__social">
+            <a href="#" class="sff__social-btn" aria-label="Facebook">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+            </a>
+            <a href="#" class="sff__social-btn" aria-label="Twitter">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
+            </a>
+            <a href="#" class="sff__social-btn" aria-label="Instagram">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+            </a>
+            <a href="#" class="sff__social-btn" aria-label="TikTok">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.79 1.52V6.76a4.85 4.85 0 0 1-1.02-.07z"/></svg>
+            </a>
+            <a href="#" class="sff__social-btn" aria-label="WhatsApp">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 2C6.477 2 2 6.477 2 12c0 1.89.522 3.655 1.427 5.166L2 22l4.975-1.303A9.946 9.946 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 11.999 2z"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="sff__links">
+          <div class="sff__col">
+            <div class="sff__col-head">Sports</div>
+            <a href="#" class="sff__link">Football</a>
+            <a href="#" class="sff__link">Basketball</a>
+            <a href="#" class="sff__link">Tennis</a>
+            <a href="#" class="sff__link">Cricket</a>
+            <a href="#" class="sff__link">Ice Hockey</a>
+            <a href="#" class="sff__link">Volleyball</a>
+          </div>
+          <div class="sff__col">
+            <div class="sff__col-head">Games</div>
+            <RouterLink to="/casino" class="sff__link">Live Casino</RouterLink>
+            <RouterLink to="/jackpot" class="sff__link">Jackpot</RouterLink>
+            <RouterLink to="/sports/virtuals" class="sff__link">Virtuals</RouterLink>
+            <a href="#" class="sff__link">Pick 12</a>
+            <a href="#" class="sff__link">Lucky 777</a>
+            <a href="#" class="sff__link">EKIVULU</a>
+          </div>
+          <div class="sff__col">
+            <div class="sff__col-head">Account</div>
+            <a href="#" class="sff__link">My Profile</a>
+            <a href="#" class="sff__link">Deposit</a>
+            <a href="#" class="sff__link">Withdraw</a>
+            <a href="#" class="sff__link">Transaction History</a>
+            <a href="#" class="sff__link">My Bets</a>
+            <a href="#" class="sff__link">Promotions</a>
+          </div>
+          <div class="sff__col">
+            <div class="sff__col-head">Help & Legal</div>
+            <a href="#" class="sff__link">How to Bet</a>
+            <a href="#" class="sff__link">FAQs</a>
+            <a href="#" class="sff__link">Live Chat Support</a>
+            <a href="#" class="sff__link">Terms & Conditions</a>
+            <a href="#" class="sff__link">Privacy Policy</a>
+            <a href="#" class="sff__link">Responsible Gaming</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="sff__partners">
+        <span class="sff__partner-label">Payment Methods</span>
+        <div class="sff__partner-chips">
+          <span class="sff__chip">📱 MTN Mobile Money</span>
+          <span class="sff__chip">📱 Airtel Money</span>
+          <span class="sff__chip">💳 Visa</span>
+          <span class="sff__chip">💳 Mastercard</span>
+          <span class="sff__chip">🏦 Bank Transfer</span>
+        </div>
+      </div>
+
+      <div class="sff__bottom">
+        <div class="sff__badges">
+          <span class="sff__badge sff__badge--age">18+</span>
+          <span class="sff__badge">NGB Licensed</span>
+          <span class="sff__badge">GamCare</span>
+          <span class="sff__badge">SSL Secured</span>
+          <span class="sff__badge">Responsible Gaming</span>
+        </div>
+        <p class="sff__legal">
+          Bangbet is licensed and regulated by the National Gaming Board of Uganda (NGB). Gambling is for adults 18 years and above only.
+          Gambling can be addictive — please play responsibly. If you need help, call the NGB Helpline: <strong>0800 100 066</strong> (toll free).
+        </p>
+        <p class="sff__copyright">© {{ new Date().getFullYear() }} Bangbet. All rights reserved.</p>
+      </div>
+    </footer>
 
     <!-- ── MOBILE ONLY ── betslip FAB -->
     <div v-if="store.betslip.length" class="betslip-fab mob-only" @click="showBetslip = true">
@@ -571,6 +811,45 @@ const casinoHighlights = [
   { emoji: '🎡', name: 'Lightning Roulette',  players: '2,105', hot: true  },
   { emoji: '🎲', name: 'Crash Multiplier',    players: '3,421', hot: true  },
   { emoji: '🎴', name: 'Teen Patti Live',     players: '598',   hot: false },
+];
+
+const wcMatches = [
+  { id:'wc1', league:'FIFA World Cup 2026 · Group A', homeTeam:'Uganda',    awayTeam:'Morocco',    startTime:'Today 18:00', markets:{ home:4.50, draw:3.20, away:1.75 } },
+  { id:'wc2', league:'FIFA World Cup 2026 · Group B', homeTeam:'Senegal',   awayTeam:'Ghana',      startTime:'Today 20:30', markets:{ home:2.10, draw:3.00, away:3.20 } },
+  { id:'wc3', league:'FIFA World Cup 2026 · Group C', homeTeam:'Nigeria',   awayTeam:'Cameroon',   startTime:'Today 21:00', markets:{ home:1.95, draw:3.10, away:3.60 } },
+  { id:'wc4', league:'FIFA World Cup 2026 · Group D', homeTeam:'Egypt',     awayTeam:'Algeria',    startTime:'Tomorrow 17:00', markets:{ home:2.30, draw:2.90, away:2.80 } },
+  { id:'wc5', league:'FIFA World Cup 2026 · Group E', homeTeam:'Brazil',    awayTeam:'Argentina',  startTime:'Tomorrow 20:00', markets:{ home:2.05, draw:3.20, away:3.10 } },
+  { id:'wc6', league:'FIFA World Cup 2026 · Group F', homeTeam:'France',    awayTeam:'Germany',    startTime:'Tomorrow 21:00', markets:{ home:1.85, draw:3.40, away:3.80 } },
+];
+
+const plMatches = [
+  { id:'pl1', league:'Premier League · Matchday 38', homeTeam:'Man City',    awayTeam:'Arsenal',    startTime:'Today 14:00', markets:{ home:1.75, draw:3.60, away:4.20 } },
+  { id:'pl2', league:'Premier League · Matchday 38', homeTeam:'Liverpool',   awayTeam:'Chelsea',    startTime:'Today 14:00', markets:{ home:1.60, draw:3.80, away:5.00 } },
+  { id:'pl3', league:'Premier League · Matchday 38', homeTeam:'Tottenham',   awayTeam:'Man Utd',    startTime:'Today 16:30', markets:{ home:1.90, draw:3.40, away:3.80 } },
+  { id:'pl4', league:'Premier League · Matchday 38', homeTeam:'Everton',     awayTeam:'Aston Villa',startTime:'Today 16:30', markets:{ home:2.50, draw:3.10, away:2.60 } },
+  { id:'pl5', league:'Premier League · Matchday 38', homeTeam:'Brighton',    awayTeam:'Newcastle',  startTime:'Today 16:30', markets:{ home:2.20, draw:3.20, away:3.00 } },
+];
+
+const uclMatches = [
+  { id:'ucl1', league:'UEFA Champions League · QF', homeTeam:'Real Madrid',  awayTeam:'Bayern',     startTime:'Wed 21:00', markets:{ home:1.85, draw:3.50, away:3.90 } },
+  { id:'ucl2', league:'UEFA Champions League · QF', homeTeam:'PSG',          awayTeam:'Barcelona',  startTime:'Wed 21:00', markets:{ home:2.10, draw:3.20, away:3.30 } },
+  { id:'ucl3', league:'UEFA Champions League · QF', homeTeam:'Man City',     awayTeam:'Inter',      startTime:'Thu 21:00', markets:{ home:1.70, draw:3.70, away:4.50 } },
+  { id:'ucl4', league:'UEFA Champions League · QF', homeTeam:'Atletico',     awayTeam:'Dortmund',   startTime:'Thu 21:00', markets:{ home:2.20, draw:3.10, away:3.00 } },
+];
+
+const nbaMatches = [
+  { id:'nba1', league:'NBA · Playoffs', homeTeam:'Lakers',    awayTeam:'Celtics',   startTime:'Today 02:30', markets:{ home:2.10, draw:null, away:1.70, hdp:1.88, over:1.85, under:1.95 } },
+  { id:'nba2', league:'NBA · Playoffs', homeTeam:'Warriors',  awayTeam:'Nets',      startTime:'Today 05:00', markets:{ home:1.65, draw:null, away:2.20, hdp:1.90, over:1.82, under:1.98 } },
+  { id:'nba3', league:'NBA · Playoffs', homeTeam:'Heat',      awayTeam:'Bucks',     startTime:'Today 05:30', markets:{ home:2.40, draw:null, away:1.55, hdp:1.92, over:1.88, under:1.92 } },
+  { id:'nba4', league:'NBA · Playoffs', homeTeam:'76ers',     awayTeam:'Raptors',   startTime:'Tomorrow 02:00', markets:{ home:1.80, draw:null, away:2.00, hdp:1.88, over:1.85, under:1.95 } },
+];
+
+const uplMatches = [
+  { id:'upl1', league:'Uganda Premier League · GW 28', homeTeam:'Vipers SC',     awayTeam:'KCCA FC',       startTime:'Sat 16:00', markets:{ home:1.95, draw:3.20, away:3.60 } },
+  { id:'upl2', league:'Uganda Premier League · GW 28', homeTeam:'SC Villa',      awayTeam:'Express FC',    startTime:'Sat 14:00', markets:{ home:2.30, draw:3.00, away:2.80 } },
+  { id:'upl3', league:'Uganda Premier League · GW 28', homeTeam:'Onduparaka',    awayTeam:'URA FC',        startTime:'Sun 14:00', markets:{ home:2.80, draw:2.90, away:2.40 } },
+  { id:'upl4', league:'Uganda Premier League · GW 28', homeTeam:'Police FC',     awayTeam:'BUL FC',        startTime:'Sun 16:00', markets:{ home:2.10, draw:3.10, away:3.20 } },
+  { id:'upl5', league:'Uganda Premier League · GW 28', homeTeam:'Wakiso Giants', awayTeam:'Mbarara City',  startTime:'Sun 16:00', markets:{ home:1.85, draw:3.30, away:3.80 } },
 ];
 </script>
 
@@ -1203,5 +1482,186 @@ const casinoHighlights = [
   .dt-right {
     align-self: stretch;
   }
+}
+
+/* ══════════════════════════════════════════════
+   FULL-WIDTH DARK FOOTER
+══════════════════════════════════════════════ */
+.site-footer-full {
+  background: #0f1016;
+  color: #a0a3b1;
+  width: 100%;
+  margin-top: 0;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.sff__top {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 32px 16px 24px;
+  border-bottom: 1px solid #1e2030;
+}
+
+@media (min-width: 1024px) {
+  .sff__top {
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 36px 32px 28px;
+    gap: 40px;
+  }
+}
+
+.sff__brand {
+  flex-shrink: 0;
+  max-width: 220px;
+}
+.sff__logo {
+  height: 36px;
+  object-fit: contain;
+  margin-bottom: 10px;
+  display: block;
+  filter: brightness(0) invert(1);
+}
+.sff__tagline {
+  font-size: 12px;
+  color: #6a6f7a;
+  line-height: 1.5;
+  margin: 0 0 14px;
+}
+.sff__social {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.sff__social-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  background: #1a1b26;
+  color: #a0a3b1;
+  border: 1px solid #2a2b38;
+  transition: background 0.15s, color 0.15s;
+  text-decoration: none;
+}
+.sff__social-btn:hover {
+  background: #c026d3;
+  color: #fff;
+  border-color: #c026d3;
+}
+
+.sff__links {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px 16px;
+  flex: 1;
+}
+@media (min-width: 768px) {
+  .sff__links {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.sff__col-head {
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  margin-bottom: 10px;
+}
+.sff__link {
+  display: block;
+  font-size: 12px;
+  color: #6a6f7a;
+  text-decoration: none;
+  margin-bottom: 7px;
+  transition: color 0.15s;
+}
+.sff__link:hover { color: #c026d3; }
+
+.sff__partners {
+  padding: 18px 16px;
+  border-bottom: 1px solid #1e2030;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+@media (min-width: 1024px) {
+  .sff__partners {
+    flex-direction: row;
+    align-items: center;
+    padding: 18px 32px;
+  }
+}
+.sff__partner-label {
+  font-size: 10px;
+  font-weight: 800;
+  color: #6a6f7a;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.sff__partner-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.sff__chip {
+  font-size: 11px;
+  font-weight: 600;
+  color: #a0a3b1;
+  background: #1a1b26;
+  border: 1px solid #2a2b38;
+  border-radius: 6px;
+  padding: 5px 10px;
+}
+
+.sff__bottom {
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+@media (min-width: 1024px) {
+  .sff__bottom {
+    padding: 20px 32px;
+  }
+}
+.sff__badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+.sff__badge {
+  font-size: 10px;
+  font-weight: 800;
+  color: #a0a3b1;
+  border: 1.5px solid #2a2b38;
+  border-radius: 5px;
+  padding: 3px 8px;
+  background: #1a1b26;
+  letter-spacing: .4px;
+}
+.sff__badge--age {
+  background: #c026d3;
+  color: #fff;
+  border-color: #c026d3;
+}
+.sff__legal {
+  font-size: 11px;
+  color: #4a4d5a;
+  line-height: 1.6;
+  max-width: 680px;
+  margin: 0;
+}
+.sff__legal strong { color: #6a6f7a; }
+.sff__copyright {
+  font-size: 11px;
+  color: #3a3d4a;
+  margin: 0;
 }
 </style>
