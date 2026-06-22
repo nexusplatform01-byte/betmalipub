@@ -526,7 +526,7 @@
               <div class="dt-bs__bonus">
                 <div class="dt-bs__bonus-header">
                   <span class="dt-bs__bonus-title">🎁 Bet Bonus</span>
-                  <span class="dt-bs__bonus-max">Up to 1000%</span>
+                  <span class="dt-bs__bonus-max">Up to 500%</span>
                 </div>
                 <div class="dt-bs__bonus-bar-wrap">
                   <div class="dt-bs__bonus-bar" :style="{ width: Math.min(bonusPercent / 10, 100) + '%' }"></div>
@@ -807,7 +807,7 @@
         <div class="mob-bs-bonus">
           <div class="mob-bs-bonus__header">
             <span class="mob-bs-bonus__title">🎁 Bet Bonus</span>
-            <span class="mob-bs-bonus__max">Up to 1000%</span>
+            <span class="mob-bs-bonus__max">Up to 500%</span>
           </div>
           <div class="mob-bs-bonus__bar-wrap">
             <div class="mob-bs-bonus__bar" :style="{ width: Math.min(bonusPercent / 10, 100) + '%' }"></div>
@@ -876,7 +876,6 @@ const totalOdds = computed(() => store.betslip.reduce((acc, b) => acc * b.odds, 
 const BONUS_TIERS: [number, number][] = [
   [2, 40], [3, 80], [4, 120], [5, 160], [6, 200],
   [7, 250], [8, 300], [9, 400], [10, 500],
-  [11, 600], [12, 700], [13, 800], [14, 900], [15, 1000],
 ];
 const bonusPercent = computed(() => {
   const n = store.betslip.length;
