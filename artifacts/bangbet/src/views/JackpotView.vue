@@ -1,41 +1,752 @@
 <template>
-  <div class="page">
+  <div class="page jp-page">
     <AppHeader />
+
     <div class="page-title-bar">
       <button class="back-btn" @click="$router.back()">←</button>
       <span class="page-title">🏆 Sports Jackpot</span>
     </div>
 
-    <div class="jackpot-banner">
-      <div class="jackpot-label">Current Jackpot Prize</div>
-      <div class="jackpot-amount">UGX 6,600,000</div>
-      <div style="font-size:12px;color:rgba(255,255,255,0.55);margin-top:6px;">Predict 12 correct scores to win!</div>
-    </div>
+    <!-- Spinning jackpot pool (same as homepage) -->
+    <JackpotSection />
 
-    <div style="padding:10px 10px 0;background:var(--bg-main);">
-      <img :src="'/static/img/Bg_SportsJackpot_Up_36.b6e66f7.png'" alt="Jackpot" style="width:100%;border-radius:8px;display:block;margin-bottom:8px;" />
-    </div>
-
-    <div class="section">
-      <div class="section-header">
-        <div class="section-title">📅 Jackpot Matches</div>
+    <!-- Tier selector tabs -->
+    <div class="jpt-tabs-wrap">
+      <div class="jpt-tabs">
+        <button
+          v-for="t in tiers" :key="t.id"
+          class="jpt-tab"
+          :class="[`jpt-tab--${t.id}`, { 'jpt-tab--active': activeTier === t.id }]"
+          @click="activeTier = t.id"
+        >
+          <span class="jpt-tab__medal">{{ t.medal }}</span>
+          <div class="jpt-tab__text">
+            <span class="jpt-tab__name">{{ t.name }}</span>
+            <span class="jpt-tab__stake">UGX {{ t.stake.toLocaleString() }}</span>
+          </div>
+          <span v-if="betPlaced[t.id]" class="jpt-tab__pill">✓</span>
+        </button>
       </div>
-      <MatchCard v-for="match in store.topMatches.slice(0, 6)" :key="match.id" :match="match" />
     </div>
 
-    <div style="padding:0 10px 16px;background:var(--bg-main);">
-      <button class="btn-full" style="background:var(--accent);color:#000;">Place Jackpot Bet</button>
-    </div>
+    <!-- Per-tier panels -->
+    <template v-for="t in tiers" :key="'panel-'+t.id">
+      <div v-show="activeTier === t.id" class="jpt-panel" :data-tier="t.id">
 
+        <!-- Hero: prize + countdown -->
+        <div class="jpt-hero" :class="`jpt-hero--${t.id}`">
+          <div class="jpt-hero__prize-col">
+            <div class="jpt-hero__badge">{{ t.name }} JACKPOT</div>
+            <div class="jpt-hero__prize">{{ t.prizeDisplay }}</div>
+            <div class="jpt-hero__matches-badge">12 Matches · 1X2 Only</div>
+            <div class="jpt-hero__stake-tag">
+              <span class="jpt-hero__stake-lbl">Fixed Entry Stake</span>
+              <span class="jpt-hero__stake-val">UGX {{ t.stake.toLocaleString() }}</span>
+            </div>
+          </div>
+          <div class="jpt-hero__cdown-col">
+            <div class="jpt-hero__cdown-lbl">⏱ Jackpot closes in</div>
+            <div class="jpt-cdown" :class="`jpt-cdown--${t.id}`">
+              <div class="jpt-cdown__block">
+                <span class="jpt-cdown__val">{{ cd[t.id].h }}</span>
+                <span class="jpt-cdown__unit">HRS</span>
+              </div>
+              <span class="jpt-cdown__sep">:</span>
+              <div class="jpt-cdown__block">
+                <span class="jpt-cdown__val">{{ cd[t.id].m }}</span>
+                <span class="jpt-cdown__unit">MIN</span>
+              </div>
+              <span class="jpt-cdown__sep">:</span>
+              <div class="jpt-cdown__block">
+                <span class="jpt-cdown__val">{{ cd[t.id].s }}</span>
+                <span class="jpt-cdown__unit">SEC</span>
+              </div>
+            </div>
+            <div class="jpt-cdown__note">Last match ends {{ t.lastMatchDisplay }}</div>
+          </div>
+        </div>
+
+        <!-- Pick progress -->
+        <div class="jpt-progress">
+          <div class="jpt-progress__row">
+            <span class="jpt-progress__count"><strong>{{ picksCount(t.id) }}</strong>/12 picks made</span>
+            <span v-if="picksCount(t.id) < 12" class="jpt-progress__hint">{{ 12 - picksCount(t.id) }} more to go</span>
+            <span v-else class="jpt-progress__done">✓ All picks done!</span>
+          </div>
+          <div class="jpt-progress__track">
+            <div
+              class="jpt-progress__fill"
+              :class="`jpt-progress__fill--${t.id}`"
+              :style="{ width: (picksCount(t.id)/12*100) + '%' }"
+            ></div>
+          </div>
+        </div>
+
+        <!-- Match table -->
+        <div class="jpt-table">
+          <div class="jpt-table__hdr" :class="`jpt-table__hdr--${t.id}`">
+            <div class="jpt-th jpt-th--num">#</div>
+            <div class="jpt-th jpt-th--info">Match</div>
+            <div class="jpt-th jpt-th--odd">1</div>
+            <div class="jpt-th jpt-th--odd">X</div>
+            <div class="jpt-th jpt-th--odd">2</div>
+          </div>
+
+          <div
+            v-for="(match, idx) in t.matches" :key="match.id"
+            class="jpt-row"
+            :class="{ 'jpt-row--picked': picks[t.id][idx] !== null }"
+          >
+            <div class="jpt-row__num">{{ idx + 1 }}</div>
+            <div class="jpt-row__info">
+              <div class="jpt-row__league">{{ match.league }}</div>
+              <div class="jpt-row__teams">
+                <span class="jpt-row__team">{{ match.home }}</span>
+                <span class="jpt-row__vs">vs</span>
+                <span class="jpt-row__team">{{ match.away }}</span>
+              </div>
+              <div class="jpt-row__time">{{ match.time }}</div>
+            </div>
+            <button
+              class="jpt-odd"
+              :class="{ 'jpt-odd--active': picks[t.id][idx] === '1' }"
+              :disabled="betPlaced[t.id]"
+              @click="setPick(t.id, idx, '1')"
+            >{{ match.odds[0] }}</button>
+            <button
+              class="jpt-odd"
+              :class="{ 'jpt-odd--active': picks[t.id][idx] === 'X' }"
+              :disabled="betPlaced[t.id]"
+              @click="setPick(t.id, idx, 'X')"
+            >{{ match.odds[1] }}</button>
+            <button
+              class="jpt-odd"
+              :class="{ 'jpt-odd--active': picks[t.id][idx] === '2' }"
+              :disabled="betPlaced[t.id]"
+              @click="setPick(t.id, idx, '2')"
+            >{{ match.odds[2] }}</button>
+          </div>
+        </div>
+
+        <!-- Footer action -->
+        <div class="jpt-footer">
+          <!-- Results after countdown -->
+          <template v-if="results[t.id]">
+            <div class="jpt-result" :class="results[t.id]!.won ? 'jpt-result--win' : 'jpt-result--loss'">
+              <div class="jpt-result__icon">{{ results[t.id]!.won ? '🎉' : '😔' }}</div>
+              <div class="jpt-result__title">
+                {{ results[t.id]!.won ? '🏆 JACKPOT WON!' : 'Better luck next time!' }}
+              </div>
+              <div v-if="results[t.id]!.won" class="jpt-result__prize">{{ t.prizeDisplay }}</div>
+              <div class="jpt-result__sub">
+                {{ results[t.id]!.won
+                   ? 'Prize has been credited to your account!'
+                   : `You got ${results[t.id]!.correct} out of 12 correct.` }}
+              </div>
+            </div>
+          </template>
+
+          <!-- Waiting for countdown -->
+          <template v-else-if="betPlaced[t.id]">
+            <div class="jpt-waiting">
+              <div class="jpt-waiting__icon">🎟</div>
+              <div class="jpt-waiting__title">Entry Confirmed!</div>
+              <div class="jpt-waiting__sub">Awaiting results when the jackpot closes.</div>
+              <div class="jpt-waiting__stake">Stake paid: <strong>UGX {{ t.stake.toLocaleString() }}</strong></div>
+            </div>
+          </template>
+
+          <!-- Place bet -->
+          <template v-else>
+            <div class="jpt-footer__summary">
+              <div class="jpt-footer__picks-info">
+                <span class="jpt-footer__picks-count">{{ picksCount(t.id) }}/12 picks</span>
+                <span class="jpt-footer__picks-dot">·</span>
+                <span class="jpt-footer__picks-note">{{ picksCount(t.id) < 12 ? 'Select all matches to play' : 'Ready to play!' }}</span>
+              </div>
+              <div class="jpt-footer__stake-display">
+                Stake: <strong>UGX {{ t.stake.toLocaleString() }}</strong>
+              </div>
+            </div>
+            <button
+              class="jpt-btn"
+              :class="[`jpt-btn--${t.id}`, { 'jpt-btn--disabled': picksCount(t.id) < 12 }]"
+              :disabled="picksCount(t.id) < 12"
+              @click="placeBet(t.id, t)"
+            >
+              <template v-if="!store.isLoggedIn">🔐 Login to Play</template>
+              <template v-else-if="picksCount(t.id) < 12">
+                Select {{ 12 - picksCount(t.id) }} more match{{ 12 - picksCount(t.id) !== 1 ? 'es' : '' }}
+              </template>
+              <template v-else>
+                🎰 Play {{ t.name }} Jackpot — UGX {{ t.stake.toLocaleString() }}
+              </template>
+            </button>
+          </template>
+        </div>
+
+      </div>
+    </template>
+
+    <div style="height: 70px"></div>
     <BottomNav />
   </div>
 </template>
 
 <script setup lang="ts">
-import AppHeader from "@/components/AppHeader.vue";
-import BottomNav from "@/components/BottomNav.vue";
-import MatchCard from "@/components/MatchCard.vue";
-import { useAppStore } from "@/stores/app";
+import { ref, reactive, onMounted, onUnmounted } from 'vue';
+import { useAppStore } from '@/stores/app';
+import AppHeader from '@/components/AppHeader.vue';
+import BottomNav from '@/components/BottomNav.vue';
+import JackpotSection from '@/components/JackpotSection.vue';
 
 const store = useAppStore();
+const activeTier = ref('gold');
+
+// ─── Types ───────────────────────────────────────────────
+interface JpMatch {
+  id: string;
+  league: string;
+  home: string;
+  away: string;
+  time: string;
+  odds: [number, number, number]; // 1, X, 2
+}
+
+interface JpTier {
+  id: string;
+  name: string;
+  medal: string;
+  stake: number;
+  prizeDisplay: string;
+  lastMatchDisplay: string; // display string "Today 20:00"
+  endsAt: number;           // timestamp when last match ends (kickoff + 90min)
+  matches: JpMatch[];
+}
+
+interface CdState { h: string; m: string; s: string; done: boolean; }
+interface ResultState { won: boolean; correct: number; }
+
+// ─── Helpers ─────────────────────────────────────────────
+function todayAt(h: number, m: number): number {
+  const d = new Date();
+  d.setHours(h, m, 0, 0);
+  if (d.getTime() <= Date.now()) d.setDate(d.getDate() + 1);
+  return d.getTime();
+}
+
+function pad(n: number) { return String(n).padStart(2, '0'); }
+
+function fmtCountdown(endsAt: number): CdState {
+  const diff = Math.max(0, endsAt - Date.now());
+  if (diff === 0) return { h: '00', m: '00', s: '00', done: true };
+  const totalSec = Math.floor(diff / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  return { h: pad(h), m: pad(m), s: pad(s), done: false };
+}
+
+// ─── Tier & Match Data ────────────────────────────────────
+// Gold:    last match kicks off 20:00 → ends 21:30
+// Silver:  last match kicks off 18:00 → ends 19:30
+// Bronze:  last match kicks off 21:00 → ends 22:30
+// Premium: last match kicks off 16:00 → ends 17:30
+
+const tiers: JpTier[] = [
+  {
+    id: 'gold', name: 'GOLD', medal: '🥇',
+    stake: 10_000,
+    prizeDisplay: 'UGX 856,241,337',
+    lastMatchDisplay: 'Today 21:30',
+    endsAt: todayAt(21, 30),
+    matches: [
+      { id: 'g1',  league: 'EPL',          home: 'Arsenal',         away: 'Man City',        time: 'Today 15:00', odds: [2.50, 3.40, 2.65] },
+      { id: 'g2',  league: 'La Liga',       home: 'Barcelona',       away: 'Atletico Madrid', time: 'Today 15:30', odds: [1.85, 3.50, 4.20] },
+      { id: 'g3',  league: 'Bundesliga',    home: 'Bayern Munich',   away: 'Dortmund',        time: 'Today 16:00', odds: [1.70, 3.80, 4.50] },
+      { id: 'g4',  league: 'EPL',           home: 'Liverpool',       away: 'Chelsea',         time: 'Today 16:30', odds: [2.20, 3.20, 3.10] },
+      { id: 'g5',  league: 'Ligue 1',       home: 'PSG',             away: 'Marseille',       time: 'Today 17:00', odds: [1.60, 3.90, 5.00] },
+      { id: 'g6',  league: 'La Liga',       home: 'Real Madrid',     away: 'Sevilla',         time: 'Today 17:30', odds: [1.75, 3.60, 4.50] },
+      { id: 'g7',  league: 'Serie A',       home: 'Inter Milan',     away: 'AC Milan',        time: 'Today 18:00', odds: [2.30, 3.10, 2.90] },
+      { id: 'g8',  league: 'EPL',           home: 'Man United',      away: 'Tottenham',       time: 'Today 18:30', odds: [2.10, 3.30, 3.20] },
+      { id: 'g9',  league: 'Serie A',       home: 'Napoli',          away: 'Juventus',        time: 'Today 19:00', odds: [2.80, 3.20, 2.40] },
+      { id: 'g10', league: 'Eredivisie',    home: 'Ajax',            away: 'PSV',             time: 'Today 19:15', odds: [2.00, 3.20, 3.50] },
+      { id: 'g11', league: 'Liga Portugal', home: 'Porto',           away: 'Benfica',         time: 'Today 19:30', odds: [2.20, 3.25, 3.10] },
+      { id: 'g12', league: 'Bundesliga',    home: 'RB Leipzig',      away: 'Leverkusen',      time: 'Today 20:00', odds: [2.45, 3.15, 2.75] },
+    ],
+  },
+  {
+    id: 'silver', name: 'SILVER', medal: '🥈',
+    stake: 8_500,
+    prizeDisplay: 'UGX 432,817,658',
+    lastMatchDisplay: 'Today 19:30',
+    endsAt: todayAt(19, 30),
+    matches: [
+      { id: 's1',  league: 'EPL',          home: 'West Ham',        away: 'Aston Villa',     time: 'Today 13:00', odds: [2.40, 3.20, 2.80] },
+      { id: 's2',  league: 'Ligue 1',      home: 'Lyon',            away: 'Monaco',          time: 'Today 13:30', odds: [1.90, 3.40, 3.80] },
+      { id: 's3',  league: 'Serie A',      home: 'Roma',            away: 'Lazio',           time: 'Today 14:00', odds: [2.10, 3.10, 3.20] },
+      { id: 's4',  league: 'La Liga',      home: 'Valencia',        away: 'Villarreal',      time: 'Today 14:30', odds: [2.25, 3.15, 2.95] },
+      { id: 's5',  league: 'Eredivisie',   home: 'Feyenoord',       away: 'Utrecht',         time: 'Today 14:45', odds: [1.80, 3.50, 4.00] },
+      { id: 's6',  league: 'Scottish PL',  home: 'Celtic',          away: 'Rangers',         time: 'Today 15:00', odds: [1.95, 3.30, 3.75] },
+      { id: 's7',  league: 'Süper Lig',    home: 'Galatasaray',     away: 'Fenerbahce',      time: 'Today 15:30', odds: [2.05, 3.20, 3.40] },
+      { id: 's8',  league: 'Liga Portugal',home: 'Sporting',        away: 'Porto',           time: 'Today 16:00', odds: [2.30, 3.10, 2.90] },
+      { id: 's9',  league: 'Ligue 1',      home: 'Marseille',       away: 'Nice',            time: 'Today 16:30', odds: [1.85, 3.45, 4.10] },
+      { id: 's10', league: 'Bundesliga',   home: 'Stuttgart',       away: 'Freiburg',        time: 'Today 17:00', odds: [2.10, 3.30, 3.10] },
+      { id: 's11', league: 'Pro League',   home: 'Anderlecht',      away: 'Club Brugge',     time: 'Today 17:30', odds: [2.35, 3.15, 2.85] },
+      { id: 's12', league: 'EPL',          home: 'Newcastle',       away: 'Brighton',        time: 'Today 18:00', odds: [1.90, 3.45, 3.90] },
+    ],
+  },
+  {
+    id: 'bronze', name: 'BRONZE', medal: '🥉',
+    stake: 5_000,
+    prizeDisplay: 'UGX 287,542,110',
+    lastMatchDisplay: 'Today 22:30',
+    endsAt: todayAt(22, 30),
+    matches: [
+      { id: 'b1',  league: 'Uganda PL',    home: 'KCCA FC',         away: 'Express FC',      time: 'Today 16:00', odds: [1.85, 3.40, 4.20] },
+      { id: 'b2',  league: 'Ligue 1',      home: 'Stade Rennais',   away: 'Lille',           time: 'Today 16:30', odds: [2.30, 3.10, 2.90] },
+      { id: 'b3',  league: 'Serie A',      home: 'Empoli',          away: 'Fiorentina',      time: 'Today 17:00', odds: [3.00, 3.20, 2.25] },
+      { id: 'b4',  league: 'La Liga',      home: 'Real Sociedad',   away: 'Athletic Bilbao', time: 'Today 17:30', odds: [2.40, 3.15, 2.80] },
+      { id: 'b5',  league: 'Bundesliga',   home: 'Hertha Berlin',   away: 'Wolfsburg',       time: 'Today 18:00', odds: [2.20, 3.30, 2.95] },
+      { id: 'b6',  league: 'EPL',          home: 'Everton',         away: 'Wolves',          time: 'Today 18:30', odds: [2.35, 3.20, 2.85] },
+      { id: 'b7',  league: 'Egyptian PL',  home: 'Al Ahly',         away: 'Zamalek',         time: 'Today 19:00', odds: [1.95, 3.35, 3.80] },
+      { id: 'b8',  league: 'Argentine PL', home: 'Boca Juniors',    away: 'River Plate',     time: 'Today 19:30', odds: [2.50, 3.10, 2.60] },
+      { id: 'b9',  league: 'Bundesliga',   home: 'Mainz',           away: 'Augsburg',        time: 'Today 20:00', odds: [2.15, 3.25, 3.20] },
+      { id: 'b10', league: 'Serie A',      home: 'Genoa',           away: 'Bologna',         time: 'Today 20:15', odds: [2.55, 3.15, 2.65] },
+      { id: 'b11', league: 'Liga Portugal',home: 'Braga',           away: 'Vitoria SC',      time: 'Today 20:30', odds: [1.75, 3.55, 4.30] },
+      { id: 'b12', league: 'Ligue 1',      home: 'Lens',            away: 'Strasbourg',      time: 'Today 21:00', odds: [2.00, 3.35, 3.55] },
+    ],
+  },
+  {
+    id: 'premium', name: 'PREMIUM', medal: '💎',
+    stake: 2_000,
+    prizeDisplay: 'UGX 194,163,808',
+    lastMatchDisplay: 'Today 17:30',
+    endsAt: todayAt(17, 30),
+    matches: [
+      { id: 'p1',  league: 'Uganda PL',    home: 'KCCA FC',         away: 'Police FC',       time: 'Today 11:30', odds: [1.80, 3.60, 4.40] },
+      { id: 'p2',  league: 'Uganda PL',    home: 'Express FC',      away: 'SC Villa',        time: 'Today 12:00', odds: [2.10, 3.25, 3.30] },
+      { id: 'p3',  league: 'Tanzania SL',  home: 'Simba SC',        away: 'Young Africans',  time: 'Today 12:30', odds: [2.00, 3.30, 3.50] },
+      { id: 'p4',  league: 'DR Congo',     home: 'TP Mazembe',      away: 'V.Club',          time: 'Today 13:00', odds: [2.15, 3.20, 3.30] },
+      { id: 'p5',  league: 'South Africa', home: 'Mamelodi Sundowns',away: 'Kaizer Chiefs',  time: 'Today 13:30', odds: [1.75, 3.55, 4.50] },
+      { id: 'p6',  league: 'Cote d\'Ivoire',home: 'ASEC Mimosas',   away: 'Stade Abidjan',  time: 'Today 14:00', odds: [1.95, 3.35, 3.75] },
+      { id: 'p7',  league: 'Morocco Botola',home: 'Wydad AC',       away: 'Raja Casablanca', time: 'Today 14:30', odds: [2.10, 3.25, 3.30] },
+      { id: 'p8',  league: 'Uganda PL',    home: 'Wakiso Giants',   away: 'Proline FC',      time: 'Today 14:45', odds: [2.30, 3.20, 2.90] },
+      { id: 'p9',  league: 'Uganda PL',    home: 'Vipers SC',       away: 'BUL FC',          time: 'Today 15:00', odds: [1.70, 3.70, 4.80] },
+      { id: 'p10', league: 'Uganda PL',    home: 'Onduparaka FC',   away: 'URA FC',          time: 'Today 15:30', odds: [2.45, 3.15, 2.75] },
+      { id: 'p11', league: 'Uganda PL',    home: 'Busoga United',   away: 'Mbarara City',    time: 'Today 15:45', odds: [2.20, 3.25, 2.95] },
+      { id: 'p12', league: 'Uganda PL',    home: 'Arua Hill SC',    away: 'MYDA FC',         time: 'Today 16:00', odds: [1.90, 3.50, 3.95] },
+    ],
+  },
+];
+
+// ─── Reactive state ───────────────────────────────────────
+const picks = reactive<Record<string, (string | null)[]>>(
+  Object.fromEntries(tiers.map(t => [t.id, Array(12).fill(null)]))
+);
+
+const betPlaced = reactive<Record<string, boolean>>(
+  Object.fromEntries(tiers.map(t => [t.id, false]))
+);
+
+const results = reactive<Record<string, ResultState | null>>(
+  Object.fromEntries(tiers.map(t => [t.id, null]))
+);
+
+const cd = reactive<Record<string, CdState>>(
+  Object.fromEntries(tiers.map(t => [t.id, fmtCountdown(t.endsAt)]))
+);
+
+// ─── Pick helpers ─────────────────────────────────────────
+function picksCount(tid: string): number {
+  return picks[tid].filter(p => p !== null).length;
+}
+
+function setPick(tid: string, idx: number, val: string) {
+  if (betPlaced[tid]) return;
+  picks[tid][idx] = picks[tid][idx] === val ? null : val;
+}
+
+// ─── Place bet ────────────────────────────────────────────
+function placeBet(tid: string, tier: JpTier) {
+  if (!store.isLoggedIn) { alert('Please login first'); return; }
+  if (store.balance < tier.stake) { alert('Insufficient balance'); return; }
+  store.withdraw(tier.stake);
+  betPlaced[tid] = true;
+}
+
+// ─── Simulate results when countdown done ────────────────
+function simulateResults(tid: string) {
+  const outcomes = ['1', 'X', '2'];
+  const correct = picks[tid].filter((p, i) => {
+    const outcome = outcomes[Math.floor(Math.random() * 3)];
+    return p === outcome;
+  }).length;
+  const won = correct === 12;
+  results[tid] = { won, correct };
+  if (won) {
+    const tier = tiers.find(t => t.id === tid)!;
+    store.deposit(tier.stake + 500_000); // award demo prize
+  }
+}
+
+// ─── Countdown interval ───────────────────────────────────
+let timer: ReturnType<typeof setInterval>;
+
+onMounted(() => {
+  timer = setInterval(() => {
+    for (const t of tiers) {
+      const state = fmtCountdown(t.endsAt);
+      cd[t.id] = state;
+      if (state.done && betPlaced[t.id] && !results[t.id]) {
+        simulateResults(t.id);
+      }
+    }
+  }, 1000);
+});
+
+onUnmounted(() => clearInterval(timer));
 </script>
+
+<style scoped>
+/* ─── page ─────────────────────────────────────────────── */
+.jp-page { background: #f0f1f5; min-height: 100vh; }
+
+/* ─── tier tabs ─────────────────────────────────────────── */
+.jpt-tabs-wrap {
+  background: #1c1e24;
+  padding: 8px 8px 0;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+.jpt-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+.jpt-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 4px 10px;
+  border: none;
+  background: rgba(255,255,255,0.07);
+  border-radius: 8px 8px 0 0;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s;
+}
+.jpt-tab--active { background: rgba(255,255,255,0.15); }
+.jpt-tab__medal { font-size: 20px; line-height: 1; }
+.jpt-tab__text { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+.jpt-tab__name { font-size: 9px; font-weight: 900; letter-spacing: .5px; color: #fff; }
+.jpt-tab__stake { font-size: 7.5px; font-weight: 600; color: rgba(255,255,255,0.55); white-space: nowrap; }
+.jpt-tab__pill {
+  position: absolute; top: 4px; right: 4px;
+  background: #10a310; color: #fff;
+  font-size: 7px; font-weight: 800;
+  border-radius: 8px; padding: 1px 4px;
+}
+
+/* Gold tab accent */
+.jpt-tab--gold.jpt-tab--active { border-bottom: 3px solid #ffd700; }
+.jpt-tab--silver.jpt-tab--active { border-bottom: 3px solid #c0c8d8; }
+.jpt-tab--bronze.jpt-tab--active { border-bottom: 3px solid #d4834a; }
+.jpt-tab--premium.jpt-tab--active { border-bottom: 3px solid #c080ff; }
+
+/* ─── panel ─────────────────────────────────────────────── */
+.jpt-panel { background: #f0f1f5; }
+
+/* ─── hero ──────────────────────────────────────────────── */
+.jpt-hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 14px 16px;
+  margin: 0;
+}
+.jpt-hero--gold    { background: linear-gradient(135deg, #c87800 0%, #7a4000 100%); }
+.jpt-hero--silver  { background: linear-gradient(135deg, #5a6070 0%, #2e3240 100%); }
+.jpt-hero--bronze  { background: linear-gradient(135deg, #8c4210 0%, #4a1e00 100%); }
+.jpt-hero--premium { background: linear-gradient(135deg, #5010a8 0%, #25006a 100%); }
+
+.jpt-hero__prize-col { flex: 1; min-width: 0; }
+
+.jpt-hero__badge {
+  display: inline-block;
+  font-size: 8px; font-weight: 900; letter-spacing: 1px;
+  background: rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.9);
+  border-radius: 10px;
+  padding: 2px 8px;
+  margin-bottom: 6px;
+}
+.jpt-hero__prize {
+  font-size: 18px; font-weight: 900;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+.jpt-hero--gold .jpt-hero__prize   { color: #ffe87a; }
+.jpt-hero--silver .jpt-hero__prize { color: #e8eaf0; }
+.jpt-hero--bronze .jpt-hero__prize { color: #ffd0a0; }
+.jpt-hero--premium .jpt-hero__prize{ color: #e8c8ff; }
+
+.jpt-hero__matches-badge {
+  font-size: 9px; font-weight: 700;
+  color: rgba(255,255,255,0.65);
+  margin-bottom: 8px;
+}
+.jpt-hero__stake-tag {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(0,0,0,0.22);
+  border-radius: 6px;
+  padding: 5px 8px;
+  width: fit-content;
+}
+.jpt-hero__stake-lbl { font-size: 9px; color: rgba(255,255,255,0.6); }
+.jpt-hero__stake-val { font-size: 13px; font-weight: 900; color: #fff; }
+
+/* countdown */
+.jpt-hero__cdown-col { text-align: right; flex-shrink: 0; }
+.jpt-hero__cdown-lbl { font-size: 9px; color: rgba(255,255,255,0.6); margin-bottom: 4px; }
+
+.jpt-cdown {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: flex-end;
+}
+.jpt-cdown__block {
+  display: flex; flex-direction: column; align-items: center;
+  background: rgba(0,0,0,0.30);
+  border-radius: 6px;
+  padding: 5px 8px;
+  min-width: 44px;
+}
+.jpt-cdown__val {
+  font-size: 22px; font-weight: 900;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.jpt-cdown--gold .jpt-cdown__val    { color: #ffe87a; }
+.jpt-cdown--silver .jpt-cdown__val  { color: #e8eaf0; }
+.jpt-cdown--bronze .jpt-cdown__val  { color: #ffd0a0; }
+.jpt-cdown--premium .jpt-cdown__val { color: #e8c8ff; }
+
+.jpt-cdown__unit {
+  font-size: 7px; font-weight: 700; letter-spacing: .5px;
+  color: rgba(255,255,255,0.5);
+  margin-top: 2px;
+}
+.jpt-cdown__sep {
+  font-size: 20px; font-weight: 900; color: rgba(255,255,255,0.5);
+  margin-bottom: 12px;
+}
+.jpt-cdown__note {
+  font-size: 8.5px; color: rgba(255,255,255,0.5);
+  margin-top: 5px; text-align: right;
+}
+
+/* ─── progress ──────────────────────────────────────────── */
+.jpt-progress {
+  background: #fff;
+  padding: 8px 14px;
+  border-bottom: 1px solid #ebebeb;
+}
+.jpt-progress__row {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 5px;
+}
+.jpt-progress__count { font-size: 11px; color: #6a6f7a; }
+.jpt-progress__count strong { color: #292a33; }
+.jpt-progress__hint { font-size: 11px; color: #9599a4; }
+.jpt-progress__done { font-size: 11px; font-weight: 700; color: #10a310; }
+
+.jpt-progress__track {
+  height: 5px; background: #e8e9ed; border-radius: 4px; overflow: hidden;
+}
+.jpt-progress__fill {
+  height: 100%; border-radius: 4px;
+  transition: width 0.4s ease;
+  min-width: 3px;
+}
+.jpt-progress__fill--gold    { background: linear-gradient(90deg, #ffd700, #e8a000); }
+.jpt-progress__fill--silver  { background: linear-gradient(90deg, #b0b5c0, #5a6070); }
+.jpt-progress__fill--bronze  { background: linear-gradient(90deg, #d4834a, #8c4210); }
+.jpt-progress__fill--premium { background: linear-gradient(90deg, #c080ff, #5010a8); }
+
+/* ─── match table ───────────────────────────────────────── */
+.jpt-table { background: #fff; margin-top: 8px; }
+
+.jpt-table__hdr {
+  display: grid;
+  grid-template-columns: 28px 1fr 52px 52px 52px;
+  padding: 6px 8px;
+  border-bottom: 2px solid #ebebeb;
+}
+.jpt-table__hdr--gold    { border-bottom-color: #ffd700; }
+.jpt-table__hdr--silver  { border-bottom-color: #b0b5c0; }
+.jpt-table__hdr--bronze  { border-bottom-color: #d4834a; }
+.jpt-table__hdr--premium { border-bottom-color: #c080ff; }
+
+.jpt-th { font-size: 10px; font-weight: 800; color: #6a6f7a; letter-spacing: .3px; }
+.jpt-th--num  { text-align: center; }
+.jpt-th--info { padding-left: 4px; }
+.jpt-th--odd  { text-align: center; }
+
+.jpt-row {
+  display: grid;
+  grid-template-columns: 28px 1fr 52px 52px 52px;
+  align-items: center;
+  padding: 8px 8px;
+  border-bottom: 1px solid #f0f0f4;
+  transition: background 0.12s;
+}
+.jpt-row--picked { background: rgba(16, 163, 16, 0.04); }
+
+.jpt-row__num {
+  font-size: 10px; font-weight: 700; color: #9599a4;
+  text-align: center;
+}
+.jpt-row__info { padding-right: 4px; }
+.jpt-row__league { font-size: 9px; font-weight: 600; color: #9599a4; margin-bottom: 2px; }
+.jpt-row__teams { display: flex; align-items: center; gap: 3px; flex-wrap: wrap; }
+.jpt-row__team { font-size: 11px; font-weight: 700; color: #292a33; }
+.jpt-row__vs { font-size: 9px; color: #9599a4; }
+.jpt-row__time { font-size: 9px; color: #9599a4; margin-top: 2px; }
+
+/* odds buttons */
+.jpt-odd {
+  display: flex; align-items: center; justify-content: center;
+  width: 44px; height: 38px;
+  margin: 0 auto;
+  background: #f2f3f5;
+  border: 1.5px solid #e6e7eb;
+  border-radius: 7px;
+  font-size: 12px; font-weight: 800;
+  color: #292a33;
+  cursor: pointer;
+  transition: all 0.14s;
+}
+.jpt-odd:disabled { opacity: 0.6; cursor: default; }
+.jpt-odd--active {
+  background: linear-gradient(135deg, #c026d3, #a21caf);
+  border-color: #a21caf;
+  color: #fff;
+}
+
+/* tier-colored active odd */
+.jpt-panel[data-tier="gold"] .jpt-odd--active {
+  background: linear-gradient(135deg, #ffd700, #c87800);
+  border-color: #c87800;
+  color: #3d1800;
+}
+.jpt-panel[data-tier="silver"] .jpt-odd--active {
+  background: linear-gradient(135deg, #b0b8cc, #5a6070);
+  border-color: #5a6070;
+  color: #fff;
+}
+.jpt-panel[data-tier="bronze"] .jpt-odd--active {
+  background: linear-gradient(135deg, #d4834a, #8c4210);
+  border-color: #8c4210;
+  color: #fff;
+}
+.jpt-panel[data-tier="premium"] .jpt-odd--active {
+  background: linear-gradient(135deg, #c080ff, #5010a8);
+  border-color: #5010a8;
+  color: #fff;
+}
+
+/* ─── footer ────────────────────────────────────────────── */
+.jpt-footer {
+  padding: 14px 12px;
+  background: #fff;
+  border-top: 1px solid #ebebeb;
+  margin-top: 8px;
+}
+
+.jpt-footer__summary {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 10px;
+}
+.jpt-footer__picks-info { display: flex; align-items: center; gap: 5px; }
+.jpt-footer__picks-count { font-size: 11px; font-weight: 700; color: #292a33; }
+.jpt-footer__picks-dot { color: #9599a4; font-size: 10px; }
+.jpt-footer__picks-note { font-size: 11px; color: #9599a4; }
+.jpt-footer__stake-display { font-size: 12px; color: #6a6f7a; }
+.jpt-footer__stake-display strong { color: #292a33; }
+
+/* place bet button */
+.jpt-btn {
+  display: block; width: 100%;
+  padding: 13px; border: none; border-radius: 9px;
+  font-size: 14px; font-weight: 800;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.jpt-btn--disabled { opacity: 0.5; cursor: not-allowed; }
+.jpt-btn--gold    { background: linear-gradient(90deg, #ffd700, #c87800); color: #3d1800; }
+.jpt-btn--silver  { background: linear-gradient(90deg, #b0b8cc, #3a4050); color: #fff; }
+.jpt-btn--bronze  { background: linear-gradient(90deg, #d4834a, #8c4210); color: #fff; }
+.jpt-btn--premium { background: linear-gradient(90deg, #c080ff, #5010a8); color: #fff; }
+.jpt-btn:not(.jpt-btn--disabled):hover { opacity: 0.9; }
+
+/* ─── waiting state ─────────────────────────────────────── */
+.jpt-waiting {
+  text-align: center; padding: 16px 10px;
+}
+.jpt-waiting__icon { font-size: 32px; margin-bottom: 8px; }
+.jpt-waiting__title { font-size: 16px; font-weight: 800; color: #292a33; margin-bottom: 4px; }
+.jpt-waiting__sub { font-size: 12px; color: #6a6f7a; margin-bottom: 8px; line-height: 1.5; }
+.jpt-waiting__stake { font-size: 12px; color: #6a6f7a; }
+.jpt-waiting__stake strong { color: #292a33; }
+
+/* ─── result state ──────────────────────────────────────── */
+.jpt-result {
+  text-align: center; padding: 20px 12px;
+  border-radius: 10px;
+}
+.jpt-result--win  { background: linear-gradient(135deg, rgba(16,163,16,0.08), rgba(16,163,16,0.04)); border: 2px solid #10a310; }
+.jpt-result--loss { background: rgba(0,0,0,0.03); border: 1px solid #ebebeb; }
+
+.jpt-result__icon  { font-size: 40px; margin-bottom: 8px; }
+.jpt-result__title { font-size: 18px; font-weight: 900; margin-bottom: 6px; }
+.jpt-result--win .jpt-result__title  { color: #10a310; }
+.jpt-result--loss .jpt-result__title { color: #292a33; }
+
+.jpt-result__prize {
+  font-size: 22px; font-weight: 900; color: #ffd700;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.2);
+  margin-bottom: 6px;
+}
+.jpt-result__sub { font-size: 12px; color: #6a6f7a; line-height: 1.5; }
+
+/* ─── desktop tweaks ────────────────────────────────────── */
+@media (min-width: 1024px) {
+  .jpt-hero { padding: 20px 24px 22px; }
+  .jpt-hero__prize { font-size: 24px; }
+  .jpt-cdown__val { font-size: 28px; }
+  .jpt-cdown__block { min-width: 54px; padding: 6px 10px; }
+
+  .jpt-panel {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  .jpt-table__hdr,
+  .jpt-row {
+    grid-template-columns: 36px 1fr 72px 72px 72px;
+    padding: 10px 16px;
+  }
+  .jpt-odd { width: 60px; height: 42px; font-size: 13px; }
+  .jpt-row__team { font-size: 12px; }
+  .jpt-row__league { font-size: 10px; }
+  .jpt-footer { padding: 16px 24px; }
+  .jpt-btn { font-size: 15px; padding: 14px; }
+}
+</style>
