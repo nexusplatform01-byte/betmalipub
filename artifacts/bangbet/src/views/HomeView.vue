@@ -521,6 +521,23 @@
                   </div>
                 </div>
               </div>
+
+              <!-- Bet Bonus Banner -->
+              <div class="dt-bs__bonus">
+                <div class="dt-bs__bonus-header">
+                  <span class="dt-bs__bonus-title">🎁 Bet Bonus</span>
+                  <span class="dt-bs__bonus-max">Up to 1000%</span>
+                </div>
+                <div class="dt-bs__bonus-bar-wrap">
+                  <div class="dt-bs__bonus-bar" :style="{ width: Math.min(bonusPercent / 10, 100) + '%' }"></div>
+                </div>
+                <div class="dt-bs__bonus-row">
+                  <span v-if="bonusPercent > 0" class="dt-bs__bonus-active">+{{ bonusPercent }}% applied!</span>
+                  <span v-else class="dt-bs__bonus-hint">Add 1 more pick to unlock bonus</span>
+                  <span v-if="nextBonusTier" class="dt-bs__bonus-next">+{{ nextBonusTier.need }} → {{ nextBonusTier.pct }}%</span>
+                </div>
+              </div>
+
               <div class="dt-bs__stake-row">
                 <label>Stake (UGX)</label>
                 <input v-model="stakeAmount" type="number" placeholder="Min 500" />
@@ -529,6 +546,10 @@
                 <div class="dt-bs__summary-row">
                   <span>Total Odds</span>
                   <strong>{{ totalOdds.toFixed(2) }}</strong>
+                </div>
+                <div v-if="bonusPercent > 0" class="dt-bs__summary-row">
+                  <span>Bonus</span>
+                  <strong style="color:#c026d3">+{{ bonusPercent }}%</strong>
                 </div>
                 <div class="dt-bs__summary-row">
                   <span>Potential Win</span>
@@ -781,14 +802,35 @@
           </div>
           <span style="font-size:16px;font-weight:700;color:var(--green)">{{ bet.odds }}</span>
         </div>
+
+        <!-- Mobile Bet Bonus Banner -->
+        <div class="mob-bs-bonus">
+          <div class="mob-bs-bonus__header">
+            <span class="mob-bs-bonus__title">🎁 Bet Bonus</span>
+            <span class="mob-bs-bonus__max">Up to 1000%</span>
+          </div>
+          <div class="mob-bs-bonus__bar-wrap">
+            <div class="mob-bs-bonus__bar" :style="{ width: Math.min(bonusPercent / 10, 100) + '%' }"></div>
+          </div>
+          <div class="mob-bs-bonus__row">
+            <span v-if="bonusPercent > 0" class="mob-bs-bonus__active">+{{ bonusPercent }}% applied!</span>
+            <span v-else class="mob-bs-bonus__hint">Add 1 more pick to unlock bonus</span>
+            <span v-if="nextBonusTier" class="mob-bs-bonus__next">+{{ nextBonusTier.need }} pick → {{ nextBonusTier.pct }}%</span>
+          </div>
+        </div>
+
         <div style="margin-top:14px">
           <div class="form-group">
             <label class="form-label">Stake (UGX)</label>
-            <input v-model="stakeAmount" class="form-input" type="number" placeholder="Min 1 UGX" />
+            <input v-model="stakeAmount" class="form-input" type="number" placeholder="Min 500 UGX" />
           </div>
-          <div style="display:flex;justify-content:space-between;margin-bottom:10px;font-size:13px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px">
             <span style="color:var(--text-grey)">Total Odds:</span>
             <span style="font-weight:700;color:var(--green)">{{ totalOdds.toFixed(2) }}</span>
+          </div>
+          <div v-if="bonusPercent > 0" style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px">
+            <span style="color:var(--text-grey)">Bonus:</span>
+            <span style="font-weight:700;color:#c026d3">+{{ bonusPercent }}%</span>
           </div>
           <div style="display:flex;justify-content:space-between;margin-bottom:14px;font-size:13px">
             <span style="color:var(--text-grey)">Potential Win:</span>
@@ -830,7 +872,24 @@ function openMatch(match: any) {
 }
 
 const totalOdds = computed(() => store.betslip.reduce((acc, b) => acc * b.odds, 1));
-const potentialWin = computed(() => Math.round(Number(stakeAmount.value || 0) * totalOdds.value).toLocaleString());
+
+const BONUS_TIERS: [number, number][] = [
+  [2, 40], [3, 80], [4, 120], [5, 160], [6, 200],
+  [7, 250], [8, 300], [9, 400], [10, 500],
+  [11, 600], [12, 700], [13, 800], [14, 900], [15, 1000],
+];
+const bonusPercent = computed(() => {
+  const n = store.betslip.length;
+  if (n <= 1) return 0;
+  const tier = [...BONUS_TIERS].reverse().find(([min]) => n >= min);
+  return tier ? tier[1] : 0;
+});
+const nextBonusTier = computed(() => {
+  const n = store.betslip.length;
+  const next = BONUS_TIERS.find(([min]) => min > n);
+  return next ? { need: next[0] - n, pct: next[1] } : null;
+});
+const potentialWin = computed(() => Math.round(Number(stakeAmount.value || 0) * totalOdds.value * (1 + bonusPercent.value / 100)).toLocaleString());
 
 const betslipTab = ref<'slip' | 'mybets'>('slip');
 
@@ -1353,6 +1412,36 @@ const iceHockeyMatches = [
     max-height: 160px;
     overflow-y: auto;
   }
+  .dt-bs__bonus {
+    margin: 8px 14px 4px;
+    background: linear-gradient(135deg, rgba(192,38,211,0.07), rgba(162,28,175,0.04));
+    border: 1px solid rgba(192,38,211,0.25);
+    border-radius: 8px;
+    padding: 8px 10px 7px;
+  }
+  .dt-bs__bonus-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 6px;
+  }
+  .dt-bs__bonus-title { font-size: 11px; font-weight: 700; color: #292a33; }
+  .dt-bs__bonus-max { font-size: 10px; font-weight: 800; color: #c026d3; }
+  .dt-bs__bonus-bar-wrap {
+    height: 5px; background: #e8e9ed; border-radius: 4px; overflow: hidden;
+    margin-bottom: 5px;
+  }
+  .dt-bs__bonus-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #c026d3, #a21caf);
+    border-radius: 4px;
+    transition: width 0.4s ease;
+    min-width: 3px;
+  }
+  .dt-bs__bonus-row {
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .dt-bs__bonus-active { font-size: 10px; font-weight: 700; color: #c026d3; }
+  .dt-bs__bonus-hint   { font-size: 10px; color: #9599a4; }
+  .dt-bs__bonus-next   { font-size: 10px; color: #9599a4; }
   .dt-bs__item {
     display: flex; justify-content: space-between; align-items: flex-start;
     padding: 10px 14px; border-bottom: 1px solid #f0f0f4;

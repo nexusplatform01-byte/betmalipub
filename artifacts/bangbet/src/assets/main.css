@@ -479,13 +479,17 @@ html, body {
   width: 100%;
 }
 
-.odds-btn:active,
-.odds-btn.selected {
+.odds-btn:active {
   background: rgba(192, 38, 211, 0.08);
   border-color: #c026d3;
 }
+.odds-btn.selected {
+  background: linear-gradient(135deg, #c026d3, #a21caf);
+  border-color: #a21caf;
+}
 
 .odds-btn__label { font-size: 10px; color: var(--text-grey); font-weight: 500; line-height: 1; width: 100%; text-align: center; }
+.odds-btn.selected .odds-btn__label { color: rgba(255,255,255,0.8); }
 .odds-btn__value {
   font-size: 16px;
   font-weight: 800;
@@ -497,7 +501,7 @@ html, body {
   width: 100%;
   justify-content: center;
 }
-.odds-btn.selected .odds-btn__value { color: #c026d3; }
+.odds-btn.selected .odds-btn__value { color: #fff; }
 
 /* ═══════════════════════════════════════
    JACKPOT SECTION
@@ -689,6 +693,38 @@ html, body {
   font-weight: 700;
 }
 .betslip-count { font-size: 17px; font-weight: 800; line-height: 1; }
+
+/* ── Mobile Betslip Bonus Banner ── */
+.mob-bs-bonus {
+  margin: 12px 0 4px;
+  background: linear-gradient(135deg, rgba(192,38,211,0.07), rgba(162,28,175,0.04));
+  border: 1px solid rgba(192,38,211,0.25);
+  border-radius: 8px;
+  padding: 9px 11px 8px;
+}
+.mob-bs-bonus__header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 6px;
+}
+.mob-bs-bonus__title { font-size: 12px; font-weight: 700; color: #292a33; }
+.mob-bs-bonus__max   { font-size: 11px; font-weight: 800; color: #c026d3; }
+.mob-bs-bonus__bar-wrap {
+  height: 5px; background: #e8e9ed; border-radius: 4px; overflow: hidden;
+  margin-bottom: 6px;
+}
+.mob-bs-bonus__bar {
+  height: 100%;
+  background: linear-gradient(90deg, #c026d3, #a21caf);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+  min-width: 3px;
+}
+.mob-bs-bonus__row {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.mob-bs-bonus__active { font-size: 11px; font-weight: 700; color: #c026d3; }
+.mob-bs-bonus__hint   { font-size: 11px; color: #9599a4; }
+.mob-bs-bonus__next   { font-size: 11px; color: #9599a4; }
 
 /* ═══════════════════════════════════════
    MODAL
