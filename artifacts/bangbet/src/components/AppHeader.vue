@@ -61,10 +61,10 @@ const openRegister = inject<() => void>("openRegister", () => {});
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0 14px;
+    padding: 0 8px;
   }
   .header__dt-stat-val {
-    font-size: 16px;
+    font-size: 11px;
     font-weight: 900;
     color: #ffe60f;
     line-height: 1.1;
@@ -78,15 +78,15 @@ const openRegister = inject<() => void>("openRegister", () => {});
     50% { opacity: 0.6; }
   }
   .header__dt-stat-lbl {
-    font-size: 9px;
+    font-size: 7px;
     color: rgba(255,255,255,0.7);
     font-weight: 600;
-    letter-spacing: .4px;
+    letter-spacing: .3px;
     text-transform: uppercase;
   }
   .header__dt-stat-sep {
     width: 1px;
-    height: 24px;
+    height: 16px;
     background: rgba(255,255,255,0.2);
   }
 }
