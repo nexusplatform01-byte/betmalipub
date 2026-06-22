@@ -512,6 +512,29 @@ const promos = [
 @media (min-width: 1024px) {
   .dt-center { background: #f2f3f5; }
 
+  /* ── section cards ── */
+  .section {
+    margin: 10px 8px 0;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 6px rgba(0,0,0,.07);
+  }
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px 8px;
+    border-bottom: 1px solid #f0f0f4;
+  }
+  .section-title {
+    font-size: 13px; font-weight: 800; color: #292a33;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .section-more {
+    font-size: 11px; font-weight: 600; color: #c026d3;
+    text-decoration: none;
+  }
+  .section-more:hover { text-decoration: underline; }
+
   /* ── hero banner soft edges ── */
   .dt-banner-wrap {
     margin: 10px 8px 0;

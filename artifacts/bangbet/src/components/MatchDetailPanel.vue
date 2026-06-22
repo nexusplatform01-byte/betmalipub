@@ -1,5 +1,5 @@
 <template>
-  <div class="mdp">
+  <div class="mdp" ref="panelEl">
     <div class="mdp__header">
       <button class="mdp__back" @click="$emit('close')">
         <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
@@ -90,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive } from 'vue';
+import { ref, computed, reactive, watch, nextTick } from 'vue';
 import { useAppStore } from '@/stores/app';
 
 const props = defineProps<{ match: any }>();
@@ -99,6 +99,8 @@ defineEmits<{ (e: 'close'): void }>();
 const store = useAppStore();
 const tab = ref('Markets');
 const tabs = ['Markets', 'Statistics'];
+const panelEl = ref<HTMLElement | null>(null);
+watch(() => props.match, () => { nextTick(() => panelEl.value?.scrollTo({ top: 0, behavior: 'instant' })); }, { immediate: true });
 
 const h = computed(() => props.match.markets.home);
 const d = computed(() => props.match.markets.draw ?? 3.20);
@@ -132,14 +134,14 @@ const groups = computed(() => reactive([
     ],
   },
   {
-    id: 'cards', title: 'Cards', open: false,
+    id: 'cards', title: 'Cards', open: true,
     markets: [
       { name: 'Cards Over/Under 3.5', outcomes: [{ label: 'Over 3.5', odds: 1.85 }, { label: 'Under 3.5', odds: 1.95 }] },
       { name: 'Cards Over/Under 4.5', outcomes: [{ label: 'Over 4.5', odds: 2.40 }, { label: 'Under 4.5', odds: 1.55 }] },
     ],
   },
   {
-    id: 'corners', title: 'Corners', open: false,
+    id: 'corners', title: 'Corners', open: true,
     markets: [
       { name: 'Corners Over/Under 8.5', outcomes: [{ label: 'Over 8.5', odds: 1.80 }, { label: 'Under 8.5', odds: 2.00 }] },
       { name: 'Corners Over/Under 9.5', outcomes: [{ label: 'Over 9.5', odds: 2.10 }, { label: 'Under 9.5', odds: 1.72 }] },
