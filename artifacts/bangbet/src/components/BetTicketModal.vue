@@ -12,7 +12,7 @@
           <button class="tkt-topbar__close" @click="$emit('close')">✕</button>
         </div>
 
-        <!-- ── Heading image (won) or coloured bar (lost/pending) ── -->
+        <!-- ── Heading image (won/lost) or coloured bar (pending) ── -->
         <div class="tkt-heading">
           <img
             v-if="bet.status === 'won'"
@@ -20,10 +20,14 @@
             class="tkt-heading__img"
             alt="Winner"
           />
-          <div v-else class="tkt-heading__bar" :class="'hbar--' + bet.status">
-            <span class="tkt-heading__bar-text">
-              {{ bet.status === 'lost' ? '❌ BETTER LUCK NEXT TIME' : '⏳ BET PENDING' }}
-            </span>
+          <img
+            v-else-if="bet.status === 'lost'"
+            src="/static/lost-banner.png"
+            class="tkt-heading__img tkt-heading__img--lost"
+            alt="Better luck next time"
+          />
+          <div v-else class="tkt-heading__bar hbar--pending">
+            <span class="tkt-heading__bar-text">⏳ BET PENDING</span>
           </div>
         </div>
 
@@ -224,6 +228,12 @@ function selResult(sel: Selection): string {
   object-fit: cover;
   object-position: center 30%;
 }
+.tkt-heading__img--lost {
+  height: 110px;
+  object-fit: contain;
+  background: #fff8f8;
+  object-position: center center;
+}
 .tkt-heading__bar {
   padding: 12px 14px;
   display: flex; align-items: center; justify-content: center;
@@ -293,13 +303,13 @@ function selResult(sel: Selection): string {
 }
 .tkt-sel__score { font-size: 10px; font-weight: 700; color: #6b7280; min-height: 12px; }
 .tkt-sel__odds {
-  font-size: 11px; font-weight: 900;
-  border-radius: 5px; padding: 2px 8px;
-  min-width: 32px; text-align: center; color: #fff;
+  font-size: 10px; font-weight: 800;
+  border-radius: 4px; padding: 2px 6px;
+  min-width: 28px; text-align: center; color: #fff;
 }
-.odds--won     { background: #16a34a; }
-.odds--lost    { background: #dc2626; }
-.odds--pending { background: #92400e; }
+.odds--won     { background: #7c3aed; }
+.odds--lost    { background: #7c3aed; }
+.odds--pending { background: #7c3aed; }
 
 /* ── Summary box — white + cyan border ── */
 .tkt-summary-box {
