@@ -59,7 +59,9 @@
             <div class="section-title"><span class="live-dot"></span> Live Now ({{ store.liveMatches.length }})</div>
             <RouterLink to="/sports/Football" class="section-more">See All ›</RouterLink>
           </div>
-          <MatchCard v-for="match in store.liveMatches" :key="match.id" :match="match" />
+          <div class="dt-matches-grid">
+            <MatchCard v-for="match in store.liveMatches" :key="match.id" :match="match" />
+          </div>
         </div>
 
         <div class="section">
@@ -67,7 +69,9 @@
             <div class="section-title">⭐ Top Matches</div>
             <RouterLink to="/sports/Football" class="section-more">See All ›</RouterLink>
           </div>
-          <MatchCard v-for="match in store.topMatches" :key="match.id" :match="match" />
+          <div class="dt-matches-grid">
+            <MatchCard v-for="match in store.topMatches" :key="match.id" :match="match" />
+          </div>
         </div>
 
         <div class="section">
@@ -108,14 +112,16 @@
           </div>
 
           <div v-else>
-            <div v-for="bet in store.betslip" :key="bet.matchId" class="dt-bs__item">
-              <div class="dt-bs__item-left">
-                <div class="dt-bs__item-team">{{ bet.team }}</div>
-                <div class="dt-bs__item-mkt">{{ bet.market }}</div>
-              </div>
-              <div class="dt-bs__item-right">
-                <span class="dt-bs__item-odds">{{ bet.odds }}</span>
-                <button class="dt-bs__item-del" @click="store.betslip.splice(store.betslip.findIndex(b=>b.matchId===bet.matchId),1)">✕</button>
+            <div class="dt-bs__items-scroll">
+              <div v-for="bet in store.betslip" :key="bet.matchId" class="dt-bs__item">
+                <div class="dt-bs__item-left">
+                  <div class="dt-bs__item-team">{{ bet.team }}</div>
+                  <div class="dt-bs__item-mkt">{{ bet.market }}</div>
+                </div>
+                <div class="dt-bs__item-right">
+                  <span class="dt-bs__item-odds">{{ bet.odds }}</span>
+                  <button class="dt-bs__item-del" @click="store.betslip.splice(store.betslip.findIndex(b=>b.matchId===bet.matchId),1)">✕</button>
+                </div>
               </div>
             </div>
 
@@ -327,7 +333,7 @@ const promos = [
 @media (min-width: 1024px) {
   .dt-shell {
     display: grid;
-    grid-template-columns: 180px 1fr 240px;
+    grid-template-columns: 180px 1fr 180px;
     gap: 0;
     width: 100%;
     min-height: calc(100vh - 120px);
@@ -409,7 +415,10 @@ const promos = [
 @media (min-width: 1024px) {
   .dt-center {
     background: #f2f3f5;
-    border-right: 1px solid #e6e7eb;
+  }
+  .dt-matches-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
   }
 }
 
@@ -454,6 +463,10 @@ const promos = [
     display: flex; flex-direction: column; align-items: center;
     padding: 30px 16px; color: #9599a4; gap: 10px; text-align: center;
     font-size: 12px; line-height: 1.5;
+  }
+  .dt-bs__items-scroll {
+    max-height: 160px;
+    overflow-y: auto;
   }
   .dt-bs__item {
     display: flex; justify-content: space-between; align-items: flex-start;
