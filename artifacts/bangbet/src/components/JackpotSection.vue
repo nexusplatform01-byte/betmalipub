@@ -14,7 +14,8 @@
         :class="`jp-card--${tier.id}`"
       >
         <div class="jp-card__head">
-          <span class="jp-card__medal">{{ tier.medal }}</span>
+          <img v-if="tier.medalImg" :src="tier.medalImg" class="jp-card__medal-img" />
+          <span v-else class="jp-card__medal">{{ tier.medal }}</span>
           <span class="jp-card__name">{{ tier.name }}</span>
         </div>
         <div class="jp-card__body">
@@ -50,12 +51,13 @@ interface Tier {
   id: string;
   name: string;
   medal: string;
+  medalImg?: string;
   base: number;
   oneDur: number; // ms for ones to complete 0→9 cycle
 }
 
 const tiers: Tier[] = [
-  { id: 'gold',    name: 'GOLD',    medal: '🥇', base: 856_241_337, oneDur: 800    },
+  { id: 'gold',    name: 'GOLD',    medal: '🥇', medalImg: 'https://www.fortebet.ug/assets/img/casino/jackpot-golden.png', base: 856_241_337, oneDur: 800    },
   { id: 'silver',  name: 'SILVER',  medal: '🥈', base: 432_817_658, oneDur: 2_500  },
   { id: 'bronze',  name: 'BRONZE',  medal: '🥉', base: 287_542_110, oneDur: 7_000  },
   { id: 'premium', name: 'PREMIUM', medal: '💎', base: 194_163_808, oneDur: 18_000 },
@@ -119,6 +121,7 @@ const slots = reactive<Record<string, Slot[]>>(
   padding: 5px 6px 4px;
 }
 .jp-card__medal { font-size: 12px; flex-shrink: 0; }
+.jp-card__medal-img { width: 22px; height: 22px; object-fit: contain; flex-shrink: 0; }
 .jp-card__name  {
   font-size: 8px; font-weight: 900; letter-spacing: .4px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
