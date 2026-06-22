@@ -135,27 +135,27 @@
                 </div>
                 <div class="dtmt__time">{{ match.minute }}'</div>
               </div>
-              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'1'), 'dtmt__odd-btn--hot': getMaxOdd(match) === match.markets.home }" @click.stop="addOdd(match,'1',match.markets.home)">
+              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'1'), 'dtmt__odd-btn--hot': getMaxOdd(match) > 0 && getMaxOdd(match) === match.markets.home, 'dtmt__odd-btn--na': !match.markets.home || match.markets.home <= 0 }" @click.stop="match.markets.home > 0 && addOdd(match,'1',match.markets.home)">
                 <span class="dtmt__odd-inner">
-                  <img v-if="getMaxOdd(match) === match.markets.home" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
-                  {{ match.markets.home }}
+                  <img v-if="getMaxOdd(match) > 0 && getMaxOdd(match) === match.markets.home" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
+                  {{ fmtOdd(match.markets.home) }}
                 </span>
               </button>
-              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'X'), 'dtmt__odd-btn--na': !match.markets.draw, 'dtmt__odd-btn--hot': match.markets.draw && getMaxOdd(match) === match.markets.draw }" @click.stop="match.markets.draw && addOdd(match,'X',match.markets.draw)">
+              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'X'), 'dtmt__odd-btn--na': !match.markets.draw || match.markets.draw <= 0, 'dtmt__odd-btn--hot': match.markets.draw && match.markets.draw > 0 && getMaxOdd(match) === match.markets.draw }" @click.stop="match.markets.draw && match.markets.draw > 0 && addOdd(match,'X',match.markets.draw)">
                 <span class="dtmt__odd-inner">
-                  <img v-if="match.markets.draw && getMaxOdd(match) === match.markets.draw" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
-                  {{ match.markets.draw ?? '-' }}
+                  <img v-if="match.markets.draw && match.markets.draw > 0 && getMaxOdd(match) === match.markets.draw" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
+                  {{ fmtOdd(match.markets.draw) }}
                 </span>
               </button>
-              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'2'), 'dtmt__odd-btn--hot': getMaxOdd(match) === match.markets.away }" @click.stop="addOdd(match,'2',match.markets.away)">
+              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'2'), 'dtmt__odd-btn--hot': getMaxOdd(match) > 0 && getMaxOdd(match) === match.markets.away, 'dtmt__odd-btn--na': !match.markets.away || match.markets.away <= 0 }" @click.stop="match.markets.away > 0 && addOdd(match,'2',match.markets.away)">
                 <span class="dtmt__odd-inner">
-                  <img v-if="getMaxOdd(match) === match.markets.away" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
-                  {{ match.markets.away }}
+                  <img v-if="getMaxOdd(match) > 0 && getMaxOdd(match) === match.markets.away" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
+                  {{ fmtOdd(match.markets.away) }}
                 </span>
               </button>
-              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'1X'), 'dtmt__odd-btn--na': !match.markets.draw }" @click.stop="match.markets.draw && addOdd(match,'1X',dc(match.markets.home,match.markets.draw))">{{ dc(match.markets.home,match.markets.draw) }}</button>
-              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'X2'), 'dtmt__odd-btn--na': !match.markets.draw }" @click.stop="match.markets.draw && addOdd(match,'X2',dc(match.markets.draw,match.markets.away))">{{ dc(match.markets.draw,match.markets.away) }}</button>
-              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'12') }" @click.stop="addOdd(match,'12',dc(match.markets.home,match.markets.away))">{{ dc(match.markets.home,match.markets.away) }}</button>
+              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'1X'), 'dtmt__odd-btn--na': dc(match.markets.home,match.markets.draw)==='-' }" @click.stop="dc(match.markets.home,match.markets.draw)!=='-' && addOdd(match,'1X',dc(match.markets.home,match.markets.draw))">{{ dc(match.markets.home,match.markets.draw) }}</button>
+              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'X2'), 'dtmt__odd-btn--na': dc(match.markets.draw,match.markets.away)==='-' }" @click.stop="dc(match.markets.draw,match.markets.away)!=='-' && addOdd(match,'X2',dc(match.markets.draw,match.markets.away))">{{ dc(match.markets.draw,match.markets.away) }}</button>
+              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'12'), 'dtmt__odd-btn--na': dc(match.markets.home,match.markets.away)==='-' }" @click.stop="dc(match.markets.home,match.markets.away)!=='-' && addOdd(match,'12',dc(match.markets.home,match.markets.away))">{{ dc(match.markets.home,match.markets.away) }}</button>
             </div>
           </div>
         </div>
@@ -190,27 +190,27 @@
                 </div>
                 <div class="dtmt__time">{{ match.startTime }}</div>
               </div>
-              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'1'), 'dtmt__odd-btn--hot': getMaxOdd(match) === match.markets.home }" @click.stop="addOdd(match,'1',match.markets.home)">
+              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'1'), 'dtmt__odd-btn--hot': getMaxOdd(match) > 0 && getMaxOdd(match) === match.markets.home, 'dtmt__odd-btn--na': !match.markets.home || match.markets.home <= 0 }" @click.stop="match.markets.home > 0 && addOdd(match,'1',match.markets.home)">
                 <span class="dtmt__odd-inner">
-                  <img v-if="getMaxOdd(match) === match.markets.home" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
-                  {{ match.markets.home }}
+                  <img v-if="getMaxOdd(match) > 0 && getMaxOdd(match) === match.markets.home" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
+                  {{ fmtOdd(match.markets.home) }}
                 </span>
               </button>
-              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'X'), 'dtmt__odd-btn--na': !match.markets.draw, 'dtmt__odd-btn--hot': match.markets.draw && getMaxOdd(match) === match.markets.draw }" @click.stop="match.markets.draw && addOdd(match,'X',match.markets.draw)">
+              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'X'), 'dtmt__odd-btn--na': !match.markets.draw || match.markets.draw <= 0, 'dtmt__odd-btn--hot': match.markets.draw && match.markets.draw > 0 && getMaxOdd(match) === match.markets.draw }" @click.stop="match.markets.draw && match.markets.draw > 0 && addOdd(match,'X',match.markets.draw)">
                 <span class="dtmt__odd-inner">
-                  <img v-if="match.markets.draw && getMaxOdd(match) === match.markets.draw" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
-                  {{ match.markets.draw ?? '-' }}
+                  <img v-if="match.markets.draw && match.markets.draw > 0 && getMaxOdd(match) === match.markets.draw" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
+                  {{ fmtOdd(match.markets.draw) }}
                 </span>
               </button>
-              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'2'), 'dtmt__odd-btn--hot': getMaxOdd(match) === match.markets.away }" @click.stop="addOdd(match,'2',match.markets.away)">
+              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'2'), 'dtmt__odd-btn--hot': getMaxOdd(match) > 0 && getMaxOdd(match) === match.markets.away, 'dtmt__odd-btn--na': !match.markets.away || match.markets.away <= 0 }" @click.stop="match.markets.away > 0 && addOdd(match,'2',match.markets.away)">
                 <span class="dtmt__odd-inner">
-                  <img v-if="getMaxOdd(match) === match.markets.away" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
-                  {{ match.markets.away }}
+                  <img v-if="getMaxOdd(match) > 0 && getMaxOdd(match) === match.markets.away" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
+                  {{ fmtOdd(match.markets.away) }}
                 </span>
               </button>
-              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'1X'), 'dtmt__odd-btn--na': !match.markets.draw }" @click.stop="match.markets.draw && addOdd(match,'1X',dc(match.markets.home,match.markets.draw))">{{ dc(match.markets.home,match.markets.draw) }}</button>
-              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'X2'), 'dtmt__odd-btn--na': !match.markets.draw }" @click.stop="match.markets.draw && addOdd(match,'X2',dc(match.markets.draw,match.markets.away))">{{ dc(match.markets.draw,match.markets.away) }}</button>
-              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'12') }" @click.stop="addOdd(match,'12',dc(match.markets.home,match.markets.away))">{{ dc(match.markets.home,match.markets.away) }}</button>
+              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'1X'), 'dtmt__odd-btn--na': dc(match.markets.home,match.markets.draw)==='−' }" @click.stop="dc(match.markets.home,match.markets.draw)!=='-' && addOdd(match,'1X',dc(match.markets.home,match.markets.draw))">{{ dc(match.markets.home,match.markets.draw) }}</button>
+              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'X2'), 'dtmt__odd-btn--na': dc(match.markets.draw,match.markets.away)==='-' }" @click.stop="dc(match.markets.draw,match.markets.away)!=='-' && addOdd(match,'X2',dc(match.markets.draw,match.markets.away))">{{ dc(match.markets.draw,match.markets.away) }}</button>
+              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'12'), 'dtmt__odd-btn--na': dc(match.markets.home,match.markets.away)==='-' }" @click.stop="dc(match.markets.home,match.markets.away)!=='-' && addOdd(match,'12',dc(match.markets.home,match.markets.away))">{{ dc(match.markets.home,match.markets.away) }}</button>
             </div>
           </div>
         </div>
@@ -408,9 +408,9 @@
               </div>
               <button class="dtmt__odd-btn" :class="{ selected: isDtSel(m,'1') }" @click.stop="addOdd(m,'1',m.markets.home)">{{ m.markets.home }}</button>
               <button class="dtmt__odd-btn" :class="{ selected: isDtSel(m,'2') }" @click.stop="addOdd(m,'2',m.markets.away)">{{ m.markets.away }}</button>
-              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(m,'HDP') }" @click.stop="addOdd(m,'HDP',m.markets.hdp)">{{ m.markets.hdp }}</button>
-              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(m,'O3.5') }" @click.stop="addOdd(m,'O3.5',m.markets.over)">{{ m.markets.over }}</button>
-              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(m,'U3.5') }" @click.stop="addOdd(m,'U3.5',m.markets.under)">{{ m.markets.under }}</button>
+              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(m,'HDP') }" @click.stop="addOdd(m,'HDP',m.markets.hdp ?? 1.90)">{{ m.markets.hdp ?? '-' }}</button>
+              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(m,'O3.5') }" @click.stop="addOdd(m,'O3.5',m.markets.over ?? 1.85)">{{ m.markets.over ?? '-' }}</button>
+              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(m,'U3.5') }" @click.stop="addOdd(m,'U3.5',m.markets.under ?? 1.95)">{{ m.markets.under ?? '-' }}</button>
               <button class="dtmt__odd-btn dtmt__odd-btn--na">-</button>
             </div>
           </div>
@@ -440,9 +440,9 @@
               </div>
               <button class="dtmt__odd-btn" :class="{ selected: isDtSel(m,'1') }" @click.stop="addOdd(m,'1',m.markets.home)">{{ m.markets.home }}</button>
               <button class="dtmt__odd-btn" :class="{ selected: isDtSel(m,'2') }" @click.stop="addOdd(m,'2',m.markets.away)">{{ m.markets.away }}</button>
-              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(m,'HDP') }" @click.stop="addOdd(m,'HDP',m.markets.hdp)">{{ m.markets.hdp }}</button>
-              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(m,'O4.5') }" @click.stop="addOdd(m,'O4.5',m.markets.over)">{{ m.markets.over }}</button>
-              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(m,'U4.5') }" @click.stop="addOdd(m,'U4.5',m.markets.under)">{{ m.markets.under }}</button>
+              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(m,'HDP') }" @click.stop="addOdd(m,'HDP',m.markets.hdp ?? 1.90)">{{ m.markets.hdp ?? '-' }}</button>
+              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(m,'O4.5') }" @click.stop="addOdd(m,'O4.5',m.markets.over ?? 1.85)">{{ m.markets.over ?? '-' }}</button>
+              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(m,'U4.5') }" @click.stop="addOdd(m,'U4.5',m.markets.under ?? 1.95)">{{ m.markets.under ?? '-' }}</button>
               <button class="dtmt__odd-btn dtmt__odd-btn--na">-</button>
             </div>
           </div>
@@ -480,14 +480,100 @@
           </div>
         </div>
 
-        <!-- ── OTHER SPORTS PLACEHOLDER ── -->
-        <div class="section dt-only" v-show="!['Football','World Cup','Basketball','Tennis','Table Tennis','Volleyball','Handball','Ice Hockey'].includes(store.activeSport)">
-          <div style="text-align:center;padding:40px 20px;color:#9599a4;">
-            <div style="font-size:32px;margin-bottom:10px;">⚽</div>
-            <div style="font-weight:700;font-size:14px;color:#292a33;margin-bottom:6px;">{{ store.activeSport }} markets loading…</div>
-            <div style="font-size:12px;">More {{ store.activeSport }} fixtures will appear here shortly.</div>
+        <!-- ── REAL SPORT PANEL — shown when non-default sport is selected ── -->
+        <template v-if="showSportPanel">
+          <!-- Live matches for this sport -->
+          <div class="section" v-if="store.liveMatches.filter(m => m.sportCode === activeSportCode).length">
+            <div class="section-header">
+              <div class="section-title"><span class="live-dot"></span> Live {{ store.activeSport }} ({{ store.liveMatches.filter(m => m.sportCode === activeSportCode).length }})</div>
+            </div>
+            <div class="mob-only">
+              <MatchCard v-for="m in store.liveMatches.filter(lm => lm.sportCode === activeSportCode)" :key="m.id" :match="m" />
+            </div>
+            <div class="dt-match-table dt-only">
+              <div class="dtmt__head">
+                <div class="dtmt__col-match">Match</div>
+                <div class="dtmt__col-odd">1</div><div class="dtmt__col-odd">X</div><div class="dtmt__col-odd">2</div>
+                <div class="dtmt__col-odd">1X</div><div class="dtmt__col-odd">X2</div><div class="dtmt__col-odd">12</div>
+              </div>
+              <div v-for="m in store.liveMatches.filter(lm => lm.sportCode === activeSportCode)" :key="m.id" class="dtmt__row" @click="openMatch(m)">
+                <div class="dtmt__col-match">
+                  <div class="dtmt__league"><span class="dtmt__live-badge">Live</span> {{ m.league }}</div>
+                  <div class="dtmt__teams">
+                    <span class="dtmt__team-name">{{ m.homeTeam }}</span>
+                    <span class="dtmt__score">{{ m.homeScore }}-{{ m.awayScore }}</span>
+                    <span class="dtmt__team-name">{{ m.awayTeam }}</span>
+                  </div>
+                  <div class="dtmt__time">{{ m.minute }}'</div>
+                </div>
+                <button class="dtmt__odd-btn" @click.stop="addOdd(m,'1',m.markets.home)">{{ m.markets.home }}</button>
+                <button class="dtmt__odd-btn" :class="{'dtmt__odd-btn--na':!m.markets.draw}" @click.stop="m.markets.draw && addOdd(m,'X',m.markets.draw)">{{ m.markets.draw ?? '-' }}</button>
+                <button class="dtmt__odd-btn" @click.stop="addOdd(m,'2',m.markets.away)">{{ m.markets.away }}</button>
+                <button class="dtmt__odd-btn" :class="{'dtmt__odd-btn--na':!m.markets.draw}" @click.stop="m.markets.draw && addOdd(m,'1X',m.markets.dc1X ?? dc(m.markets.home,m.markets.draw))">{{ m.markets.dc1X ?? dc(m.markets.home,m.markets.draw) }}</button>
+                <button class="dtmt__odd-btn" :class="{'dtmt__odd-btn--na':!m.markets.draw}" @click.stop="m.markets.draw && addOdd(m,'X2',m.markets.dcX2 ?? dc(m.markets.draw,m.markets.away))">{{ m.markets.dcX2 ?? dc(m.markets.draw,m.markets.away) }}</button>
+                <button class="dtmt__odd-btn" @click.stop="addOdd(m,'12',m.markets.dc12 ?? dc(m.markets.home,m.markets.away))">{{ m.markets.dc12 ?? dc(m.markets.home,m.markets.away) }}</button>
+              </div>
+            </div>
           </div>
-        </div>
+
+          <!-- Loading state -->
+          <div v-if="sportLoading" class="sport-panel-loading">
+            <div class="sp-spinner"></div>
+            <span>Loading {{ store.activeSport }} matches…</span>
+          </div>
+
+          <!-- Leagues with matches -->
+          <template v-else>
+            <div class="section" v-for="lg in sportLeagueGroups" :key="lg.id">
+              <div class="section-header">
+                <div class="section-title">{{ lg.flag }} {{ lg.name }} <span class="section-count-sm">({{ lg.matches.length }})</span></div>
+              </div>
+              <!-- Mobile -->
+              <div class="mob-only">
+                <MatchCard v-for="m in lg.matches" :key="m.id" :match="m" />
+              </div>
+              <!-- Desktop table -->
+              <div class="dt-match-table dt-only">
+                <div class="dtmt__head">
+                  <div class="dtmt__col-match">Match</div>
+                  <div class="dtmt__col-odd">1</div><div class="dtmt__col-odd">X</div><div class="dtmt__col-odd">2</div>
+                  <div class="dtmt__col-odd">1X</div><div class="dtmt__col-odd">X2</div><div class="dtmt__col-odd">12</div>
+                </div>
+                <div v-for="m in lg.matches" :key="m.id" class="dtmt__row" @click="openMatch(m)">
+                  <div class="dtmt__col-match">
+                    <div class="dtmt__league">{{ m.league }}</div>
+                    <div class="dtmt__teams">
+                      <span class="dtmt__team-name">{{ m.homeTeam }}</span>
+                      <span class="dtmt__vs">vs</span>
+                      <span class="dtmt__team-name">{{ m.awayTeam }}</span>
+                    </div>
+                    <div class="dtmt__time">{{ m.startTime }}</div>
+                  </div>
+                  <button class="dtmt__odd-btn" :class="{ selected: isDtSel(m,'1') }" @click.stop="addOdd(m,'1',m.markets.home)">{{ m.markets.home }}</button>
+                  <button class="dtmt__odd-btn" :class="{ selected: isDtSel(m,'X'), 'dtmt__odd-btn--na': !m.markets.draw }" @click.stop="m.markets.draw && addOdd(m,'X',m.markets.draw)">{{ m.markets.draw ?? '-' }}</button>
+                  <button class="dtmt__odd-btn" :class="{ selected: isDtSel(m,'2') }" @click.stop="addOdd(m,'2',m.markets.away)">{{ m.markets.away }}</button>
+                  <button class="dtmt__odd-btn" :class="{ selected: isDtSel(m,'1X'), 'dtmt__odd-btn--na': !m.markets.draw }" @click.stop="m.markets.draw && addOdd(m,'1X',m.markets.dc1X ?? dc(m.markets.home,m.markets.draw))">{{ m.markets.dc1X ?? dc(m.markets.home,m.markets.draw) }}</button>
+                  <button class="dtmt__odd-btn" :class="{ selected: isDtSel(m,'X2'), 'dtmt__odd-btn--na': !m.markets.draw }" @click.stop="m.markets.draw && addOdd(m,'X2',m.markets.dcX2 ?? dc(m.markets.draw,m.markets.away))">{{ m.markets.dcX2 ?? dc(m.markets.draw,m.markets.away) }}</button>
+                  <button class="dtmt__odd-btn" :class="{ selected: isDtSel(m,'12') }" @click.stop="addOdd(m,'12',m.markets.dc12 ?? dc(m.markets.home,m.markets.away))">{{ m.markets.dc12 ?? dc(m.markets.home,m.markets.away) }}</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Load more -->
+            <div v-if="sportHasMore" class="load-more-wrap">
+              <button class="load-more-btn" :disabled="sportLoadingMore" @click="loadMoreSport">
+                <span v-if="sportLoadingMore">Loading…</span>
+                <span v-else>Load More {{ store.activeSport }} Matches</span>
+              </button>
+            </div>
+            <div v-else-if="sportLeagueGroups.length > 0" class="end-note">All {{ store.activeSport }} matches loaded</div>
+            <div v-else-if="!sportLoading && !store.liveMatches.filter(m => m.sportCode === activeSportCode).length" class="sport-empty">
+              <div style="font-size:28px;margin-bottom:8px;">🔍</div>
+              <div style="font-weight:700;color:#292a33;margin-bottom:4px;">No {{ store.activeSport }} matches right now</div>
+              <div style="font-size:12px;color:#9599a4;">Check back soon for upcoming fixtures</div>
+            </div>
+          </template>
+        </template>
 
         </template>
         <MatchDetailPanel v-else :match="(selectedMatch as any)" @close="selectedMatch = null" />
@@ -641,7 +727,7 @@
         <!-- Recent Results widget -->
         <div class="dt-results">
           <div class="dt-results__head">📋 Recent Results</div>
-          <div v-for="r in recentResults" :key="r.match" class="dt-results__item">
+          <div v-for="r in recentResults" :key="r.home + r.away" class="dt-results__item">
             <div class="dt-results__teams">
               <span>{{ r.home }}</span>
               <span class="dt-results__score-box">{{ r.score }}</span>
@@ -846,7 +932,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { useRouter } from 'vue-router';
 import AppHeader from "@/components/AppHeader.vue";
 import BottomNav from "@/components/BottomNav.vue";
@@ -857,6 +943,8 @@ import MatchCard from "@/components/MatchCard.vue";
 import MatchDetailPanel from "@/components/MatchDetailPanel.vue";
 import { useAppStore } from "@/stores/app";
 import { useHomeMatches, leagueFlag } from "@/composables/useHomeMatches";
+import { useSportMatches } from "@/composables/useSportMatches";
+import { SPORT_CODE_MAP } from "@/services/topbetApi";
 
 const router = useRouter();
 const store = useAppStore();
@@ -871,6 +959,18 @@ const {
   soccerMatches,
   basketballMatches,
 } = useHomeMatches();
+
+const FOOTBALL_SPORTS = new Set(['Football', 'World Cup', 'Basketball', 'Tennis', 'Table Tennis', 'Volleyball', 'Handball', 'Ice Hockey']);
+const activeSportCode = computed(() => SPORT_CODE_MAP[store.activeSport] || 'S');
+const { leagueGroups: sportLeagueGroups, loading: sportLoading, loadingMore: sportLoadingMore, hasMore: sportHasMore, init: initSportMatches, loadMore: loadMoreSport } = useSportMatches(activeSportCode);
+const showSportPanel = computed(() => !FOOTBALL_SPORTS.has(store.activeSport));
+
+watch(() => store.activeSport, (newSport) => {
+  if (!FOOTBALL_SPORTS.has(newSport)) {
+    const code = SPORT_CODE_MAP[newSport] || 'S';
+    initSportMatches(code);
+  }
+}, { immediate: false });
 const showBetslip = ref(false);
 const stakeAmount = ref<number | string>(1000);
 const selectedMatch = ref<any | null>(null);
@@ -918,12 +1018,17 @@ function placeBet() {
 }
 
 function getMaxOdd(match: any): number {
-  const odds = [match.markets.home, match.markets.draw, match.markets.away].filter((v): v is number => v != null);
-  return Math.max(...odds);
+  const odds = [match.markets.home, match.markets.draw, match.markets.away].filter((v): v is number => v != null && v > 1.0);
+  return odds.length ? Math.max(...odds) : 0;
+}
+
+function fmtOdd(v: number | null | undefined): string {
+  if (!v || v <= 0) return '-';
+  return String(v);
 }
 
 function dc(a: number | null, b: number | null): string {
-  if (!a || !b) return '-';
+  if (!a || !b || a <= 0 || b <= 0) return '-';
   return (1 / (1/a + 1/b)).toFixed(2);
 }
 function getOver(m: any): string {
@@ -1936,5 +2041,70 @@ const iceHockeyMatches = [
   font-size: 11px;
   color: #3a3d4a;
   margin: 0;
+}
+
+/* ══════════════════════════════════════════════
+   SPORT PANEL — loading / load-more / empty
+══════════════════════════════════════════════ */
+.sport-panel-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 16px;
+  color: #a0a3b1;
+  font-size: 13px;
+}
+.sp-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #3a3d4a;
+  border-top-color: #c026d3;
+  border-radius: 50%;
+  animation: sp-spin 0.7s linear infinite;
+}
+@keyframes sp-spin { to { transform: rotate(360deg); } }
+
+.section-count-sm {
+  font-size: 11px;
+  font-weight: 400;
+  color: #9599a4;
+}
+
+.load-more-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 16px 0 8px;
+}
+.load-more-btn {
+  background: #1e1f28;
+  color: #c026d3;
+  border: 1.5px solid #c026d3;
+  border-radius: 8px;
+  padding: 10px 32px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.load-more-btn:hover:not(:disabled) {
+  background: #c026d3;
+  color: #fff;
+}
+.load-more-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.end-note {
+  text-align: center;
+  padding: 12px;
+  font-size: 12px;
+  color: #6a6f7a;
+}
+
+.sport-empty {
+  text-align: center;
+  padding: 40px 16px;
+  color: #9599a4;
 }
 </style>
