@@ -33,14 +33,126 @@
     <template v-for="t in tiers" :key="'panel-'+t.id">
       <div v-show="activeTier === t.id" class="jpt-panel" :data-tier="t.id">
 
-        <!-- Desktop 2-col layout wrapper -->
+        <!-- 3-col desktop layout wrapper -->
         <div class="jpt-desktop-layout">
 
-          <!-- LEFT: main content -->
+          <!-- ══ LEFT SIDEBAR ══ -->
+          <aside class="jpt-sidebar jpt-sidebar--left">
+
+            <!-- Tier hero card -->
+            <div class="jpt-sb-card jpt-sb-hero-card" :class="`jpt-sb-hero-card--${t.id}`">
+              <div class="jpt-sb-hero-card__medal">{{ t.medal }}</div>
+              <div class="jpt-sb-hero-card__name">{{ t.name }} JACKPOT</div>
+              <div class="jpt-sb-hero-card__prize">{{ t.prizeDisplay }}</div>
+              <div class="jpt-sb-hero-card__stake">Entry: UGX {{ t.stake.toLocaleString() }}</div>
+              <div class="jpt-sb-cdown-mini">
+                <div class="jpt-sb-cdown-mini__lbl">⏱ Closes in</div>
+                <div class="jpt-sb-cdown-mini__vals">
+                  <span class="jpt-sb-cdown-mini__block">{{ cd[t.id].h }}<small>h</small></span>
+                  <span class="jpt-sb-cdown-mini__sep">:</span>
+                  <span class="jpt-sb-cdown-mini__block">{{ cd[t.id].m }}<small>m</small></span>
+                  <span class="jpt-sb-cdown-mini__sep">:</span>
+                  <span class="jpt-sb-cdown-mini__block">{{ cd[t.id].s }}<small>s</small></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pick progress -->
+            <div class="jpt-sb-card">
+              <div class="jpt-sb-card__hdr">🎯 Your Picks</div>
+              <div class="jpt-sb-picks-progress">
+                <div class="jpt-sb-picks-count">
+                  <strong :class="picksCount(t.id) === 12 ? 'jpt-done' : ''">{{ picksCount(t.id) }}</strong>
+                  <span> / 12 selected</span>
+                </div>
+                <div class="jpt-progress__track">
+                  <div class="jpt-progress__fill" :class="`jpt-progress__fill--${t.id}`"
+                    :style="{ width: (picksCount(t.id)/12*100) + '%' }"></div>
+                </div>
+              </div>
+              <!-- Mini picks list -->
+              <div class="jpt-sb-pick-list">
+                <div
+                  v-for="(match, idx) in t.matches" :key="match.id"
+                  class="jpt-sb-pick-item"
+                  :class="{ 'jpt-sb-pick-item--done': picks[t.id][idx] !== null }"
+                >
+                  <span class="jpt-sb-pick-item__num">{{ idx + 1 }}</span>
+                  <span class="jpt-sb-pick-item__team">{{ match.home }} v {{ match.away }}</span>
+                  <span class="jpt-sb-pick-item__val" :class="`jpt-sb-pick-item__val--${t.id}`">
+                    {{ picks[t.id][idx] ?? '—' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick actions -->
+            <div class="jpt-sb-card">
+              <div class="jpt-sb-card__hdr">⚡ Quick Actions</div>
+              <div class="jpt-sb-actions">
+                <button class="jpt-sb-action-btn" :disabled="betPlaced[t.id]" @click="autoPick(t.id, t.matches)">🎲 Auto Pick All</button>
+                <button class="jpt-sb-action-btn jpt-sb-action-btn--clear" :disabled="betPlaced[t.id]" @click="clearPicks(t.id)">✕ Clear Picks</button>
+              </div>
+            </div>
+
+            <!-- Bet / place button -->
+            <div class="jpt-sb-card">
+              <div class="jpt-sb-card__hdr">💰 Your Bet</div>
+              <div class="jpt-sb-bet-body">
+                <template v-if="results[t.id]">
+                  <div class="jpt-result" :class="results[t.id]!.won ? 'jpt-result--win' : 'jpt-result--loss'">
+                    <div class="jpt-result__icon">{{ results[t.id]!.won ? '🎉' : '😔' }}</div>
+                    <div class="jpt-result__title">{{ results[t.id]!.won ? 'JACKPOT WON!' : 'Better luck next time!' }}</div>
+                    <div v-if="results[t.id]!.won" class="jpt-result__prize">{{ t.prizeDisplay }}</div>
+                    <div class="jpt-result__sub">
+                      {{ results[t.id]!.won ? 'Prize credited!' : `${results[t.id]!.correct}/12 correct.` }}
+                    </div>
+                  </div>
+                </template>
+                <template v-else-if="betPlaced[t.id]">
+                  <div class="jpt-sb-confirmed">
+                    <div class="jpt-sb-confirmed__icon">🎟</div>
+                    <div class="jpt-sb-confirmed__title">Entry Confirmed!</div>
+                    <div class="jpt-sb-confirmed__sub">Awaiting results when jackpot closes.</div>
+                    <div class="jpt-sb-confirmed__stake">Paid: <strong>UGX {{ t.stake.toLocaleString() }}</strong></div>
+                  </div>
+                </template>
+                <template v-else>
+                  <div class="jpt-sb-bet-row">
+                    <span class="jpt-sb-bet-lbl">Fixed Stake</span>
+                    <span class="jpt-sb-bet-val">UGX {{ t.stake.toLocaleString() }}</span>
+                  </div>
+                  <div class="jpt-sb-bet-row">
+                    <span class="jpt-sb-bet-lbl">Prize Pool</span>
+                    <span class="jpt-sb-bet-val" style="font-size:11px">{{ t.prizeDisplay }}</span>
+                  </div>
+                  <div class="jpt-sb-bet-row">
+                    <span class="jpt-sb-bet-lbl">Picks</span>
+                    <span class="jpt-sb-bet-val" :class="picksCount(t.id) === 12 ? 'jpt-done' : ''">{{ picksCount(t.id) }}/12</span>
+                  </div>
+                  <button
+                    class="jpt-btn jpt-sb-play-btn"
+                    :class="[`jpt-btn--${t.id}`, { 'jpt-btn--disabled': picksCount(t.id) < 12 }]"
+                    :disabled="picksCount(t.id) < 12"
+                    @click="placeBet(t.id, t)"
+                  >
+                    <template v-if="!store.isLoggedIn">🔐 Login to Play</template>
+                    <template v-else-if="picksCount(t.id) < 12">
+                      Pick {{ 12 - picksCount(t.id) }} more
+                    </template>
+                    <template v-else>🎰 Play Now</template>
+                  </button>
+                </template>
+              </div>
+            </div>
+
+          </aside>
+
+          <!-- ══ CENTER: match table ══ -->
           <div class="jpt-main">
 
-            <!-- Hero: prize + countdown -->
-            <div class="jpt-hero" :class="`jpt-hero--${t.id}`">
+            <!-- Mobile hero (hidden on desktop, shown on mobile) -->
+            <div class="jpt-hero jpt-hero--mobile" :class="`jpt-hero--${t.id}`">
               <div class="jpt-hero__prize-col">
                 <div class="jpt-hero__badge">{{ t.name }} JACKPOT</div>
                 <div class="jpt-hero__prize">{{ t.prizeDisplay }}</div>
@@ -72,19 +184,16 @@
               </div>
             </div>
 
-            <!-- Pick progress -->
-            <div class="jpt-progress">
+            <!-- Mobile progress -->
+            <div class="jpt-progress jpt-progress--mobile">
               <div class="jpt-progress__row">
                 <span class="jpt-progress__count"><strong>{{ picksCount(t.id) }}</strong>/12 picks made</span>
                 <span v-if="picksCount(t.id) < 12" class="jpt-progress__hint">{{ 12 - picksCount(t.id) }} more to go</span>
                 <span v-else class="jpt-progress__done">✓ All picks done!</span>
               </div>
               <div class="jpt-progress__track">
-                <div
-                  class="jpt-progress__fill"
-                  :class="`jpt-progress__fill--${t.id}`"
-                  :style="{ width: (picksCount(t.id)/12*100) + '%' }"
-                ></div>
+                <div class="jpt-progress__fill" :class="`jpt-progress__fill--${t.id}`"
+                  :style="{ width: (picksCount(t.id)/12*100) + '%' }"></div>
               </div>
             </div>
 
@@ -97,7 +206,6 @@
                 <div class="jpt-th jpt-th--odd">X</div>
                 <div class="jpt-th jpt-th--odd">2</div>
               </div>
-
               <div
                 v-for="(match, idx) in t.matches" :key="match.id"
                 class="jpt-row"
@@ -113,40 +221,24 @@
                   </div>
                   <div class="jpt-row__time">{{ match.time }}</div>
                 </div>
-                <button
-                  class="jpt-odd"
-                  :class="{ 'jpt-odd--active': picks[t.id][idx] === '1' }"
-                  :disabled="betPlaced[t.id]"
-                  @click="setPick(t.id, idx, '1')"
-                >{{ match.odds[0] }}</button>
-                <button
-                  class="jpt-odd"
-                  :class="{ 'jpt-odd--active': picks[t.id][idx] === 'X' }"
-                  :disabled="betPlaced[t.id]"
-                  @click="setPick(t.id, idx, 'X')"
-                >{{ match.odds[1] }}</button>
-                <button
-                  class="jpt-odd"
-                  :class="{ 'jpt-odd--active': picks[t.id][idx] === '2' }"
-                  :disabled="betPlaced[t.id]"
-                  @click="setPick(t.id, idx, '2')"
-                >{{ match.odds[2] }}</button>
+                <button class="jpt-odd" :class="{ 'jpt-odd--active': picks[t.id][idx] === '1' }"
+                  :disabled="betPlaced[t.id]" @click="setPick(t.id, idx, '1')">{{ match.odds[0] }}</button>
+                <button class="jpt-odd" :class="{ 'jpt-odd--active': picks[t.id][idx] === 'X' }"
+                  :disabled="betPlaced[t.id]" @click="setPick(t.id, idx, 'X')">{{ match.odds[1] }}</button>
+                <button class="jpt-odd" :class="{ 'jpt-odd--active': picks[t.id][idx] === '2' }"
+                  :disabled="betPlaced[t.id]" @click="setPick(t.id, idx, '2')">{{ match.odds[2] }}</button>
               </div>
             </div>
 
-            <!-- Footer action -->
-            <div class="jpt-footer">
+            <!-- Mobile footer -->
+            <div class="jpt-footer jpt-footer--mobile">
               <template v-if="results[t.id]">
                 <div class="jpt-result" :class="results[t.id]!.won ? 'jpt-result--win' : 'jpt-result--loss'">
                   <div class="jpt-result__icon">{{ results[t.id]!.won ? '🎉' : '😔' }}</div>
-                  <div class="jpt-result__title">
-                    {{ results[t.id]!.won ? '🏆 JACKPOT WON!' : 'Better luck next time!' }}
-                  </div>
+                  <div class="jpt-result__title">{{ results[t.id]!.won ? '🏆 JACKPOT WON!' : 'Better luck next time!' }}</div>
                   <div v-if="results[t.id]!.won" class="jpt-result__prize">{{ t.prizeDisplay }}</div>
                   <div class="jpt-result__sub">
-                    {{ results[t.id]!.won
-                       ? 'Prize has been credited to your account!'
-                       : `You got ${results[t.id]!.correct} out of 12 correct.` }}
+                    {{ results[t.id]!.won ? 'Prize credited!' : `You got ${results[t.id]!.correct} out of 12 correct.` }}
                   </div>
                 </div>
               </template>
@@ -163,39 +255,30 @@
                   <div class="jpt-footer__picks-info">
                     <span class="jpt-footer__picks-count">{{ picksCount(t.id) }}/12 picks</span>
                     <span class="jpt-footer__picks-dot">·</span>
-                    <span class="jpt-footer__picks-note">{{ picksCount(t.id) < 12 ? 'Select all matches to play' : 'Ready to play!' }}</span>
+                    <span class="jpt-footer__picks-note">{{ picksCount(t.id) < 12 ? 'Select all to play' : 'Ready!' }}</span>
                   </div>
-                  <div class="jpt-footer__stake-display">
-                    Stake: <strong>UGX {{ t.stake.toLocaleString() }}</strong>
-                  </div>
+                  <div class="jpt-footer__stake-display">Stake: <strong>UGX {{ t.stake.toLocaleString() }}</strong></div>
                 </div>
-                <button
-                  class="jpt-btn"
-                  :class="[`jpt-btn--${t.id}`, { 'jpt-btn--disabled': picksCount(t.id) < 12 }]"
-                  :disabled="picksCount(t.id) < 12"
-                  @click="placeBet(t.id, t)"
-                >
+                <button class="jpt-btn" :class="[`jpt-btn--${t.id}`, { 'jpt-btn--disabled': picksCount(t.id) < 12 }]"
+                  :disabled="picksCount(t.id) < 12" @click="placeBet(t.id, t)">
                   <template v-if="!store.isLoggedIn">🔐 Login to Play</template>
-                  <template v-else-if="picksCount(t.id) < 12">
-                    Select {{ 12 - picksCount(t.id) }} more match{{ 12 - picksCount(t.id) !== 1 ? 'es' : '' }}
-                  </template>
-                  <template v-else>
-                    🎰 Play {{ t.name }} Jackpot — UGX {{ t.stake.toLocaleString() }}
-                  </template>
+                  <template v-else-if="picksCount(t.id) < 12">Select {{ 12 - picksCount(t.id) }} more match{{ 12 - picksCount(t.id) !== 1 ? 'es' : '' }}</template>
+                  <template v-else>🎰 Play {{ t.name }} Jackpot — UGX {{ t.stake.toLocaleString() }}</template>
                 </button>
               </template>
             </div>
 
           </div><!-- end jpt-main -->
 
-          <!-- RIGHT: sidebar (desktop only) -->
-          <aside class="jpt-sidebar">
+          <!-- ══ RIGHT SIDEBAR ══ -->
+          <aside class="jpt-sidebar jpt-sidebar--right">
 
             <!-- All prize pools -->
             <div class="jpt-sb-card">
               <div class="jpt-sb-card__hdr">🏆 Prize Pools</div>
               <div class="jpt-sb-prize-list">
-                <div v-for="tier in tiers" :key="tier.id" class="jpt-sb-prize-row" :class="`jpt-sb-prize-row--${tier.id}`">
+                <div v-for="tier in tiers" :key="tier.id" class="jpt-sb-prize-row" :class="`jpt-sb-prize-row--${tier.id}`"
+                  @click="activeTier = tier.id">
                   <span class="jpt-sb-prize-row__medal">{{ tier.medal }}</span>
                   <div class="jpt-sb-prize-row__info">
                     <span class="jpt-sb-prize-row__name">{{ tier.name }}</span>
@@ -210,26 +293,12 @@
             <div class="jpt-sb-card">
               <div class="jpt-sb-card__hdr">📖 How to Play</div>
               <ol class="jpt-sb-steps">
-                <li class="jpt-sb-step">
-                  <span class="jpt-sb-step__num">1</span>
-                  <span>Choose your jackpot tier (Gold, Silver, Bronze or Premium)</span>
-                </li>
-                <li class="jpt-sb-step">
-                  <span class="jpt-sb-step__num">2</span>
-                  <span>Predict the result (1, X or 2) for all <strong>12 matches</strong></span>
-                </li>
-                <li class="jpt-sb-step">
-                  <span class="jpt-sb-step__num">3</span>
-                  <span>Pay the fixed stake and confirm your entry</span>
-                </li>
-                <li class="jpt-sb-step">
-                  <span class="jpt-sb-step__num">4</span>
-                  <span>Get all 12 correct → <strong>WIN THE JACKPOT!</strong></span>
-                </li>
+                <li class="jpt-sb-step"><span class="jpt-sb-step__num">1</span><span>Pick your jackpot tier</span></li>
+                <li class="jpt-sb-step"><span class="jpt-sb-step__num">2</span><span>Predict 1, X or 2 for all <strong>12 matches</strong></span></li>
+                <li class="jpt-sb-step"><span class="jpt-sb-step__num">3</span><span>Pay the fixed stake &amp; confirm</span></li>
+                <li class="jpt-sb-step"><span class="jpt-sb-step__num">4</span><span>Get all 12 right → <strong>WIN!</strong></span></li>
               </ol>
-              <div class="jpt-sb-note">
-                💡 Partial wins: 11 correct wins 50%, 10 correct wins 20% of the pool.
-              </div>
+              <div class="jpt-sb-note">💡 11 correct = 50% prize · 10 correct = 20% prize</div>
             </div>
 
             <!-- Recent winners -->
@@ -246,17 +315,13 @@
             </div>
 
             <!-- Entry stats -->
-            <div class="jpt-sb-card jpt-sb-card--stat">
+            <div class="jpt-sb-card">
               <div class="jpt-sb-card__hdr">📊 Today's Entries</div>
               <div class="jpt-sb-stats">
-                <div class="jpt-sb-stat">
-                  <span class="jpt-sb-stat__val">4,821</span>
-                  <span class="jpt-sb-stat__lbl">Total entries</span>
-                </div>
-                <div class="jpt-sb-stat">
-                  <span class="jpt-sb-stat__val">{{ picksCount(t.id) }}/12</span>
-                  <span class="jpt-sb-stat__lbl">Your picks</span>
-                </div>
+                <div class="jpt-sb-stat"><span class="jpt-sb-stat__val">4,821</span><span class="jpt-sb-stat__lbl">Total entries</span></div>
+                <div class="jpt-sb-stat"><span class="jpt-sb-stat__val">{{ picksCount(t.id) }}/12</span><span class="jpt-sb-stat__lbl">Your picks</span></div>
+                <div class="jpt-sb-stat"><span class="jpt-sb-stat__val">3</span><span class="jpt-sb-stat__lbl">Today's winners</span></div>
+                <div class="jpt-sb-stat"><span class="jpt-sb-stat__val">12</span><span class="jpt-sb-stat__lbl">Matches today</span></div>
               </div>
             </div>
 
@@ -451,6 +516,19 @@ function picksCount(tid: string): number {
 function setPick(tid: string, idx: number, val: string) {
   if (betPlaced[tid]) return;
   picks[tid][idx] = picks[tid][idx] === val ? null : val;
+}
+
+function autoPick(tid: string, matches: JpTier['matches']) {
+  if (betPlaced[tid]) return;
+  const opts = ['1', 'X', '2'];
+  matches.forEach((_, i) => {
+    picks[tid][i] = opts[Math.floor(Math.random() * 3)];
+  });
+}
+
+function clearPicks(tid: string) {
+  if (betPlaced[tid]) return;
+  picks[tid] = Array(12).fill(null);
 }
 
 // ─── Place bet ────────────────────────────────────────────
@@ -813,177 +891,238 @@ onUnmounted(() => clearInterval(timer));
 }
 .jpt-result__sub { font-size: 12px; color: #6a6f7a; line-height: 1.5; }
 
-/* ─── desktop layout ────────────────────────────────────── */
+/* ─── desktop 3-col layout ──────────────────────────────── */
 .jpt-desktop-layout { display: flex; flex-direction: column; }
 .jpt-sidebar { display: none; }
+.jpt-hero--mobile { display: block; }
+.jpt-progress--mobile { display: block; }
+.jpt-footer--mobile { display: block; }
 
+/* ── Shared sidebar card styles (always defined, shown on desktop) ── */
+.jpt-sb-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 6px rgba(0,0,0,.08);
+  overflow: visible;
+}
+.jpt-sb-card__hdr {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .4px;
+  color: #292a33;
+  padding: 10px 14px 8px;
+  border-bottom: 1px solid #f0f1f5;
+  background: #fafafa;
+  border-radius: 12px 12px 0 0;
+}
+
+/* ── Left sidebar hero card ── */
+.jpt-sb-hero-card {
+  padding: 18px 14px 14px;
+  text-align: center;
+  color: #fff;
+  overflow: hidden;
+  position: relative;
+}
+.jpt-sb-hero-card--gold    { background: linear-gradient(135deg, #c87800 0%, #f5a623 100%); }
+.jpt-sb-hero-card--silver  { background: linear-gradient(135deg, #4a5568 0%, #718096 100%); }
+.jpt-sb-hero-card--bronze  { background: linear-gradient(135deg, #7b3a10 0%, #c05621 100%); }
+.jpt-sb-hero-card--premium { background: linear-gradient(135deg, #5b21b6 0%, #a855f7 100%); }
+.jpt-sb-hero-card__medal  { font-size: 36px; line-height: 1; margin-bottom: 4px; }
+.jpt-sb-hero-card__name   { font-size: 10px; font-weight: 900; letter-spacing: 1px; opacity: .85; margin-bottom: 4px; }
+.jpt-sb-hero-card__prize  { font-size: 20px; font-weight: 900; margin-bottom: 4px; }
+.jpt-sb-hero-card__stake  { font-size: 10px; opacity: .75; margin-bottom: 10px; }
+
+/* ── Mini countdown ── */
+.jpt-sb-cdown-mini { background: rgba(0,0,0,.2); border-radius: 8px; padding: 8px 10px; }
+.jpt-sb-cdown-mini__lbl { font-size: 9px; opacity: .7; margin-bottom: 4px; }
+.jpt-sb-cdown-mini__vals { display: flex; align-items: center; justify-content: center; gap: 4px; }
+.jpt-sb-cdown-mini__block {
+  font-size: 18px; font-weight: 900;
+  background: rgba(255,255,255,.15);
+  border-radius: 6px;
+  padding: 2px 8px;
+  min-width: 38px;
+  text-align: center;
+}
+.jpt-sb-cdown-mini__block small { font-size: 8px; font-weight: 600; opacity: .7; margin-left: 1px; }
+.jpt-sb-cdown-mini__sep { font-size: 16px; font-weight: 900; opacity: .6; }
+
+/* ── Picks progress ── */
+.jpt-sb-picks-progress { padding: 10px 14px 6px; }
+.jpt-sb-picks-count { font-size: 11px; color: #6a6f7a; margin-bottom: 6px; }
+.jpt-sb-picks-count strong { font-size: 16px; color: #292a33; }
+.jpt-done { color: #10a310 !important; }
+
+/* ── Mini picks list ── */
+.jpt-sb-pick-list { padding: 0 0 6px; }
+.jpt-sb-pick-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-top: 1px solid #f5f5f8;
+  font-size: 10px;
+  color: #9599a4;
+  transition: background .1s;
+}
+.jpt-sb-pick-item--done { background: #f9fff9; color: #292a33; }
+.jpt-sb-pick-item__num {
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #e8eaf0; color: #9599a4;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; flex-shrink: 0;
+}
+.jpt-sb-pick-item--done .jpt-sb-pick-item__num { background: #dcf5dc; color: #10a310; }
+.jpt-sb-pick-item__team { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.jpt-sb-pick-item__val {
+  font-size: 11px; font-weight: 900; color: #c026d3;
+  min-width: 18px; text-align: right; flex-shrink: 0;
+}
+.jpt-sb-pick-item__val--gold    { color: #c87800; }
+.jpt-sb-pick-item__val--silver  { color: #5a6070; }
+.jpt-sb-pick-item__val--bronze  { color: #8c4210; }
+.jpt-sb-pick-item__val--premium { color: #7e22ce; }
+
+/* ── Quick actions ── */
+.jpt-sb-actions { display: flex; flex-direction: column; gap: 8px; padding: 10px 14px; }
+.jpt-sb-action-btn {
+  width: 100%; padding: 9px 12px;
+  border-radius: 8px; border: 1.5px solid #e0e2ea;
+  background: #f5f6fa; color: #292a33;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  transition: background .12s, border-color .12s;
+}
+.jpt-sb-action-btn:hover:not(:disabled) { background: #ebe8f5; border-color: #c026d3; color: #c026d3; }
+.jpt-sb-action-btn--clear:hover:not(:disabled) { background: #fff0f0; border-color: #e53e3e; color: #e53e3e; }
+.jpt-sb-action-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ── Bet body ── */
+.jpt-sb-bet-body { padding: 10px 14px 14px; display: flex; flex-direction: column; gap: 8px; }
+.jpt-sb-bet-row { display: flex; justify-content: space-between; align-items: center; }
+.jpt-sb-bet-lbl { font-size: 11px; color: #9599a4; }
+.jpt-sb-bet-val { font-size: 13px; font-weight: 800; color: #292a33; }
+.jpt-sb-play-btn { margin-top: 4px; }
+
+/* ── Confirmed state ── */
+.jpt-sb-confirmed { text-align: center; padding: 8px 0; }
+.jpt-sb-confirmed__icon  { font-size: 28px; margin-bottom: 4px; }
+.jpt-sb-confirmed__title { font-size: 13px; font-weight: 800; color: #292a33; margin-bottom: 4px; }
+.jpt-sb-confirmed__sub   { font-size: 10px; color: #9599a4; margin-bottom: 8px; line-height: 1.4; }
+.jpt-sb-confirmed__stake { font-size: 11px; color: #292a33; }
+
+/* ── Prize list ── */
+.jpt-sb-prize-list { padding: 4px 0; }
+.jpt-sb-prize-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px; border-bottom: 1px solid #f5f5f8;
+  cursor: pointer; transition: background .12s;
+}
+.jpt-sb-prize-row:last-child { border-bottom: none; }
+.jpt-sb-prize-row:hover { background: #fafafa; }
+.jpt-sb-prize-row__medal { font-size: 20px; flex-shrink: 0; }
+.jpt-sb-prize-row__info  { flex: 1; min-width: 0; }
+.jpt-sb-prize-row__name  { display: block; font-size: 11px; font-weight: 800; color: #292a33; }
+.jpt-sb-prize-row__stake { font-size: 9px; color: #9599a4; }
+.jpt-sb-prize-row__amount { font-size: 11px; font-weight: 900; text-align: right; }
+.jpt-sb-prize-row--gold .jpt-sb-prize-row__amount    { color: #c87800; }
+.jpt-sb-prize-row--silver .jpt-sb-prize-row__amount  { color: #5a6070; }
+.jpt-sb-prize-row--bronze .jpt-sb-prize-row__amount  { color: #8c4210; }
+.jpt-sb-prize-row--premium .jpt-sb-prize-row__amount { color: #7e22ce; }
+
+/* ── How to play ── */
+.jpt-sb-steps {
+  margin: 0; padding: 10px 14px; list-style: none;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.jpt-sb-step {
+  display: flex; align-items: flex-start; gap: 8px;
+  font-size: 11px; color: #6a6f7a; line-height: 1.45;
+}
+.jpt-sb-step strong { color: #292a33; }
+.jpt-sb-step__num {
+  display: flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: #c026d3; color: #fff;
+  font-size: 9px; font-weight: 900; flex-shrink: 0; margin-top: 1px;
+}
+.jpt-sb-note { font-size: 10px; color: #9599a4; padding: 0 14px 12px; line-height: 1.5; }
+
+/* ── Winners ── */
+.jpt-sb-winner {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px; border-bottom: 1px solid #f5f5f8;
+}
+.jpt-sb-winner:last-child { border-bottom: none; }
+.jpt-sb-winner__avatar { font-size: 22px; flex-shrink: 0; }
+.jpt-sb-winner__info   { flex: 1; min-width: 0; }
+.jpt-sb-winner__name   { font-size: 11px; font-weight: 700; color: #292a33; }
+.jpt-sb-winner__tier   { font-size: 9px; color: #9599a4; }
+.jpt-sb-winner__prize  { font-size: 11px; font-weight: 900; color: #10a310; }
+
+/* ── Stats ── */
+.jpt-sb-stats {
+  display: grid; grid-template-columns: 1fr 1fr;
+  padding: 10px 14px 12px; gap: 10px;
+}
+.jpt-sb-stat { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.jpt-sb-stat__val { font-size: 16px; font-weight: 900; color: #292a33; }
+.jpt-sb-stat__lbl { font-size: 9px; color: #9599a4; text-align: center; }
+
+/* ─── Desktop layout ─────────────────────────────────────── */
 @media (min-width: 1024px) {
+  .jpt-hero--mobile     { display: none; }
+  .jpt-progress--mobile { display: none; }
+  .jpt-footer--mobile   { display: none; }
+
   .jpt-desktop-layout {
     flex-direction: row;
     align-items: flex-start;
-    gap: 16px;
+    gap: 14px;
     padding: 14px 20px;
   }
 
+  /* Left sidebar */
+  .jpt-sidebar--left {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 230px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 56px;
+  }
+
+  /* Center */
   .jpt-main {
     flex: 1;
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 0;
     background: #fff;
     border-radius: 12px;
-    overflow: hidden;
     box-shadow: 0 1px 6px rgba(0,0,0,.07);
+    overflow: hidden;
   }
-
-  .jpt-hero { padding: 20px 24px 22px; }
-  .jpt-hero__prize { font-size: 24px; }
-  .jpt-cdown__val { font-size: 28px; }
-  .jpt-cdown__block { min-width: 54px; padding: 6px 10px; }
-
-  .jpt-progress { border-radius: 0; }
-  .jpt-table { margin-top: 0; }
-  .jpt-footer { border-radius: 0; margin-top: 0; }
-
+  .jpt-table { margin-top: 0; border-radius: 0; }
   .jpt-table__hdr,
   .jpt-row {
-    grid-template-columns: 36px 1fr 72px 72px 72px;
-    padding: 10px 16px;
+    grid-template-columns: 34px 1fr 68px 68px 68px;
+    padding: 9px 14px;
   }
-  .jpt-odd { width: 60px; height: 42px; font-size: 13px; }
-  .jpt-row__team { font-size: 12px; }
+  .jpt-odd { width: 56px; height: 40px; font-size: 13px; }
+  .jpt-row__team  { font-size: 11px; }
   .jpt-row__league { font-size: 10px; }
-  .jpt-footer { padding: 16px 24px; }
-  .jpt-btn { font-size: 15px; padding: 14px; }
 
-  /* ── Sidebar ── */
-  .jpt-sidebar {
+  /* Right sidebar */
+  .jpt-sidebar--right {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    width: 280px;
+    width: 230px;
     flex-shrink: 0;
     position: sticky;
     top: 56px;
-    max-height: calc(100vh - 80px);
-    overflow-y: auto;
   }
-
-  .jpt-sb-card {
-    background: #fff;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 1px 6px rgba(0,0,0,.07);
-  }
-
-  .jpt-sb-card__hdr {
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: .4px;
-    color: #292a33;
-    padding: 10px 14px 8px;
-    border-bottom: 1px solid #f0f1f5;
-    background: #fafafa;
-  }
-
-  /* Prize list */
-  .jpt-sb-prize-list { padding: 6px 0; }
-  .jpt-sb-prize-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 14px;
-    border-bottom: 1px solid #f5f5f8;
-    cursor: pointer;
-    transition: background .12s;
-  }
-  .jpt-sb-prize-row:last-child { border-bottom: none; }
-  .jpt-sb-prize-row:hover { background: #fafafa; }
-
-  .jpt-sb-prize-row__medal { font-size: 20px; flex-shrink: 0; }
-  .jpt-sb-prize-row__info { flex: 1; min-width: 0; }
-  .jpt-sb-prize-row__name {
-    display: block;
-    font-size: 11px; font-weight: 800; color: #292a33;
-    letter-spacing: .3px;
-  }
-  .jpt-sb-prize-row__stake { font-size: 9px; color: #9599a4; }
-  .jpt-sb-prize-row__amount { font-size: 11px; font-weight: 900; color: #c026d3; text-align: right; }
-
-  .jpt-sb-prize-row--gold .jpt-sb-prize-row__amount    { color: #c87800; }
-  .jpt-sb-prize-row--silver .jpt-sb-prize-row__amount  { color: #5a6070; }
-  .jpt-sb-prize-row--bronze .jpt-sb-prize-row__amount  { color: #8c4210; }
-  .jpt-sb-prize-row--premium .jpt-sb-prize-row__amount { color: #7e22ce; }
-
-  /* How to play steps */
-  .jpt-sb-steps {
-    margin: 0;
-    padding: 10px 14px;
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .jpt-sb-step {
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    font-size: 11px;
-    color: #6a6f7a;
-    line-height: 1.45;
-  }
-  .jpt-sb-step strong { color: #292a33; }
-  .jpt-sb-step__num {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: #c026d3;
-    color: #fff;
-    font-size: 9px;
-    font-weight: 900;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-  .jpt-sb-note {
-    font-size: 10px;
-    color: #9599a4;
-    padding: 0 14px 12px;
-    line-height: 1.5;
-  }
-
-  /* Winners */
-  .jpt-sb-winner {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 14px;
-    border-bottom: 1px solid #f5f5f8;
-  }
-  .jpt-sb-winner:last-child { border-bottom: none; }
-  .jpt-sb-winner__avatar { font-size: 22px; flex-shrink: 0; }
-  .jpt-sb-winner__info { flex: 1; min-width: 0; }
-  .jpt-sb-winner__name { font-size: 11px; font-weight: 700; color: #292a33; }
-  .jpt-sb-winner__tier { font-size: 9px; color: #9599a4; }
-  .jpt-sb-winner__prize { font-size: 11px; font-weight: 900; color: #10a310; }
-
-  /* Stats */
-  .jpt-sb-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 10px 14px 12px;
-    gap: 8px;
-  }
-  .jpt-sb-stat {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
-  }
-  .jpt-sb-stat__val { font-size: 18px; font-weight: 900; color: #292a33; }
-  .jpt-sb-stat__lbl { font-size: 9px; color: #9599a4; text-align: center; }
 }
 </style>
