@@ -914,9 +914,10 @@ const uplMatches = [
     grid-template-columns: 180px 1fr 215px;
     gap: 0;
     width: 100%;
-    min-height: calc(100vh - 120px);
-    align-items: start;
+    height: calc(100vh - 96px);
+    align-items: stretch;
     background: #f2f3f5;
+    overflow: hidden;
   }
 }
 
@@ -933,7 +934,9 @@ const uplMatches = [
     border-radius: 10px;
     box-shadow: 0 1px 6px rgba(0,0,0,.08);
     margin: 10px 0 10px 8px;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
   }
   .dt-sidebar__search {
     display: flex; align-items: center; gap: 8px;
@@ -987,7 +990,12 @@ const uplMatches = [
   min-width: 0;
 }
 @media (min-width: 1024px) {
-  .dt-center { background: #f2f3f5; }
+  .dt-center {
+    background: #f2f3f5;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+  }
 
   /* ── section cards ── */
   .section {
@@ -1148,6 +1156,9 @@ const uplMatches = [
     gap: 10px;
     background: transparent;
     padding: 10px 8px 10px 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
   }
 
   /* Betslip panel */
