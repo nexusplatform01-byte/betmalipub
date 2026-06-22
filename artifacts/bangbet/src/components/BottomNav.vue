@@ -90,6 +90,10 @@ const hasBets  = computed(() => store.betslip.length > 0);
   padding-bottom: 5px;
 }
 
+@media (min-width: 1024px) {
+  .bnav { display: none !important; }
+}
+
 /* ── regular tab ────────────────────────────────────── */
 .bnav__item {
   flex: 1;

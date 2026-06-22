@@ -327,11 +327,12 @@ const promos = [
 @media (min-width: 1024px) {
   .dt-shell {
     display: grid;
-    grid-template-columns: 220px 1fr 300px;
+    grid-template-columns: 180px 1fr 240px;
     gap: 0;
     width: 100%;
     min-height: calc(100vh - 120px);
     align-items: start;
+    background: #f2f3f5;
   }
 }
 
@@ -345,12 +346,14 @@ const promos = [
     display: flex;
     flex-direction: column;
     background: #fff;
-    border-right: 1px solid #e6e7eb;
-    min-height: calc(100vh - 120px);
+    border-radius: 10px;
+    box-shadow: 0 1px 6px rgba(0,0,0,.08);
+    margin: 10px 0 10px 8px;
+    overflow: hidden;
     position: sticky;
-    top: 0;
+    top: 10px;
+    max-height: calc(100vh - 140px);
     overflow-y: auto;
-    max-height: calc(100vh - 120px);
   }
   .dt-sidebar__search {
     display: flex; align-items: center; gap: 8px;
@@ -420,11 +423,11 @@ const promos = [
     display: flex;
     flex-direction: column;
     gap: 10px;
-    background: #f5f6f9;
-    padding: 12px;
+    background: transparent;
+    padding: 10px 8px 10px 0;
     position: sticky;
-    top: 0;
-    max-height: calc(100vh - 120px);
+    top: 10px;
+    max-height: calc(100vh - 140px);
     overflow-y: auto;
   }
 
