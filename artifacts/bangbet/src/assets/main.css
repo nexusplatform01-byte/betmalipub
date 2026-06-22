@@ -86,24 +86,6 @@ html, body {
   .bottom-nav {
     display: none !important;
   }
-  .header {
-    height: 32px;
-    padding: 0 16px;
-  }
-  .header__logo {
-    height: 18px;
-  }
-  .header__actions {
-    gap: 5px;
-  }
-  .btn-login {
-    padding: 3px 10px;
-    font-size: 11px;
-  }
-  .btn-register {
-    padding: 3px 10px;
-    font-size: 11px;
-  }
 }
 
 .app-wrapper { width: 100%; }
@@ -167,6 +149,28 @@ html, body {
 .header__balance { display: flex; flex-direction: column; align-items: flex-end; }
 .header__balance-amount { font-size: 14px; font-weight: 700; color: var(--accent); }
 .header__balance-label { font-size: 10px; color: rgba(255,255,255,0.45); margin-top: 1px; }
+
+/* ── Desktop header overrides (placed after base to win cascade) ── */
+@media (min-width: 1024px) {
+  .header {
+    height: 38px;
+    padding: 0 16px;
+  }
+  .header__logo {
+    height: 18px;
+  }
+  .header__actions {
+    gap: 5px;
+  }
+  .btn-login {
+    padding: 3px 10px;
+    font-size: 11px;
+  }
+  .btn-register {
+    padding: 3px 10px;
+    font-size: 11px;
+  }
+}
 
 /* ═══════════════════════════════════════
    BOTTOM NAV
