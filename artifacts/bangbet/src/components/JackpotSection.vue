@@ -58,8 +58,8 @@ interface Tier {
 
 const tiers: Tier[] = [
   { id: 'gold',    name: 'GOLD',    medal: '🥇', medalImg: 'https://www.fortebet.ug/assets/img/casino/jackpot-golden.png', base: 856_241_337, oneDur: 800    },
-  { id: 'silver',  name: 'SILVER',  medal: '🥈', base: 432_817_658, oneDur: 2_500  },
-  { id: 'bronze',  name: 'BRONZE',  medal: '🥉', base: 287_542_110, oneDur: 7_000  },
+  { id: 'silver',  name: 'SILVER',  medal: '🥈', medalImg: 'https://www.fortebet.ug/assets/img/casino/jackpot-silver.png', base: 432_817_658, oneDur: 2_500  },
+  { id: 'bronze',  name: 'BRONZE',  medal: '🥉', medalImg: 'https://www.fortebet.ug/assets/img/casino/jackpot-bronze.png', base: 287_542_110, oneDur: 7_000  },
   { id: 'premium', name: 'PREMIUM', medal: '💎', base: 194_163_808, oneDur: 18_000 },
 ];
 
