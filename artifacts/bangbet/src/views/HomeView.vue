@@ -403,7 +403,7 @@ const promos = [
   }
   .dt-topnav__tab {
     display: flex; align-items: center; gap: 5px;
-    padding: 11px 16px;
+    padding: 8px 16px;
     background: none; border: none; cursor: pointer;
     font-size: 13px; font-weight: 600; color: #a0a3b1;
     border-bottom: 2.5px solid transparent;
