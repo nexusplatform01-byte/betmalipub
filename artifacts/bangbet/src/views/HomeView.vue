@@ -50,7 +50,7 @@
 
       <!-- CENTER CONTENT -->
       <main class="dt-center">
-        <BannerSlider />
+        <div class="dt-banner-wrap"><BannerSlider /></div>
         <SportMenu active-name="Football" />
         <JackpotSection />
 
@@ -418,7 +418,7 @@ const promos = [
 @media (min-width: 1024px) {
   .dt-shell {
     display: grid;
-    grid-template-columns: 180px 1fr 180px;
+    grid-template-columns: 180px 1fr 215px;
     gap: 0;
     width: 100%;
     min-height: calc(100vh - 120px);
@@ -496,65 +496,104 @@ const promos = [
 @media (min-width: 1024px) {
   .dt-center { background: #f2f3f5; }
 
+  /* ── hero banner soft edges ── */
+  .dt-banner-wrap {
+    margin: 10px 8px 0;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,.12);
+  }
+
   /* ── match table ── */
-  .dt-match-table { background: #fff; border-radius: 8px; overflow: hidden; margin: 0 0 2px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  .dt-match-table {
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 0 0 4px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  }
   .dtmt__head {
     display: grid;
-    grid-template-columns: 1fr repeat(8, 68px);
+    grid-template-columns: 1fr repeat(8, 72px);
     background: #f5f6f9;
-    border-bottom: 2px solid #e6e7eb;
+    border-bottom: 1px solid #e6e7eb;
+    padding: 0 4px;
   }
   .dtmt__col-match {
-    padding: 7px 12px;
+    padding: 6px 10px;
     font-size: 10px; font-weight: 800; color: #9599a4;
-    letter-spacing: .6px; text-transform: uppercase;
+    letter-spacing: .5px; text-transform: uppercase;
   }
   .dtmt__col-odd {
-    padding: 7px 4px;
-    font-size: 11px; font-weight: 800; color: #9599a4;
-    text-align: center; letter-spacing: .4px;
-    border-left: 1px solid #e6e7eb;
+    padding: 6px 4px;
+    font-size: 10px; font-weight: 800; color: #9599a4;
+    text-align: center; letter-spacing: .3px;
   }
   .dtmt__row {
     display: grid;
-    grid-template-columns: 1fr repeat(8, 68px);
+    grid-template-columns: 1fr repeat(8, 72px);
     border-bottom: 1px solid #f0f0f4;
     cursor: pointer;
     transition: background 0.1s;
     align-items: center;
+    padding: 0 4px;
   }
   .dtmt__row:last-child { border-bottom: none; }
   .dtmt__row:hover { background: #fafbfc; }
-  .dtmt__col-match { padding: 8px 12px; }
+  .dtmt__col-match { padding: 6px 10px; }
   .dtmt__league {
-    font-size: 10px; color: #9599a4; font-weight: 600;
-    margin-bottom: 2px; display: flex; align-items: center; gap: 5px;
+    font-size: 9px; color: #9599a4; font-weight: 600;
+    margin-bottom: 1px; display: flex; align-items: center; gap: 4px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .dtmt__live-badge {
     background: #e04040; color: #fff;
-    font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px;
-    letter-spacing: .5px;
+    font-size: 8px; font-weight: 800; padding: 1px 3px; border-radius: 3px;
+    letter-spacing: .5px; flex-shrink: 0;
   }
   .dtmt__teams {
-    font-size: 12px; font-weight: 700; color: #1a1b22;
-    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 700; color: #1a1b22;
+    display: flex; align-items: center; gap: 5px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .dtmt__score {
     background: #c026d3; color: #fff;
-    font-size: 10px; font-weight: 800; padding: 1px 5px; border-radius: 4px;
+    font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 4px;
+    flex-shrink: 0;
   }
-  .dtmt__vs { color: #aaa; font-weight: 400; font-size: 11px; }
-  .dtmt__time { font-size: 10px; color: #9599a4; margin-top: 2px; }
+  .dtmt__vs { color: #aaa; font-weight: 400; font-size: 10px; flex-shrink: 0; }
+  .dtmt__time { font-size: 9px; color: #9599a4; margin-top: 1px; }
+
+  /* ── real styled odds boxes ── */
   .dtmt__odd-btn {
-    display: block; width: 100%; height: 100%;
-    min-height: 48px;
-    background: none; border: none; border-left: 1px solid #f0f0f4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    width: calc(100% - 8px);
+    min-height: 40px;
+    margin: 4px;
+    background: #f2f3f5;
+    border: 1.5px solid #e6e7eb;
+    border-radius: 7px;
     cursor: pointer;
-    font-size: 13px; font-weight: 700; color: #292a33;
-    transition: background 0.12s, color 0.12s;
+    font-size: 13px;
+    font-weight: 800;
+    color: #292a33;
+    transition: background 0.12s, border-color 0.12s, color 0.12s;
+    padding: 3px 2px;
   }
-  .dtmt__odd-btn:hover { background: rgba(192,38,211,0.08); color: #c026d3; }
-  .dtmt__odd-btn.selected { background: #c026d3; color: #fff; }
+  .dtmt__odd-btn:hover {
+    background: rgba(192,38,211,0.08);
+    border-color: #c026d3;
+    color: #c026d3;
+  }
+  .dtmt__odd-btn.selected {
+    background: rgba(192,38,211,0.1);
+    border-color: #c026d3;
+    color: #c026d3;
+  }
 }
 
 /* ══════════════════════════════════════════════
