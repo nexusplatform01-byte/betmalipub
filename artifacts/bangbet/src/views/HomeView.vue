@@ -88,10 +88,10 @@
                 <div class="dtmt__time">{{ match.minute }}'</div>
               </div>
               <button class="dtmt__odd-btn" @click.stop="addOdd(match,'1',match.markets.home)">{{ match.markets.home }}</button>
-              <button class="dtmt__odd-btn" @click.stop="addOdd(match,'X',match.markets.draw)">{{ match.markets.draw }}</button>
+              <button class="dtmt__odd-btn" :class="{ 'dtmt__odd-btn--na': !match.markets.draw }" @click.stop="match.markets.draw && addOdd(match,'X',match.markets.draw)">{{ match.markets.draw ?? '-' }}</button>
               <button class="dtmt__odd-btn" @click.stop="addOdd(match,'2',match.markets.away)">{{ match.markets.away }}</button>
-              <button class="dtmt__odd-btn" @click.stop="addOdd(match,'1X',dc(match.markets.home,match.markets.draw))">{{ dc(match.markets.home,match.markets.draw) }}</button>
-              <button class="dtmt__odd-btn" @click.stop="addOdd(match,'X2',dc(match.markets.draw,match.markets.away))">{{ dc(match.markets.draw,match.markets.away) }}</button>
+              <button class="dtmt__odd-btn" :class="{ 'dtmt__odd-btn--na': !match.markets.draw }" @click.stop="match.markets.draw && addOdd(match,'1X',dc(match.markets.home,match.markets.draw))">{{ dc(match.markets.home,match.markets.draw) }}</button>
+              <button class="dtmt__odd-btn" :class="{ 'dtmt__odd-btn--na': !match.markets.draw }" @click.stop="match.markets.draw && addOdd(match,'X2',dc(match.markets.draw,match.markets.away))">{{ dc(match.markets.draw,match.markets.away) }}</button>
               <button class="dtmt__odd-btn" @click.stop="addOdd(match,'12',dc(match.markets.home,match.markets.away))">{{ dc(match.markets.home,match.markets.away) }}</button>
             </div>
           </div>
@@ -128,10 +128,10 @@
                 <div class="dtmt__time">{{ match.startTime }}</div>
               </div>
               <button class="dtmt__odd-btn" @click.stop="addOdd(match,'1',match.markets.home)">{{ match.markets.home }}</button>
-              <button class="dtmt__odd-btn" @click.stop="addOdd(match,'X',match.markets.draw)">{{ match.markets.draw }}</button>
+              <button class="dtmt__odd-btn" :class="{ 'dtmt__odd-btn--na': !match.markets.draw }" @click.stop="match.markets.draw && addOdd(match,'X',match.markets.draw)">{{ match.markets.draw ?? '-' }}</button>
               <button class="dtmt__odd-btn" @click.stop="addOdd(match,'2',match.markets.away)">{{ match.markets.away }}</button>
-              <button class="dtmt__odd-btn" @click.stop="addOdd(match,'1X',dc(match.markets.home,match.markets.draw))">{{ dc(match.markets.home,match.markets.draw) }}</button>
-              <button class="dtmt__odd-btn" @click.stop="addOdd(match,'X2',dc(match.markets.draw,match.markets.away))">{{ dc(match.markets.draw,match.markets.away) }}</button>
+              <button class="dtmt__odd-btn" :class="{ 'dtmt__odd-btn--na': !match.markets.draw }" @click.stop="match.markets.draw && addOdd(match,'1X',dc(match.markets.home,match.markets.draw))">{{ dc(match.markets.home,match.markets.draw) }}</button>
+              <button class="dtmt__odd-btn" :class="{ 'dtmt__odd-btn--na': !match.markets.draw }" @click.stop="match.markets.draw && addOdd(match,'X2',dc(match.markets.draw,match.markets.away))">{{ dc(match.markets.draw,match.markets.away) }}</button>
               <button class="dtmt__odd-btn" @click.stop="addOdd(match,'12',dc(match.markets.home,match.markets.away))">{{ dc(match.markets.home,match.markets.away) }}</button>
             </div>
           </div>
@@ -317,7 +317,8 @@ function placeBet() {
   stakeAmount.value = 1000;
 }
 
-function dc(a: number, b: number): string {
+function dc(a: number | null, b: number | null): string {
+  if (!a || !b) return '-';
   return (1 / (1/a + 1/b)).toFixed(2);
 }
 function getOver(m: any): string {
@@ -538,6 +539,7 @@ const promos = [
     padding: 6px 10px;
     font-size: 10px; font-weight: 800; color: #9599a4;
     letter-spacing: .5px; text-transform: uppercase;
+    min-width: 0; overflow: hidden;
   }
   .dtmt__col-odd {
     padding: 6px 4px;
@@ -555,7 +557,7 @@ const promos = [
   }
   .dtmt__row:last-child { border-bottom: none; }
   .dtmt__row:hover { background: #fafbfc; }
-  .dtmt__col-match { padding: 6px 10px; }
+  .dtmt__col-match { padding: 6px 10px; min-width: 0; overflow: hidden; }
   .dtmt__league {
     font-size: 9px; color: #9599a4; font-weight: 600;
     margin-bottom: 1px; display: flex; align-items: center; gap: 4px;
@@ -613,6 +615,13 @@ const promos = [
     background: rgba(192,38,211,0.1);
     border-color: #c026d3;
     color: #c026d3;
+  }
+  .dtmt__odd-btn--na {
+    color: #b0b3bc;
+    background: #f5f6f9;
+    border-color: #e6e7eb;
+    cursor: default;
+    pointer-events: none;
   }
 }
 
