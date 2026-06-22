@@ -59,8 +59,40 @@
             <div class="section-title"><span class="live-dot"></span> Live Now ({{ store.liveMatches.length }})</div>
             <RouterLink to="/sports/Football" class="section-more">See All ›</RouterLink>
           </div>
-          <div class="dt-matches-grid">
+          <!-- Mobile: card grid -->
+          <div class="mob-only">
             <MatchCard v-for="match in store.liveMatches" :key="match.id" :match="match" />
+          </div>
+          <!-- Desktop: Fortebet-style row table -->
+          <div class="dt-match-table dt-only">
+            <div class="dtmt__head">
+              <div class="dtmt__col-match">Match</div>
+              <div class="dtmt__col-odd">1</div>
+              <div class="dtmt__col-odd">X</div>
+              <div class="dtmt__col-odd">2</div>
+              <div class="dtmt__col-odd">1X</div>
+              <div class="dtmt__col-odd">X2</div>
+              <div class="dtmt__col-odd">12</div>
+              <div class="dtmt__col-odd">O2.5</div>
+              <div class="dtmt__col-odd">U2.5</div>
+            </div>
+            <div v-for="match in store.liveMatches" :key="match.id" class="dtmt__row" @click="$router.push(`/match/${match.id}`)">
+              <div class="dtmt__col-match">
+                <div class="dtmt__league">
+                  <span class="dtmt__live-badge">LIVE</span> {{ match.league }}
+                </div>
+                <div class="dtmt__teams">{{ match.homeTeam }} <span class="dtmt__score">{{ match.homeScore }}-{{ match.awayScore }}</span> {{ match.awayTeam }}</div>
+                <div class="dtmt__time">{{ match.minute }}'</div>
+              </div>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(match,'1',match.markets.home)">{{ match.markets.home }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(match,'X',match.markets.draw)">{{ match.markets.draw }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(match,'2',match.markets.away)">{{ match.markets.away }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(match,'1X',dc(match.markets.home,match.markets.draw))">{{ dc(match.markets.home,match.markets.draw) }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(match,'X2',dc(match.markets.draw,match.markets.away))">{{ dc(match.markets.draw,match.markets.away) }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(match,'12',dc(match.markets.home,match.markets.away))">{{ dc(match.markets.home,match.markets.away) }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(match,'O2.5',getOver(match))">{{ getOver(match) }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(match,'U2.5',getUnder(match))">{{ getUnder(match) }}</button>
+            </div>
           </div>
         </div>
 
@@ -69,8 +101,38 @@
             <div class="section-title">⭐ Top Matches</div>
             <RouterLink to="/sports/Football" class="section-more">See All ›</RouterLink>
           </div>
-          <div class="dt-matches-grid">
+          <!-- Mobile: card grid -->
+          <div class="mob-only">
             <MatchCard v-for="match in store.topMatches" :key="match.id" :match="match" />
+          </div>
+          <!-- Desktop: Fortebet-style row table -->
+          <div class="dt-match-table dt-only">
+            <div class="dtmt__head">
+              <div class="dtmt__col-match">Match</div>
+              <div class="dtmt__col-odd">1</div>
+              <div class="dtmt__col-odd">X</div>
+              <div class="dtmt__col-odd">2</div>
+              <div class="dtmt__col-odd">1X</div>
+              <div class="dtmt__col-odd">X2</div>
+              <div class="dtmt__col-odd">12</div>
+              <div class="dtmt__col-odd">O2.5</div>
+              <div class="dtmt__col-odd">U2.5</div>
+            </div>
+            <div v-for="match in store.topMatches" :key="match.id" class="dtmt__row" @click="$router.push(`/match/${match.id}`)">
+              <div class="dtmt__col-match">
+                <div class="dtmt__league">{{ match.league }}</div>
+                <div class="dtmt__teams">{{ match.homeTeam }} <span class="dtmt__vs">vs</span> {{ match.awayTeam }}</div>
+                <div class="dtmt__time">{{ match.startTime }}</div>
+              </div>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(match,'1',match.markets.home)">{{ match.markets.home }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(match,'X',match.markets.draw)">{{ match.markets.draw }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(match,'2',match.markets.away)">{{ match.markets.away }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(match,'1X',dc(match.markets.home,match.markets.draw))">{{ dc(match.markets.home,match.markets.draw) }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(match,'X2',dc(match.markets.draw,match.markets.away))">{{ dc(match.markets.draw,match.markets.away) }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(match,'12',dc(match.markets.home,match.markets.away))">{{ dc(match.markets.home,match.markets.away) }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(match,'O2.5',getOver(match))">{{ getOver(match) }}</button>
+              <button class="dtmt__odd-btn" @click.stop="addOdd(match,'U2.5',getUnder(match))">{{ getUnder(match) }}</button>
+            </div>
           </div>
         </div>
 
@@ -240,6 +302,27 @@ function placeBet() {
   stakeAmount.value = 1000;
 }
 
+function dc(a: number, b: number): string {
+  return (1 / (1/a + 1/b)).toFixed(2);
+}
+function getOver(m: any): string {
+  const base = (m.markets.home + m.markets.away) / 2 * 0.72;
+  return Math.max(1.55, Math.min(2.90, base)).toFixed(2);
+}
+function getUnder(m: any): string {
+  const o = parseFloat(getOver(m));
+  return Math.max(1.30, Math.min(2.50, (o * 0.9) / (o - 0.9))).toFixed(2);
+}
+function addOdd(match: any, market: string, odds: number | string) {
+  store.addToBetslip({
+    matchId: `${match.id}_${market}`,
+    baseMatchId: match.id,
+    team: `${match.homeTeam} vs ${match.awayTeam}`,
+    market,
+    odds: parseFloat(String(odds))
+  });
+}
+
 const desktopNavTabs = [
   { label: 'Sportsbook', icon: '⚽', route: '/' },
   { label: 'Live',       icon: '🔴', route: '/sports/Football', badge: '24' },
@@ -279,10 +362,12 @@ const promos = [
 
 <style scoped>
 /* ══════════════════════════════════════════════
-   MOBILE ONLY helper  (hides desktop elements)
+   MOBILE / DESKTOP visibility helpers
 ══════════════════════════════════════════════ */
+.dt-only { display: none; }
 @media (min-width: 1024px) {
   .mob-only { display: none !important; }
+  .dt-only  { display: block; }
 }
 
 /* ══════════════════════════════════════════════
@@ -356,10 +441,6 @@ const promos = [
     box-shadow: 0 1px 6px rgba(0,0,0,.08);
     margin: 10px 0 10px 8px;
     overflow: hidden;
-    position: sticky;
-    top: 10px;
-    max-height: calc(100vh - 140px);
-    overflow-y: auto;
   }
   .dt-sidebar__search {
     display: flex; align-items: center; gap: 8px;
@@ -407,19 +488,73 @@ const promos = [
 }
 
 /* ══════════════════════════════════════════════
-   CENTER COLUMN
+   CENTER COLUMN + FORTEBET MATCH TABLE
 ══════════════════════════════════════════════ */
 .dt-center {
   min-width: 0;
 }
 @media (min-width: 1024px) {
-  .dt-center {
-    background: #f2f3f5;
-  }
-  .dt-matches-grid {
+  .dt-center { background: #f2f3f5; }
+
+  /* ── match table ── */
+  .dt-match-table { background: #fff; border-radius: 8px; overflow: hidden; margin: 0 0 2px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  .dtmt__head {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr repeat(8, 68px);
+    background: #f5f6f9;
+    border-bottom: 2px solid #e6e7eb;
   }
+  .dtmt__col-match {
+    padding: 7px 12px;
+    font-size: 10px; font-weight: 800; color: #9599a4;
+    letter-spacing: .6px; text-transform: uppercase;
+  }
+  .dtmt__col-odd {
+    padding: 7px 4px;
+    font-size: 11px; font-weight: 800; color: #9599a4;
+    text-align: center; letter-spacing: .4px;
+    border-left: 1px solid #e6e7eb;
+  }
+  .dtmt__row {
+    display: grid;
+    grid-template-columns: 1fr repeat(8, 68px);
+    border-bottom: 1px solid #f0f0f4;
+    cursor: pointer;
+    transition: background 0.1s;
+    align-items: center;
+  }
+  .dtmt__row:last-child { border-bottom: none; }
+  .dtmt__row:hover { background: #fafbfc; }
+  .dtmt__col-match { padding: 8px 12px; }
+  .dtmt__league {
+    font-size: 10px; color: #9599a4; font-weight: 600;
+    margin-bottom: 2px; display: flex; align-items: center; gap: 5px;
+  }
+  .dtmt__live-badge {
+    background: #e04040; color: #fff;
+    font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px;
+    letter-spacing: .5px;
+  }
+  .dtmt__teams {
+    font-size: 12px; font-weight: 700; color: #1a1b22;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .dtmt__score {
+    background: #c026d3; color: #fff;
+    font-size: 10px; font-weight: 800; padding: 1px 5px; border-radius: 4px;
+  }
+  .dtmt__vs { color: #aaa; font-weight: 400; font-size: 11px; }
+  .dtmt__time { font-size: 10px; color: #9599a4; margin-top: 2px; }
+  .dtmt__odd-btn {
+    display: block; width: 100%; height: 100%;
+    min-height: 48px;
+    background: none; border: none; border-left: 1px solid #f0f0f4;
+    cursor: pointer;
+    font-size: 13px; font-weight: 700; color: #292a33;
+    transition: background 0.12s, color 0.12s;
+  }
+  .dtmt__odd-btn:hover { background: rgba(192,38,211,0.08); color: #c026d3; }
+  .dtmt__odd-btn.selected { background: #c026d3; color: #fff; }
 }
 
 /* ══════════════════════════════════════════════
@@ -434,10 +569,6 @@ const promos = [
     gap: 10px;
     background: transparent;
     padding: 10px 8px 10px 0;
-    position: sticky;
-    top: 10px;
-    max-height: calc(100vh - 140px);
-    overflow-y: auto;
   }
 
   /* Betslip panel */
