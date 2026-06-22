@@ -50,6 +50,7 @@
 
       <!-- CENTER CONTENT -->
       <main class="dt-center">
+        <template v-if="!selectedMatch">
         <div class="dt-banner-wrap"><BannerSlider /></div>
         <SportMenu active-name="Football" />
         <JackpotSection />
@@ -74,12 +75,16 @@
               <div class="dtmt__col-odd">X2</div>
               <div class="dtmt__col-odd">12</div>
             </div>
-            <div v-for="match in store.liveMatches" :key="match.id" class="dtmt__row" @click="$router.push(`/match/${match.id}`)">
+            <div v-for="match in store.liveMatches" :key="match.id" class="dtmt__row" @click="openMatch(match)">
               <div class="dtmt__col-match">
                 <div class="dtmt__league">
                   <span class="dtmt__live-badge">Live</span> {{ match.league }}
                 </div>
-                <div class="dtmt__teams">{{ match.homeTeam }} <span class="dtmt__score">{{ match.homeScore }}-{{ match.awayScore }}</span> {{ match.awayTeam }}</div>
+                <div class="dtmt__teams">
+                  <span class="dtmt__team-name">{{ match.homeTeam }}</span>
+                  <span class="dtmt__score">{{ match.homeScore }}-{{ match.awayScore }}</span>
+                  <span class="dtmt__team-name">{{ match.awayTeam }}</span>
+                </div>
                 <div class="dtmt__time">{{ match.minute }}'</div>
               </div>
               <button class="dtmt__odd-btn" @click.stop="addOdd(match,'1',match.markets.home)">{{ match.markets.home }}</button>
@@ -112,10 +117,14 @@
               <div class="dtmt__col-odd">X2</div>
               <div class="dtmt__col-odd">12</div>
             </div>
-            <div v-for="match in store.topMatches" :key="match.id" class="dtmt__row" @click="$router.push(`/match/${match.id}`)">
+            <div v-for="match in store.topMatches" :key="match.id" class="dtmt__row" @click="openMatch(match)">
               <div class="dtmt__col-match">
                 <div class="dtmt__league">{{ match.league }}</div>
-                <div class="dtmt__teams">{{ match.homeTeam }} <span class="dtmt__vs">vs</span> {{ match.awayTeam }}</div>
+                <div class="dtmt__teams">
+                  <span class="dtmt__team-name">{{ match.homeTeam }}</span>
+                  <span class="dtmt__vs">vs</span>
+                  <span class="dtmt__team-name">{{ match.awayTeam }}</span>
+                </div>
                 <div class="dtmt__time">{{ match.startTime }}</div>
               </div>
               <button class="dtmt__odd-btn" @click.stop="addOdd(match,'1',match.markets.home)">{{ match.markets.home }}</button>
@@ -149,6 +158,8 @@
           </div>
           <p class="footer-text">Bangbet is licensed and regulated by the National Gaming Board of Uganda.<br/>Gambling is for adults 18+. Please gamble responsibly.</p>
         </div>
+        </template>
+        <MatchDetailPanel v-else :match="(selectedMatch as any)" @close="selectedMatch = null" />
       </main>
 
       <!-- RIGHT BETSLIP PANEL -->
@@ -215,7 +226,7 @@
           <div class="dt-livescores__head">
             <span class="live-dot"></span> Live Scores
           </div>
-          <div v-for="m in store.liveMatches.slice(0,3)" :key="m.id" class="dt-livescores__row" @click="$router.push(`/match/${m.id}`)">
+          <div v-for="m in store.liveMatches.slice(0,3)" :key="m.id" class="dt-livescores__row" @click="openMatch(m)">
             <div class="dt-livescores__teams">
               <span>{{ m.homeTeam }}</span>
               <span>{{ m.awayTeam }}</span>
@@ -272,17 +283,29 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
+import { useRouter } from 'vue-router';
 import AppHeader from "@/components/AppHeader.vue";
 import BottomNav from "@/components/BottomNav.vue";
 import SportMenu from "@/components/SportMenu.vue";
 import JackpotSection from "@/components/JackpotSection.vue";
 import BannerSlider from "@/components/BannerSlider.vue";
 import MatchCard from "@/components/MatchCard.vue";
+import MatchDetailPanel from "@/components/MatchDetailPanel.vue";
 import { useAppStore } from "@/stores/app";
 
+const router = useRouter();
 const store = useAppStore();
 const showBetslip = ref(false);
 const stakeAmount = ref<number | string>(1000);
+const selectedMatch = ref<any | null>(null);
+
+function openMatch(match: any) {
+  if (window.innerWidth >= 1024) {
+    selectedMatch.value = match;
+  } else {
+    router.push(`/match/${match.id}`);
+  }
+}
 
 const totalOdds = computed(() => store.betslip.reduce((acc, b) => acc * b.odds, 1));
 const potentialWin = computed(() => Math.round(Number(stakeAmount.value || 0) * totalOdds.value).toLocaleString());
@@ -545,8 +568,13 @@ const promos = [
   }
   .dtmt__teams {
     font-size: 11px; font-weight: 700; color: #1a1b22;
-    display: flex; align-items: center; gap: 5px;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    display: flex; align-items: center; gap: 4px;
+    min-width: 0; overflow: hidden;
+  }
+  .dtmt__team-name {
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    min-width: 0; flex: 1;
+    max-width: 42%;
   }
   .dtmt__score {
     background: #c026d3; color: #fff;
