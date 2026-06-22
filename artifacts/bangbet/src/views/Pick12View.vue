@@ -87,24 +87,23 @@
         <div class="p12-sb-card">
           <div class="p12-sb-card__hdr">⚡ Quick Actions</div>
           <div class="p12-sb-actions">
-            <button class="p12-sb-action-btn" :disabled="submitted" @click="autoFill">🎲 Auto Fill All</button>
-            <button class="p12-sb-action-btn p12-sb-action-btn--clear" :disabled="submitted" @click="clearAll">✕ Clear All</button>
+            <button class="p12-sb-action-btn" :disabled="status !== 'open'" @click="autoFill">🎲 Auto Fill All</button>
+            <button class="p12-sb-action-btn p12-sb-action-btn--clear" :disabled="status !== 'open'" @click="clearAll">✕ Clear All</button>
           </div>
         </div>
 
-        <!-- Submit card -->
+        <!-- Submit / Status card -->
         <div class="p12-sb-card">
-          <div class="p12-sb-card__hdr">📤 Submit Entry</div>
+          <div class="p12-sb-card__hdr">
+            <template v-if="status === 'open'">📤 Submit Entry</template>
+            <template v-else-if="status === 'pending'">⏳ Entry Pending</template>
+            <template v-else-if="status === 'won'">🏆 You Won!</template>
+            <template v-else>😔 Result: Lost</template>
+          </div>
           <div class="p12-sb-submit-body">
-            <template v-if="submitted">
-              <div class="p12-sb-confirmed">
-                <div class="p12-sb-confirmed__icon">🎟</div>
-                <div class="p12-sb-confirmed__title">Submitted!</div>
-                <div class="p12-sb-confirmed__sub">Results on Sunday after all matches.</div>
-                <button class="p12-reset-btn p12-sb-reset" @click="resetEntry">New Entry</button>
-              </div>
-            </template>
-            <template v-else>
+
+            <!-- Open: show bet details + submit -->
+            <template v-if="status === 'open'">
               <div class="p12-sb-bet-row">
                 <span class="p12-sb-bet-lbl">Entry Fee</span>
                 <span class="p12-sb-bet-val p12-sb-bet-val--free">FREE</span>
@@ -127,6 +126,40 @@
                 <template v-else>🎯 Submit — FREE</template>
               </button>
             </template>
+
+            <!-- Pending -->
+            <template v-else-if="status === 'pending'">
+              <div class="p12-sb-status p12-sb-status--pending">
+                <div class="p12-sb-status__pulse"></div>
+                <div class="p12-sb-status__icon">🎟</div>
+                <div class="p12-sb-status__title">Awaiting Results</div>
+                <div class="p12-sb-status__sub">Your entry is confirmed. Results are published automatically after all Sunday matches finish.</div>
+                <div class="p12-sb-status__badge p12-sb-status__badge--pending">PENDING</div>
+              </div>
+            </template>
+
+            <!-- Won -->
+            <template v-else-if="status === 'won'">
+              <div class="p12-sb-status p12-sb-status--won">
+                <div class="p12-sb-status__icon">🎉</div>
+                <div class="p12-sb-status__title">Jackpot Winner!</div>
+                <div class="p12-sb-status__prize">UGX 10,000,000</div>
+                <div class="p12-sb-status__sub">Prize credited to your account. New round opens next Monday.</div>
+                <div class="p12-sb-status__badge p12-sb-status__badge--won">WON</div>
+              </div>
+            </template>
+
+            <!-- Lost -->
+            <template v-else>
+              <div class="p12-sb-status p12-sb-status--lost">
+                <div class="p12-sb-status__icon">😔</div>
+                <div class="p12-sb-status__title">Not This Time</div>
+                <div class="p12-sb-status__correct">{{ correctCount }}/12 correct</div>
+                <div class="p12-sb-status__sub">Better luck next week! A new round opens automatically every Monday.</div>
+                <div class="p12-sb-status__badge p12-sb-status__badge--lost">LOST</div>
+              </div>
+            </template>
+
           </div>
         </div>
 
@@ -135,22 +168,70 @@
       <!-- ══ CENTER: match table ══ -->
       <div class="p12-main">
 
-        <!-- Submitted state -->
-        <div v-if="submitted" class="p12-submitted">
-          <div class="p12-submitted__icon">🎟</div>
-          <div class="p12-submitted__title">Predictions Submitted!</div>
-          <div class="p12-submitted__sub">Results will be available on Sunday after all matches finish.</div>
-          <div class="p12-submitted__picks">
+        <!-- PENDING state -->
+        <div v-if="status === 'pending'" class="p12-status-panel p12-status-panel--pending">
+          <div class="p12-status-panel__glow"></div>
+          <div class="p12-status-panel__icon">🎟</div>
+          <div class="p12-status-panel__badge p12-status-panel__badge--pending">● PENDING</div>
+          <div class="p12-status-panel__title">Entry Submitted!</div>
+          <div class="p12-status-panel__sub">Your predictions are locked in. Results are published automatically once all Sunday matches finish. Check back then!</div>
+          <div class="p12-status-panel__note">📅 Next round opens automatically every Monday morning.</div>
+          <!-- Your locked picks -->
+          <div class="p12-sub-picks">
+            <div class="p12-sub-picks__hdr">Your locked predictions</div>
             <div v-for="(match, i) in matches" :key="match.id" class="p12-sub-row">
               <span class="p12-sub-row__num">{{ i + 1 }}</span>
               <span class="p12-sub-row__match">{{ match.home }} vs {{ match.away }}</span>
               <span class="p12-sub-row__score">{{ scores[i][0] }} – {{ scores[i][1] }}</span>
             </div>
           </div>
-          <button class="p12-reset-btn" @click="resetEntry">Start New Entry</button>
         </div>
 
-        <!-- Match prediction table -->
+        <!-- WON state -->
+        <div v-else-if="status === 'won'" class="p12-status-panel p12-status-panel--won">
+          <div class="p12-status-panel__confetti">🎊🎊🎊</div>
+          <div class="p12-status-panel__icon">🏆</div>
+          <div class="p12-status-panel__badge p12-status-panel__badge--won">✓ WON</div>
+          <div class="p12-status-panel__title">Jackpot Winner!</div>
+          <div class="p12-status-panel__prize">UGX 10,000,000</div>
+          <div class="p12-status-panel__sub">Congratulations! You got all 12 scores correct. The prize has been credited to your account.</div>
+          <div class="p12-status-panel__note">📅 A new round opens automatically next Monday.</div>
+          <div class="p12-sub-picks">
+            <div class="p12-sub-picks__hdr">Your winning predictions</div>
+            <div v-for="(match, i) in matches" :key="match.id" class="p12-sub-row p12-sub-row--correct">
+              <span class="p12-sub-row__num">{{ i + 1 }}</span>
+              <span class="p12-sub-row__match">{{ match.home }} vs {{ match.away }}</span>
+              <span class="p12-sub-row__score">{{ scores[i][0] }} – {{ scores[i][1] }}</span>
+              <span class="p12-sub-row__tick">✓</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- LOST state -->
+        <div v-else-if="status === 'lost'" class="p12-status-panel p12-status-panel--lost">
+          <div class="p12-status-panel__icon">😔</div>
+          <div class="p12-status-panel__badge p12-status-panel__badge--lost">✗ LOST</div>
+          <div class="p12-status-panel__title">Not This Time</div>
+          <div class="p12-status-panel__correct">{{ correctCount }} out of 12 correct</div>
+          <div class="p12-status-panel__sub">So close! Better luck next week. A new round opens automatically every Monday morning — no action needed.</div>
+          <div class="p12-status-panel__note">📅 Next round opens automatically every Monday morning.</div>
+          <div class="p12-sub-picks">
+            <div class="p12-sub-picks__hdr">Your predictions vs results</div>
+            <div
+              v-for="(match, i) in matches" :key="match.id"
+              class="p12-sub-row"
+              :class="actualResults[i] && scores[i][0] === actualResults[i][0] && scores[i][1] === actualResults[i][1] ? 'p12-sub-row--correct' : 'p12-sub-row--wrong'"
+            >
+              <span class="p12-sub-row__num">{{ i + 1 }}</span>
+              <span class="p12-sub-row__match">{{ match.home }} vs {{ match.away }}</span>
+              <span class="p12-sub-row__score">{{ scores[i][0] }}–{{ scores[i][1] }}</span>
+              <span class="p12-sub-row__actual">Actual: {{ actualResults[i]?.[0] }}–{{ actualResults[i]?.[1] }}</span>
+              <span class="p12-sub-row__tick">{{ actualResults[i] && scores[i][0] === actualResults[i][0] && scores[i][1] === actualResults[i][1] ? '✓' : '✗' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- OPEN: match prediction table -->
         <div v-else class="p12-table">
           <div class="p12-table__hdr">
             <div class="p12-th-num">#</div>
@@ -175,28 +256,18 @@
               </div>
               <div class="p12-row__time">{{ match.time }}</div>
             </div>
-            <input
-              type="number" class="p12-score-input"
-              min="0" max="9" placeholder="?"
+            <input type="number" class="p12-score-input" min="0" max="9" placeholder="?"
               :value="scores[i][0] ?? ''"
-              :disabled="submitted"
-              @change="setScore(i, 0, $event)"
-              @input="setScore(i, 0, $event)"
-            />
+              @change="setScore(i, 0, $event)" @input="setScore(i, 0, $event)" />
             <div class="p12-score-dash">–</div>
-            <input
-              type="number" class="p12-score-input"
-              min="0" max="9" placeholder="?"
+            <input type="number" class="p12-score-input" min="0" max="9" placeholder="?"
               :value="scores[i][1] ?? ''"
-              :disabled="submitted"
-              @change="setScore(i, 1, $event)"
-              @input="setScore(i, 1, $event)"
-            />
+              @change="setScore(i, 1, $event)" @input="setScore(i, 1, $event)" />
           </div>
         </div>
 
-        <!-- Mobile-only footer -->
-        <div v-if="!submitted" class="p12-footer p12-footer--mobile">
+        <!-- Mobile-only footer (only when open) -->
+        <div v-if="status === 'open'" class="p12-footer p12-footer--mobile">
           <div class="p12-footer__info">
             <span>{{ filledCount }}/12 predictions</span>
             <span class="p12-footer__free">FREE ENTRY</span>
@@ -210,6 +281,17 @@
             <template v-if="filledCount < 12">Enter {{ 12 - filledCount }} more scores</template>
             <template v-else>🎯 Submit My Picks — FREE</template>
           </button>
+        </div>
+
+        <!-- Mobile-only status banners -->
+        <div v-if="status === 'pending'" class="p12-mobile-status p12-mobile-status--pending">
+          <span class="p12-mobile-status__dot"></span> Your entry is <strong>Pending</strong> — results publish after Sunday's matches.
+        </div>
+        <div v-if="status === 'won'" class="p12-mobile-status p12-mobile-status--won">
+          🏆 <strong>WON!</strong> UGX 10M credited to your account.
+        </div>
+        <div v-if="status === 'lost'" class="p12-mobile-status p12-mobile-status--lost">
+          😔 <strong>Lost</strong> — {{ correctCount }}/12 correct. New round starts next Monday.
         </div>
 
       </div><!-- end p12-main -->
@@ -278,7 +360,8 @@ import { ref, reactive, computed } from 'vue';
 import AppHeader from '@/components/AppHeader.vue';
 import BottomNav from '@/components/BottomNav.vue';
 
-const submitted = ref(false);
+type Status = 'open' | 'pending' | 'won' | 'lost';
+const status = ref<Status>('open');
 
 interface P12Match { id: string; league: string; home: string; away: string; time: string; }
 
@@ -301,9 +384,20 @@ const scores = reactive<([number | null, number | null])[]>(
   Array.from({ length: 12 }, () => [null, null])
 );
 
+// Simulated actual results (revealed when status becomes won/lost)
+const actualResults = ref<([number, number] | null)[]>(Array(12).fill(null));
+
 const filledCount = computed(() =>
   scores.filter(s => s[0] !== null && s[1] !== null).length
 );
+
+const correctCount = computed(() => {
+  if (!actualResults.value.some(r => r !== null)) return 0;
+  return scores.filter((s, i) => {
+    const r = actualResults.value[i];
+    return r && s[0] === r[0] && s[1] === r[1];
+  }).length;
+});
 
 function setScore(matchIdx: number, side: 0 | 1, event: Event) {
   const raw = (event.target as HTMLInputElement).value;
@@ -314,7 +408,7 @@ function setScore(matchIdx: number, side: 0 | 1, event: Event) {
 }
 
 function autoFill() {
-  if (submitted.value) return;
+  if (status.value !== 'open') return;
   scores.forEach((_, i) => {
     scores[i][0] = Math.floor(Math.random() * 5);
     scores[i][1] = Math.floor(Math.random() * 4);
@@ -322,18 +416,23 @@ function autoFill() {
 }
 
 function clearAll() {
-  if (submitted.value) return;
+  if (status.value !== 'open') return;
   scores.forEach((_, i) => { scores[i][0] = null; scores[i][1] = null; });
 }
 
 function submitEntry() {
   if (filledCount.value < 12) return;
-  submitted.value = true;
-}
-
-function resetEntry() {
-  scores.forEach((_, i) => { scores[i][0] = null; scores[i][1] = null; });
-  submitted.value = false;
+  status.value = 'pending';
+  // Demo: simulate results arriving after 4 seconds
+  setTimeout(() => {
+    const results: [number, number][] = Array.from({ length: 12 }, () => [
+      Math.floor(Math.random() * 4),
+      Math.floor(Math.random() * 4),
+    ]);
+    actualResults.value = results;
+    const correct = scores.filter((s, i) => s[0] === results[i][0] && s[1] === results[i][1]).length;
+    status.value = correct === 12 ? 'won' : 'lost';
+  }, 4000);
 }
 
 const pastWinners = [
@@ -593,21 +692,100 @@ const pastWinners = [
 }
 .p12-submit-btn--disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* ─── Submitted state ────────────────────────────────────── */
-.p12-submitted {
-  background: #fff; padding: 20px 16px; margin-top: 8px; text-align: center;
+/* ─── Status panels (pending / won / lost) ───────────────── */
+.p12-status-panel {
+  background: #fff; padding: 28px 20px 20px; margin-top: 8px;
+  text-align: center; position: relative; overflow: hidden;
 }
-.p12-submitted__icon  { font-size: 44px; margin-bottom: 10px; }
-.p12-submitted__title { font-size: 20px; font-weight: 900; color: #292a33; margin-bottom: 6px; }
-.p12-submitted__sub   { font-size: 12px; color: #6a6f7a; margin-bottom: 16px; line-height: 1.6; }
-.p12-submitted__picks { text-align: left; max-width: 480px; margin: 0 auto 16px; }
+.p12-status-panel__glow {
+  position: absolute; top: -40px; left: 50%; transform: translateX(-50%);
+  width: 200px; height: 200px; border-radius: 50%;
+  background: rgba(59, 130, 246, .12); pointer-events: none;
+}
+.p12-status-panel__confetti { font-size: 28px; margin-bottom: 4px; letter-spacing: 4px; }
+.p12-status-panel__icon  { font-size: 52px; margin-bottom: 8px; }
+.p12-status-panel__badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 900; letter-spacing: 1px;
+  border-radius: 20px; padding: 3px 12px; margin-bottom: 10px;
+}
+.p12-status-panel__badge--pending { background: #fef3c7; color: #92400e; }
+.p12-status-panel__badge--won     { background: #d1fae5; color: #065f46; }
+.p12-status-panel__badge--lost    { background: #fee2e2; color: #991b1b; }
+.p12-status-panel__title   { font-size: 22px; font-weight: 900; color: #292a33; margin-bottom: 6px; }
+.p12-status-panel__prize   { font-size: 28px; font-weight: 900; color: #10a310; margin-bottom: 8px; }
+.p12-status-panel__correct { font-size: 16px; font-weight: 800; color: #6a6f7a; margin-bottom: 8px; }
+.p12-status-panel__sub  { font-size: 12px; color: #6a6f7a; line-height: 1.65; max-width: 400px; margin: 0 auto 10px; }
+.p12-status-panel__note { font-size: 11px; color: #9599a4; margin-bottom: 18px; }
+
+/* pending pulsing dot animation */
+.p12-status-panel--pending .p12-status-panel__glow {
+  animation: p12-glow-pulse 2s ease-in-out infinite;
+}
+@keyframes p12-glow-pulse {
+  0%, 100% { opacity: .4; transform: translateX(-50%) scale(1); }
+  50%       { opacity: .9; transform: translateX(-50%) scale(1.2); }
+}
+
+/* Sub picks list inside panels */
+.p12-sub-picks { text-align: left; margin-top: 4px; border-top: 1px solid #f0f0f4; }
+.p12-sub-picks__hdr {
+  font-size: 10px; font-weight: 800; color: #9599a4;
+  letter-spacing: .4px; padding: 10px 0 4px;
+}
 .p12-sub-row {
   display: flex; align-items: center; gap: 8px;
   padding: 6px 0; border-bottom: 1px solid #f0f0f4; font-size: 12px;
 }
-.p12-sub-row__num   { width: 20px; font-weight: 700; color: #9599a4; flex-shrink: 0; text-align: center; }
-.p12-sub-row__match { flex: 1; color: #292a33; font-weight: 600; }
-.p12-sub-row__score { font-weight: 900; color: #d946ef; flex-shrink: 0; }
+.p12-sub-row--correct { background: rgba(16,163,16,.04); }
+.p12-sub-row--wrong   { background: rgba(239,68,68,.04); }
+.p12-sub-row__num    { width: 20px; font-weight: 700; color: #9599a4; flex-shrink: 0; text-align: center; }
+.p12-sub-row__match  { flex: 1; color: #292a33; font-weight: 600; font-size: 11px; }
+.p12-sub-row__score  { font-weight: 900; color: #d946ef; flex-shrink: 0; }
+.p12-sub-row__actual { font-size: 10px; color: #9599a4; flex-shrink: 0; }
+.p12-sub-row__tick   { font-size: 12px; font-weight: 900; flex-shrink: 0; }
+.p12-sub-row--correct .p12-sub-row__tick { color: #10a310; }
+.p12-sub-row--wrong   .p12-sub-row__tick { color: #ef4444; }
+
+/* Left sidebar status panels */
+.p12-sb-status { text-align: center; padding: 10px 0 4px; }
+.p12-sb-status__pulse {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #f59e0b; margin: 0 auto 8px;
+  animation: p12-dot-pulse 1.4s ease-in-out infinite;
+}
+@keyframes p12-dot-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: .4; transform: scale(.6); }
+}
+.p12-sb-status__icon    { font-size: 30px; margin-bottom: 6px; }
+.p12-sb-status__title   { font-size: 13px; font-weight: 800; color: #292a33; margin-bottom: 6px; }
+.p12-sb-status__prize   { font-size: 17px; font-weight: 900; color: #10a310; margin-bottom: 6px; }
+.p12-sb-status__correct { font-size: 13px; font-weight: 800; color: #6a6f7a; margin-bottom: 6px; }
+.p12-sb-status__sub     { font-size: 10px; color: #9599a4; line-height: 1.5; margin-bottom: 10px; }
+.p12-sb-status__badge {
+  display: inline-block; font-size: 9px; font-weight: 900; letter-spacing: 1px;
+  border-radius: 20px; padding: 3px 10px;
+}
+.p12-sb-status__badge--pending { background: #fef3c7; color: #92400e; }
+.p12-sb-status__badge--won     { background: #d1fae5; color: #065f46; }
+.p12-sb-status__badge--lost    { background: #fee2e2; color: #991b1b; }
+
+/* Mobile status banner */
+.p12-mobile-status {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 14px; font-size: 12px; color: #292a33;
+  margin-top: 8px; border-radius: 8px; margin: 8px 10px 0;
+}
+.p12-mobile-status--pending { background: #fef3c7; }
+.p12-mobile-status--won     { background: #d1fae5; }
+.p12-mobile-status--lost    { background: #fee2e2; }
+.p12-mobile-status__dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  background: #f59e0b;
+  animation: p12-dot-pulse 1.4s ease-in-out infinite;
+}
+
 .p12-reset-btn {
   background: #f0f1f5; border: 1px solid #e0e1e5;
   border-radius: 8px; padding: 10px 24px;
