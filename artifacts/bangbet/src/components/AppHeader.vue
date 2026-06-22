@@ -2,23 +2,10 @@
   <header class="header">
     <img :src="'/static/images/Img_Logo_Yellow_66.png'" alt="Bangbet" class="header__logo" />
 
-    <!-- Desktop centre: quick stats -->
-    <div class="header__dt-stats">
-      <div class="header__dt-stat">
-        <span class="header__dt-stat-val">251</span>
-        <span class="header__dt-stat-lbl">Football</span>
-      </div>
-      <div class="header__dt-stat-sep"></div>
-      <div class="header__dt-stat">
-        <span class="header__dt-stat-val live">24</span>
-        <span class="header__dt-stat-lbl">Live Now</span>
-      </div>
-      <div class="header__dt-stat-sep"></div>
-      <div class="header__dt-stat">
-        <span class="header__dt-stat-val">UGX 50M</span>
-        <span class="header__dt-stat-lbl">Jackpot</span>
-      </div>
-    </div>
+    <nav class="header__nav" v-if="!store.isLoggedIn">
+      <a class="header__nav-link" href="#">App</a>
+      <a class="header__nav-link" href="#">Contact</a>
+    </nav>
 
     <div class="header__actions" v-if="!store.isLoggedIn">
       <button class="btn-login" @click="openLogin">Login</button>
@@ -44,50 +31,31 @@ const openRegister = inject<() => void>("openRegister", () => {});
 </script>
 
 <style scoped>
-/* Desktop header extras — hidden on mobile */
-.header__dt-stats {
+.header__nav {
   display: none;
 }
 
 @media (min-width: 1024px) {
-  .header__dt-stats {
+  .header__nav {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     flex: 1;
-    justify-content: center;
+    padding-left: 24px;
   }
-  .header__dt-stat {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0 8px;
-  }
-  .header__dt-stat-val {
-    font-size: 11px;
-    font-weight: 900;
-    color: #ffe60f;
-    line-height: 1.1;
-  }
-  .header__dt-stat-val.live {
-    color: #ff6b6b;
-    animation: pulse-live 1.5s infinite;
-  }
-  @keyframes pulse-live {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.6; }
-  }
-  .header__dt-stat-lbl {
-    font-size: 7px;
-    color: rgba(255,255,255,0.7);
+  .header__nav-link {
+    padding: 4px 14px;
+    font-size: 13px;
     font-weight: 600;
-    letter-spacing: .3px;
-    text-transform: uppercase;
+    color: rgba(255,255,255,0.80);
+    text-decoration: none;
+    border-radius: 6px;
+    transition: color 0.15s, background 0.15s;
+    letter-spacing: 0.2px;
   }
-  .header__dt-stat-sep {
-    width: 1px;
-    height: 16px;
-    background: rgba(255,255,255,0.2);
+  .header__nav-link:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.10);
   }
 }
 </style>
