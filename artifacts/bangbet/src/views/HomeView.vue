@@ -1167,6 +1167,7 @@ const uplMatches = [
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 1px 6px rgba(0,0,0,.08);
+    flex-shrink: 0;
   }
   .dt-bs__header {
     display: flex;
@@ -1240,6 +1241,7 @@ const uplMatches = [
     background: #fff; border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 1px 6px rgba(0,0,0,.06);
+    flex-shrink: 0;
   }
   .dt-promo__head {
     font-size: 11px; font-weight: 800; color: #292a33;
@@ -1260,6 +1262,7 @@ const uplMatches = [
     background: #fff; border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 1px 6px rgba(0,0,0,.06);
+    flex-shrink: 0;
   }
   .dt-livescores__head {
     display: flex; align-items: center; gap: 6px;
@@ -1336,6 +1339,7 @@ const uplMatches = [
   .dt-tips {
     background: #fff; border-radius: 10px;
     overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,.06);
+    flex-shrink: 0;
   }
   .dt-tips__head {
     font-size: 11px; font-weight: 800; color: #292a33;
@@ -1369,6 +1373,7 @@ const uplMatches = [
   .dt-results {
     background: #fff; border-radius: 10px;
     overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,.06);
+    flex-shrink: 0;
   }
   .dt-results__head {
     font-size: 11px; font-weight: 800; color: #292a33;
@@ -1394,6 +1399,7 @@ const uplMatches = [
   .dt-casino-widget {
     background: #fff; border-radius: 10px;
     overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,.06);
+    flex-shrink: 0;
   }
   .dt-casino-widget__head {
     font-size: 11px; font-weight: 800; color: #292a33;
@@ -1425,6 +1431,7 @@ const uplMatches = [
     border-radius: 10px; overflow: hidden;
     box-shadow: 0 1px 6px rgba(0,0,0,.15);
     padding: 14px; text-align: center;
+    flex-shrink: 0;
   }
   .dt-jackpot-widget__head {
     font-size: 10px; font-weight: 800; color: #d4a843;
@@ -1463,6 +1470,7 @@ const uplMatches = [
     border-radius: 10px; padding: 12px 14px;
     display: flex; align-items: center; gap: 10px;
     box-shadow: 0 1px 6px rgba(192,38,211,0.25);
+    flex-shrink: 0;
   }
   .dt-app-banner__icon { font-size: 24px; flex-shrink: 0; }
   .dt-app-banner__text { flex: 1; }
