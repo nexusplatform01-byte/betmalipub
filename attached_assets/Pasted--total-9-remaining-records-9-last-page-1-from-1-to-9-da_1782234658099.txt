@@ -1,0 +1,729 @@
+{
+  "total": 9,
+  "remaining_records": 9,
+  "last_page": 1,
+  "from": 1,
+  "to": 9,
+  "data": [
+    {
+      "producer_id": 1,
+      "producer_status": 0,
+      "highlight_market": {
+        "market_name": "1 X 2",
+        "market_id": 2,
+        "specifier": "",
+        "status_name": "Open",
+        "status": 0,
+        "outcomes": [
+          {
+            "alias": "1",
+            "outcome_name": "1",
+            "outcome_id": "384871387",
+            "outcome_type_id": 1,
+            "odds": 1.03,
+            "active": 1,
+            "probability": 0
+          },
+          {
+            "alias": "X",
+            "outcome_name": "X",
+            "outcome_id": "384871388",
+            "outcome_type_id": 2,
+            "odds": 18,
+            "active": 1,
+            "probability": 0
+          },
+          {
+            "alias": "2",
+            "outcome_name": "2",
+            "outcome_id": "384871389",
+            "outcome_type_id": 3,
+            "odds": 60,
+            "active": 1,
+            "probability": 0
+          }
+        ],
+        "handicap": false
+      },
+      "tournament": "World Cup",
+      "sport_id": 1,
+      "game_id": 170,
+      "name": "Portugal v Uzbekistan",
+      "match_id": 13344912,
+      "date": "2026-06-23 20:00:00",
+      "tournament_id": 215,
+      "status": 0,
+      "market_name": "",
+      "country": "World",
+      "category_id": 2,
+      "home_team": "Portugal",
+      "away_team": "Uzbekistan",
+      "highlights_priority": 8400,
+      "upcoming_priority": 0,
+      "boosted_priority": 1,
+      "src": "gs",
+      "fixture_status": {
+        "event_id": 0,
+        "event_prefix": "",
+        "sport_id": 0,
+        "status": 0,
+        "status_name": "not_started",
+        "home_score": "",
+        "away_score": "",
+        "match_status": "",
+        "status_code": 0,
+        "event_time": "",
+        "home_penalty_score": 0,
+        "away_penalty_score": 0,
+        "markets": 196
+      },
+      "weight": 19411,
+      "bet_builder_coverage": {
+        "PreMatch": 0,
+        "InPlay": 0
+      },
+      "home_competitor_id": 10049,
+      "away_competitor_id": 136157
+    },
+    {
+      "producer_id": 1,
+      "producer_status": 0,
+      "highlight_market": {
+        "market_name": "1 X 2",
+        "market_id": 2,
+        "specifier": "",
+        "status_name": "Open",
+        "status": 0,
+        "outcomes": [
+          {
+            "alias": "1",
+            "outcome_name": "1",
+            "outcome_id": "397344860",
+            "outcome_type_id": 1,
+            "odds": 7,
+            "active": 1,
+            "probability": 0
+          },
+          {
+            "alias": "X",
+            "outcome_name": "X",
+            "outcome_id": "397344861",
+            "outcome_type_id": 2,
+            "odds": 1.28,
+            "active": 1,
+            "probability": 0
+          },
+          {
+            "alias": "2",
+            "outcome_name": "2",
+            "outcome_id": "397344862",
+            "outcome_type_id": 3,
+            "odds": 6.25,
+            "active": 1,
+            "probability": 0
+          }
+        ],
+        "handicap": false
+      },
+      "tournament": "Club Friendlies",
+      "sport_id": 1,
+      "game_id": 1913,
+      "name": "FK Sileks v Dinamo Tirana",
+      "match_id": 14026931,
+      "date": "2026-06-23 18:30:00",
+      "tournament_id": 682,
+      "status": 0,
+      "market_name": "",
+      "country": "World",
+      "category_id": 2,
+      "home_team": "FK Sileks",
+      "away_team": "Dinamo Tirana",
+      "highlights_priority": 0,
+      "upcoming_priority": 0,
+      "boosted_priority": 0,
+      "src": "gs",
+      "fixture_status": {
+        "event_id": 0,
+        "event_prefix": "",
+        "sport_id": 0,
+        "status": 0,
+        "status_name": "not_started",
+        "home_score": "",
+        "away_score": "",
+        "match_status": "",
+        "status_code": 0,
+        "event_time": "",
+        "home_penalty_score": 0,
+        "away_penalty_score": 0,
+        "markets": 10
+      },
+      "weight": 11,
+      "bet_builder_coverage": {
+        "PreMatch": 0,
+        "InPlay": 0
+      },
+      "home_competitor_id": 104019,
+      "away_competitor_id": 127128
+    },
+    {
+      "producer_id": 1,
+      "producer_status": 0,
+      "highlight_market": {
+        "market_name": "1 X 2",
+        "market_id": 2,
+        "specifier": "",
+        "status_name": "Open",
+        "status": 0,
+        "outcomes": [
+          {
+            "alias": "1",
+            "outcome_name": "1",
+            "outcome_id": "397352365",
+            "outcome_type_id": 1,
+            "odds": 2.27,
+            "active": 1,
+            "probability": 0
+          },
+          {
+            "alias": "X",
+            "outcome_name": "X",
+            "outcome_id": "397352366",
+            "outcome_type_id": 2,
+            "odds": 2.33,
+            "active": 1,
+            "probability": 0
+          },
+          {
+            "alias": "2",
+            "outcome_name": "2",
+            "outcome_id": "397352367",
+            "outcome_type_id": 3,
+            "odds": 4.7,
+            "active": 1,
+            "probability": 0
+          }
+        ],
+        "handicap": false
+      },
+      "tournament": "Club Friendlies",
+      "sport_id": 1,
+      "game_id": 342,
+      "name": "FK Borac Banja Luka v FK Sutjeska",
+      "match_id": 14044108,
+      "date": "2026-06-23 19:00:00",
+      "tournament_id": 682,
+      "status": 0,
+      "market_name": "",
+      "country": "World",
+      "category_id": 2,
+      "home_team": "FK Borac Banja Luka",
+      "away_team": "FK Sutjeska",
+      "highlights_priority": 0,
+      "upcoming_priority": 0,
+      "boosted_priority": 0,
+      "src": "gs",
+      "fixture_status": {
+        "event_id": 0,
+        "event_prefix": "",
+        "sport_id": 0,
+        "status": 0,
+        "status_name": "not_started",
+        "home_score": "",
+        "away_score": "",
+        "match_status": "",
+        "status_code": 0,
+        "event_time": "",
+        "home_penalty_score": 0,
+        "away_penalty_score": 0,
+        "markets": 11
+      },
+      "weight": 11,
+      "bet_builder_coverage": {
+        "PreMatch": 0,
+        "InPlay": 0
+      },
+      "home_competitor_id": 443046,
+      "away_competitor_id": 226304
+    },
+    {
+      "producer_id": 1,
+      "producer_status": 0,
+      "highlight_market": {
+        "market_name": "1 X 2",
+        "market_id": 2,
+        "specifier": "",
+        "status_name": "Open",
+        "status": 0,
+        "outcomes": [
+          {
+            "alias": "1",
+            "outcome_name": "1",
+            "outcome_id": "397091428",
+            "outcome_type_id": 1,
+            "odds": 1,
+            "active": 0,
+            "probability": 0
+          },
+          {
+            "alias": "X",
+            "outcome_name": "X",
+            "outcome_id": "397091429",
+            "outcome_type_id": 2,
+            "odds": 17,
+            "active": 1,
+            "probability": 0
+          },
+          {
+            "alias": "2",
+            "outcome_name": "2",
+            "outcome_id": "397091430",
+            "outcome_type_id": 3,
+            "odds": 41,
+            "active": 1,
+            "probability": 0
+          }
+        ],
+        "handicap": false
+      },
+      "tournament": "Club Friendlies",
+      "sport_id": 1,
+      "game_id": 150,
+      "name": "Olimpija Ljubljana v Vllaznia Shkodër",
+      "match_id": 14022208,
+      "date": "2026-06-23 19:00:00",
+      "tournament_id": 682,
+      "status": 0,
+      "market_name": "",
+      "country": "World",
+      "category_id": 2,
+      "home_team": "Olimpija Ljubljana",
+      "away_team": "Vllaznia Shkodër",
+      "highlights_priority": 0,
+      "upcoming_priority": 0,
+      "boosted_priority": 0,
+      "src": "gs",
+      "fixture_status": {
+        "event_id": 0,
+        "event_prefix": "",
+        "sport_id": 0,
+        "status": 0,
+        "status_name": "not_started",
+        "home_score": "",
+        "away_score": "",
+        "match_status": "",
+        "status_code": 0,
+        "event_time": "",
+        "home_penalty_score": 0,
+        "away_penalty_score": 0,
+        "markets": 9
+      },
+      "weight": 11,
+      "bet_builder_coverage": {
+        "PreMatch": 0,
+        "InPlay": 0
+      },
+      "home_competitor_id": 87621,
+      "away_competitor_id": 109156
+    },
+    {
+      "producer_id": 1,
+      "producer_status": 0,
+      "highlight_market": {
+        "market_name": "1 X 2",
+        "market_id": 2,
+        "specifier": "",
+        "status_name": "Open",
+        "status": 0,
+        "outcomes": [
+          {
+            "alias": "1",
+            "outcome_name": "1",
+            "outcome_id": "397265821",
+            "outcome_type_id": 1,
+            "odds": 3.6,
+            "active": 1,
+            "probability": 0
+          },
+          {
+            "alias": "X",
+            "outcome_name": "X",
+            "outcome_id": "397265822",
+            "outcome_type_id": 2,
+            "odds": 2.65,
+            "active": 1,
+            "probability": 0
+          },
+          {
+            "alias": "2",
+            "outcome_name": "2",
+            "outcome_id": "397265823",
+            "outcome_type_id": 3,
+            "odds": 2.35,
+            "active": 1,
+            "probability": 0
+          }
+        ],
+        "handicap": false
+      },
+      "tournament": "Club Friendlies",
+      "sport_id": 1,
+      "game_id": 1870,
+      "name": "NK Aluminij v Pyunik FC",
+      "match_id": 14053659,
+      "date": "2026-06-23 19:00:00",
+      "tournament_id": 682,
+      "status": 0,
+      "market_name": "",
+      "country": "World",
+      "category_id": 2,
+      "home_team": "NK Aluminij",
+      "away_team": "Pyunik FC",
+      "highlights_priority": 0,
+      "upcoming_priority": 0,
+      "boosted_priority": 0,
+      "src": "gs",
+      "fixture_status": {
+        "event_id": 0,
+        "event_prefix": "",
+        "sport_id": 0,
+        "status": 0,
+        "status_name": "not_started",
+        "home_score": "",
+        "away_score": "",
+        "match_status": "",
+        "status_code": 0,
+        "event_time": "",
+        "home_penalty_score": 0,
+        "away_penalty_score": 0,
+        "markets": 10
+      },
+      "weight": 11,
+      "bet_builder_coverage": {
+        "PreMatch": 0,
+        "InPlay": 0
+      },
+      "home_competitor_id": 444304,
+      "away_competitor_id": 120246
+    },
+    {
+      "producer_id": 1,
+      "producer_status": 0,
+      "highlight_market": {
+        "market_name": "1 X 2",
+        "market_id": 2,
+        "specifier": "",
+        "status_name": "Open",
+        "status": 0,
+        "outcomes": [
+          {
+            "alias": "1",
+            "outcome_name": "1",
+            "outcome_id": "397214399",
+            "outcome_type_id": 1,
+            "odds": 1,
+            "active": 0,
+            "probability": 0
+          },
+          {
+            "alias": "X",
+            "outcome_name": "X",
+            "outcome_id": "397214400",
+            "outcome_type_id": 2,
+            "odds": 17,
+            "active": 1,
+            "probability": 0
+          },
+          {
+            "alias": "2",
+            "outcome_name": "2",
+            "outcome_id": "397214401",
+            "outcome_type_id": 3,
+            "odds": 40,
+            "active": 1,
+            "probability": 0
+          }
+        ],
+        "handicap": false
+      },
+      "tournament": "Club Friendlies",
+      "sport_id": 1,
+      "game_id": 1984,
+      "name": "Botev Plovdiv v Spartak Pleven",
+      "match_id": 14009692,
+      "date": "2026-06-23 19:05:00",
+      "tournament_id": 682,
+      "status": 0,
+      "market_name": "",
+      "country": "World",
+      "category_id": 2,
+      "home_team": "Botev Plovdiv",
+      "away_team": "Spartak Pleven",
+      "highlights_priority": 0,
+      "upcoming_priority": 0,
+      "boosted_priority": 0,
+      "src": "gs",
+      "fixture_status": {
+        "event_id": 0,
+        "event_prefix": "",
+        "sport_id": 0,
+        "status": 0,
+        "status_name": "not_started",
+        "home_score": "",
+        "away_score": "",
+        "match_status": "",
+        "status_code": 0,
+        "event_time": "",
+        "home_penalty_score": 0,
+        "away_penalty_score": 0,
+        "markets": 9
+      },
+      "weight": 11,
+      "bet_builder_coverage": {
+        "PreMatch": 0,
+        "InPlay": 0
+      },
+      "home_competitor_id": 95147,
+      "away_competitor_id": 451237
+    },
+    {
+      "producer_id": 1,
+      "producer_status": 0,
+      "highlight_market": {
+        "market_name": "1 X 2",
+        "market_id": 2,
+        "specifier": "",
+        "status_name": "Open",
+        "status": 0,
+        "outcomes": [
+          {
+            "alias": "1",
+            "outcome_name": "1",
+            "outcome_id": "397352295",
+            "outcome_type_id": 1,
+            "odds": 11.5,
+            "active": 1,
+            "probability": 0
+          },
+          {
+            "alias": "X",
+            "outcome_name": "X",
+            "outcome_id": "397352296",
+            "outcome_type_id": 2,
+            "odds": 5.5,
+            "active": 1,
+            "probability": 0
+          },
+          {
+            "alias": "2",
+            "outcome_name": "2",
+            "outcome_id": "397352297",
+            "outcome_type_id": 3,
+            "odds": 1.23,
+            "active": 1,
+            "probability": 0
+          }
+        ],
+        "handicap": false
+      },
+      "tournament": "Sweden Ligacupen Elit",
+      "sport_id": 1,
+      "game_id": 2087,
+      "name": "Ljungskile SK U21 v IFK Göteborg U21",
+      "match_id": 13727257,
+      "date": "2026-06-23 19:00:00",
+      "tournament_id": 5869,
+      "status": 0,
+      "market_name": "",
+      "country": "Sweden",
+      "category_id": 216,
+      "home_team": "Ljungskile SK U21",
+      "away_team": "IFK Göteborg U21",
+      "highlights_priority": 0,
+      "upcoming_priority": 0,
+      "boosted_priority": 0,
+      "src": "gs",
+      "fixture_status": {
+        "event_id": 0,
+        "event_prefix": "",
+        "sport_id": 0,
+        "status": 0,
+        "status_name": "not_started",
+        "home_score": "",
+        "away_score": "",
+        "match_status": "",
+        "status_code": 0,
+        "event_time": "",
+        "home_penalty_score": 0,
+        "away_penalty_score": 0,
+        "markets": 10
+      },
+      "weight": 2,
+      "bet_builder_coverage": {
+        "PreMatch": 0,
+        "InPlay": 0
+      },
+      "home_competitor_id": 487834,
+      "away_competitor_id": 488090
+    },
+    {
+      "producer_id": 1,
+      "producer_status": 0,
+      "highlight_market": {
+        "market_name": "1 X 2",
+        "market_id": 2,
+        "specifier": "",
+        "status_name": "Open",
+        "status": 0,
+        "outcomes": [
+          {
+            "alias": "1",
+            "outcome_name": "1",
+            "outcome_id": "397013042",
+            "outcome_type_id": 1,
+            "odds": 1.75,
+            "active": 1,
+            "probability": 0
+          },
+          {
+            "alias": "X",
+            "outcome_name": "X",
+            "outcome_id": "397013043",
+            "outcome_type_id": 2,
+            "odds": 3.7,
+            "active": 1,
+            "probability": 0
+          },
+          {
+            "alias": "2",
+            "outcome_name": "2",
+            "outcome_id": "397013044",
+            "outcome_type_id": 3,
+            "odds": 4.2,
+            "active": 1,
+            "probability": 0
+          }
+        ],
+        "handicap": false
+      },
+      "tournament": "Georgia Erovnuli Liga",
+      "sport_id": 1,
+      "game_id": 4407,
+      "name": "Dinamo Tbilisi v FC Dinamo Batumi",
+      "match_id": 13489181,
+      "date": "2026-06-23 20:00:00",
+      "tournament_id": 3021,
+      "status": 0,
+      "market_name": "",
+      "country": "Georgia",
+      "category_id": 177,
+      "home_team": "Dinamo Tbilisi",
+      "away_team": "FC Dinamo Batumi",
+      "highlights_priority": 0,
+      "upcoming_priority": 0,
+      "boosted_priority": 0,
+      "src": "gs",
+      "fixture_status": {
+        "event_id": 0,
+        "event_prefix": "",
+        "sport_id": 0,
+        "status": 0,
+        "status_name": "not_started",
+        "home_score": "",
+        "away_score": "",
+        "match_status": "",
+        "status_code": 0,
+        "event_time": "",
+        "home_penalty_score": 0,
+        "away_penalty_score": 0,
+        "markets": 15
+      },
+      "weight": 2,
+      "bet_builder_coverage": {
+        "PreMatch": 0,
+        "InPlay": 0
+      },
+      "home_competitor_id": 177348,
+      "away_competitor_id": 577339
+    },
+    {
+      "producer_id": 1,
+      "producer_status": 0,
+      "highlight_market": {
+        "market_name": "1 X 2",
+        "market_id": 2,
+        "specifier": "",
+        "status_name": "Open",
+        "status": 0,
+        "outcomes": [
+          {
+            "alias": "1",
+            "outcome_name": "1",
+            "outcome_id": "397097300",
+            "outcome_type_id": 1,
+            "odds": 6,
+            "active": 1,
+            "probability": 0
+          },
+          {
+            "alias": "X",
+            "outcome_name": "X",
+            "outcome_id": "397097301",
+            "outcome_type_id": 2,
+            "odds": 4.8,
+            "active": 1,
+            "probability": 0
+          },
+          {
+            "alias": "2",
+            "outcome_name": "2",
+            "outcome_id": "397097302",
+            "outcome_type_id": 3,
+            "odds": 1.45,
+            "active": 1,
+            "probability": 0
+          }
+        ],
+        "handicap": false
+      },
+      "tournament": "Sweden Svenska Cupen",
+      "sport_id": 1,
+      "game_id": 4419,
+      "name": "BK Astrio v Ängelholms FF",
+      "match_id": 13902798,
+      "date": "2026-06-23 20:00:00",
+      "tournament_id": 114,
+      "status": 0,
+      "market_name": "",
+      "country": "Sweden",
+      "category_id": 216,
+      "home_team": "BK Astrio",
+      "away_team": "Ängelholms FF",
+      "highlights_priority": 0,
+      "upcoming_priority": 0,
+      "boosted_priority": 0,
+      "src": "gs",
+      "fixture_status": {
+        "event_id": 0,
+        "event_prefix": "",
+        "sport_id": 0,
+        "status": 0,
+        "status_name": "not_started",
+        "home_score": "",
+        "away_score": "",
+        "match_status": "",
+        "status_code": 0,
+        "event_time": "",
+        "home_penalty_score": 0,
+        "away_penalty_score": 0,
+        "markets": 99
+      },
+      "weight": 2,
+      "bet_builder_coverage": {
+        "PreMatch": 0,
+        "InPlay": 0
+      },
+      "home_competitor_id": 176400,
+      "away_competitor_id": 111304
+    }
+  ]
+}

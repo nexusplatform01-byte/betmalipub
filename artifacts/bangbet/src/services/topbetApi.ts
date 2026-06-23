@@ -138,57 +138,74 @@ function mapEsMatch(e: any, sportCode?: string): Match {
   }
 }
 
+const BANDA_BASE = 'https://fx.banda.software/ug/v2'
+
+function parseBandaOutcomes(outcomes: any[]): Pick<Match['markets'], 'home' | 'draw' | 'away'> {
+  const get = (alias: string): number | null => {
+    const o = outcomes.find((x: any) => x.alias === alias && x.active === 1)
+    return o && o.odds > 1 ? o.odds : null
+  }
+  return {
+    home: get('1') ?? 0,
+    draw: get('X'),
+    away: get('2') ?? 0,
+  }
+}
+
+function parseBandaDate(dateStr: string): string {
+  if (!dateStr) return ''
+  // dateStr format: "2026-06-23 20:00:00" (UTC)
+  const d = new Date(dateStr.replace(' ', 'T') + 'Z')
+  return formatKickOff(d.getTime())
+}
+
 export async function fetchLiveEvents(): Promise<{ liveSports: any[]; matches: Match[] }> {
-  const res = await fetch(`${BASE}/live/events/en`)
-  const text = await res.text()
-  const line = text.split('\n').find((l) => l.startsWith('data:')) || text.trim()
-  const json = JSON.parse(line.replace(/^data:/, '').trim())
-  const { liveSports = [], liveHeaders = [], liveResults = [] } = json
-
-  const byId: Record<number, any> = {}
-  for (const r of liveResults) byId[r.mi] = r
-
-  // Try to fetch top-match odds for all live sports to enrich the live match list
-  const liveSportCodes: string[] = [...new Set(liveHeaders.map((h: any) => h.s || 'S'))] as string[]
-  const oddsById: Record<string, Match['markets']> = {}
   try {
-    await Promise.all(
-      liveSportCodes.map(async (sc) => {
-        const topRes = await fetch(`${API}/top/desk?annex=13&sport=${sc}&locale=en`)
-        const topData = await topRes.json()
-        for (const e of topData.esMatches || []) {
-          oddsById[String(e.id)] = parseOdds(e.betMap)
-        }
-      }),
+    const res = await fetch(
+      `${BANDA_BASE}/highlights/1?page=1&per_page=50&boosted=0&highlight_market_id=0&tournament_id=0&category_id=0&upcoming=0&today=1&match_live_status=1`,
     )
-  } catch (_) { /* best-effort */ }
+    const json = await res.json()
+    const items: any[] = json.data || []
 
-  const matches: Match[] = liveHeaders.map((h: any) => {
-    const r = byId[h.id]
-    const score = parseScore(h.fd)
-    const sc: string = h.s || 'S'
-    const enriched = oddsById[String(h.id)]
-    const markets = enriched ?? (r?.bm ? parseOdds(r.bm) : null)
-    return {
-      id: String(h.id),
-      sport: SPORT_NAME_MAP[sc] || h.sn || sc,
-      sportCode: sc,
-      league: h.lg || '',
-      leagueId: '',
-      leagueLogo: SPORT_ICON(sc),
-      homeTeam: h.h || '',
-      awayTeam: h.a || '',
-      homeScore: score.home,
-      awayScore: score.away,
-      minute: r?.cm ? parseInt(r.cm) : undefined,
-      isLive: true,
-      status: h.ls,
-      markets: markets ?? { home: 0, draw: null, away: 0 },
-      marketsCount: h.mc,
-    }
-  })
+    const matches: Match[] = items.map((item: any) => {
+      const outcomes: any[] = item.highlight_market?.outcomes || []
+      const markets = parseBandaOutcomes(outcomes)
+      const fs = item.fixture_status || {}
+      const homeScore = fs.home_score !== '' && fs.home_score != null ? parseInt(fs.home_score) : undefined
+      const awayScore = fs.away_score !== '' && fs.away_score != null ? parseInt(fs.away_score) : undefined
+      const minute = fs.event_time ? parseInt(fs.event_time) || undefined : undefined
+      const isLive = fs.status_name === 'live' || fs.status_name === 'inprogress' || fs.status_name === 'halftime'
 
-  return { liveSports, matches }
+      return {
+        id: String(item.match_id),
+        sport: 'Football',
+        sportCode: 'S',
+        league: item.tournament || '',
+        leagueId: String(item.tournament_id || ''),
+        leagueLogo: SPORT_ICON('S'),
+        homeTeam: item.home_team || '',
+        awayTeam: item.away_team || '',
+        homeScore,
+        awayScore,
+        minute,
+        isLive,
+        status: fs.status_name || '',
+        startTime: item.date ? parseBandaDate(item.date) : undefined,
+        markets: {
+          ...markets,
+          dc1X: undefined,
+          dcX2: undefined,
+          dc12: undefined,
+        },
+        marketsCount: fs.markets || 0,
+      }
+    })
+
+    return { liveSports: [], matches }
+  } catch (e) {
+    console.error('[Bangbet] banda live fetch error:', e)
+    return { liveSports: [], matches: [] }
+  }
 }
 
 export async function fetchTopMatches(sport = 'S'): Promise<Match[]> {
