@@ -140,10 +140,12 @@ function mapEsMatch(e: any, sportCode?: string): Match {
 
 const BANDA_BASE = 'https://fx.banda.software/ug/v2'
 
+const LIVE_STATUSES = new Set(['live', 'inprogress', 'halftime', '1st_half', '2nd_half', 'pause', 'extra_time'])
+
 function parseBandaOutcomes(outcomes: any[]): Pick<Match['markets'], 'home' | 'draw' | 'away'> {
   const get = (alias: string): number | null => {
     const o = outcomes.find((x: any) => x.alias === alias && x.active === 1)
-    return o && o.odds > 1 ? o.odds : null
+    return o && typeof o.odds === 'number' ? o.odds : null
   }
   return {
     home: get('1') ?? 0,
@@ -154,56 +156,85 @@ function parseBandaOutcomes(outcomes: any[]): Pick<Match['markets'], 'home' | 'd
 
 function parseBandaDate(dateStr: string): string {
   if (!dateStr) return ''
-  // dateStr format: "2026-06-23 20:00:00" (UTC)
   const d = new Date(dateStr.replace(' ', 'T') + 'Z')
   return formatKickOff(d.getTime())
 }
 
+function mapBandaItem(item: any): Match {
+  const outcomes: any[] = item.highlight_market?.outcomes || []
+  const markets = parseBandaOutcomes(outcomes)
+  const fs = item.fixture_status || {}
+  const statusName: string = fs.status_name || 'not_started'
+  const isLive = LIVE_STATUSES.has(statusName)
+  const homeScore = fs.home_score !== '' && fs.home_score != null ? parseInt(fs.home_score) : undefined
+  const awayScore = fs.away_score !== '' && fs.away_score != null ? parseInt(fs.away_score) : undefined
+  const minute = fs.event_time ? parseInt(fs.event_time) || undefined : undefined
+  return {
+    id: String(item.match_id),
+    sport: 'Football',
+    sportCode: 'S',
+    league: item.tournament || '',
+    leagueId: String(item.tournament_id || ''),
+    leagueLogo: SPORT_ICON('S'),
+    homeTeam: item.home_team || '',
+    awayTeam: item.away_team || '',
+    homeScore,
+    awayScore,
+    minute,
+    isLive,
+    status: statusName,
+    startTime: item.date ? parseBandaDate(item.date) : undefined,
+    markets: { ...markets, dc1X: undefined, dcX2: undefined, dc12: undefined },
+    marketsCount: fs.markets || 0,
+  }
+}
+
+async function fetchBanda(url: string): Promise<any[]> {
+  const res = await fetch(url, {
+    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  const json = await res.json()
+  return json.data || []
+}
+
 export async function fetchLiveEvents(): Promise<{ liveSports: any[]; matches: Match[] }> {
   try {
-    const res = await fetch(
-      `${BANDA_BASE}/highlights/1?page=1&per_page=50&boosted=0&highlight_market_id=0&tournament_id=0&category_id=0&upcoming=0&today=1&match_live_status=1`,
-    )
-    const json = await res.json()
-    const items: any[] = json.data || []
+    // Fetch currently-live matches first
+    const [liveItems, todayItems] = await Promise.all([
+      fetchBanda(
+        `${BANDA_BASE}/highlights/1?page=1&per_page=100&boosted=0&highlight_market_id=0&tournament_id=0&category_id=0&upcoming=0&today=1&match_live_status=1`,
+      ),
+      fetchBanda(
+        `${BANDA_BASE}/highlights/1?page=1&per_page=50&boosted=0&highlight_market_id=0&tournament_id=0&category_id=0&upcoming=0&today=1&match_live_status=0`,
+      ),
+    ])
 
-    const matches: Match[] = items.map((item: any) => {
-      const outcomes: any[] = item.highlight_market?.outcomes || []
-      const markets = parseBandaOutcomes(outcomes)
-      const fs = item.fixture_status || {}
-      const homeScore = fs.home_score !== '' && fs.home_score != null ? parseInt(fs.home_score) : undefined
-      const awayScore = fs.away_score !== '' && fs.away_score != null ? parseInt(fs.away_score) : undefined
-      const minute = fs.event_time ? parseInt(fs.event_time) || undefined : undefined
-      const isLive = fs.status_name === 'live' || fs.status_name === 'inprogress' || fs.status_name === 'halftime'
-
-      return {
-        id: String(item.match_id),
-        sport: 'Football',
-        sportCode: 'S',
-        league: item.tournament || '',
-        leagueId: String(item.tournament_id || ''),
-        leagueLogo: SPORT_ICON('S'),
-        homeTeam: item.home_team || '',
-        awayTeam: item.away_team || '',
-        homeScore,
-        awayScore,
-        minute,
-        isLive,
-        status: fs.status_name || '',
-        startTime: item.date ? parseBandaDate(item.date) : undefined,
-        markets: {
-          ...markets,
-          dc1X: undefined,
-          dcX2: undefined,
-          dc12: undefined,
-        },
-        marketsCount: fs.markets || 0,
+    // Merge: live items first, then fill with today's highlights (deduplicated)
+    const seen = new Set<string>()
+    const merged: any[] = []
+    for (const item of liveItems) {
+      seen.add(String(item.match_id))
+      merged.push(item)
+    }
+    for (const item of todayItems) {
+      if (!seen.has(String(item.match_id))) {
+        seen.add(String(item.match_id))
+        merged.push(item)
       }
+    }
+
+    const matches = merged.map(mapBandaItem)
+    // Sort: truly live first, then by kick-off time
+    matches.sort((a, b) => {
+      if (a.isLive && !b.isLive) return -1
+      if (!a.isLive && b.isLive) return 1
+      return 0
     })
 
     return { liveSports: [], matches }
   } catch (e) {
-    console.error('[Bangbet] banda live fetch error:', e)
+    console.error('[Bangbet] banda fetch error:', String(e))
     return { liveSports: [], matches: [] }
   }
 }
