@@ -113,7 +113,7 @@
               </span>
               Matches
             </div>
-            <RouterLink to="/sports/Football" class="section-more">See All ›</RouterLink>
+            <RouterLink to="/sports/Football" class="section-more mob-only">See All ›</RouterLink>
           </div>
 
           <!-- ── SKELETON (loading) ── -->
@@ -244,7 +244,7 @@
         <div class="section">
           <div class="section-header">
             <div class="section-title">⭐ Top Matches</div>
-            <RouterLink to="/sports/Football" class="section-more">See All ›</RouterLink>
+            <RouterLink to="/sports/Football" class="section-more mob-only">See All ›</RouterLink>
           </div>
           <!-- Mobile: card grid -->
           <div class="mob-only">
@@ -519,7 +519,7 @@
         <div class="dt-promo">
           <div class="dt-promo__head">🎁 Promotions</div>
           <div class="dt-promo__item" v-for="p in promos" :key="p.title">
-            <span class="dt-promo__icon">{{ p.icon }}</span>
+            <span class="dt-promo__icon"><img src="/promo-gift.png" alt="promo" class="dt-promo__gift-img" /></span>
             <div>
               <div class="dt-promo__title">{{ p.title }}</div>
               <div class="dt-promo__sub">{{ p.sub }}</div>
@@ -1524,6 +1524,7 @@ const iceHockeyMatches = [
   }
   .dt-promo__item:last-child { border-bottom: none; }
   .dt-promo__icon { font-size: 18px; flex-shrink: 0; }
+  .dt-promo__gift-img { width: 32px; height: 32px; object-fit: contain; display: block; }
   .dt-promo__title { font-size: 12px; font-weight: 700; color: #292a33; }
   .dt-promo__sub   { font-size: 10px; color: #6a6f7a; margin-top: 2px; }
 
