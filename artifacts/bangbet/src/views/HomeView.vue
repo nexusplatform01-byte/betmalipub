@@ -192,31 +192,31 @@
                   </div>
                 </div>
                 <!-- 1 -->
-                <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'1'), 'dtmt__odd-btn--hot': getMaxOdd(match) > 0 && getMaxOdd(match) === match.markets.home, 'dtmt__odd-btn--na': !match.markets.home || match.markets.home <= 0 }" @click.stop="match.markets.home > 0 && addOdd(match,'1',match.markets.home)">
+                <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'1'), 'dtmt__odd-btn--na': !match.markets.home || match.markets.home <= 0 }" @click.stop="match.markets.home > 0 && addOdd(match,'1',match.markets.home)">
                   <span class="dtmt__odd-inner">
                     <span v-if="!match.markets.home || match.markets.home <= 0" class="dtmt__lock">🔒</span>
                     <template v-else>
-                      <img v-if="getMaxOdd(match) > 0 && getMaxOdd(match) === match.markets.home" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
+                      <img v-if="match.markets.home > 0 && match.markets.home >= (match.markets.draw || 0) && match.markets.home >= (match.markets.away || 0)" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
                       {{ fmtOdd(match.markets.home) }}
                     </template>
                   </span>
                 </button>
                 <!-- X -->
-                <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'X'), 'dtmt__odd-btn--hot': match.markets.draw && match.markets.draw > 0 && getMaxOdd(match) === match.markets.draw, 'dtmt__odd-btn--na': !match.markets.draw || match.markets.draw <= 0 }" @click.stop="match.markets.draw && match.markets.draw > 0 && addOdd(match,'X',match.markets.draw)">
+                <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'X'), 'dtmt__odd-btn--na': !match.markets.draw || match.markets.draw <= 0 }" @click.stop="match.markets.draw && match.markets.draw > 0 && addOdd(match,'X',match.markets.draw)">
                   <span class="dtmt__odd-inner">
                     <span v-if="!match.markets.draw || match.markets.draw <= 0" class="dtmt__lock">🔒</span>
                     <template v-else>
-                      <img v-if="match.markets.draw > 0 && getMaxOdd(match) === match.markets.draw" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
+                      <img v-if="match.markets.draw > 0 && match.markets.draw > match.markets.home && match.markets.draw >= (match.markets.away || 0)" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
                       {{ fmtOdd(match.markets.draw) }}
                     </template>
                   </span>
                 </button>
                 <!-- 2 -->
-                <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'2'), 'dtmt__odd-btn--hot': getMaxOdd(match) > 0 && getMaxOdd(match) === match.markets.away, 'dtmt__odd-btn--na': !match.markets.away || match.markets.away <= 0 }" @click.stop="match.markets.away > 0 && addOdd(match,'2',match.markets.away)">
+                <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'2'), 'dtmt__odd-btn--na': !match.markets.away || match.markets.away <= 0 }" @click.stop="match.markets.away > 0 && addOdd(match,'2',match.markets.away)">
                   <span class="dtmt__odd-inner">
                     <span v-if="!match.markets.away || match.markets.away <= 0" class="dtmt__lock">🔒</span>
                     <template v-else>
-                      <img v-if="getMaxOdd(match) > 0 && getMaxOdd(match) === match.markets.away" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
+                      <img v-if="match.markets.away > 0 && match.markets.away > match.markets.home && match.markets.away > (match.markets.draw || 0)" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
                       {{ fmtOdd(match.markets.away) }}
                     </template>
                   </span>
@@ -271,21 +271,21 @@
                 </div>
                 <div class="dtmt__time">{{ match.startTime }}</div>
               </div>
-              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'1'), 'dtmt__odd-btn--hot': getMaxOdd(match) > 0 && getMaxOdd(match) === match.markets.home, 'dtmt__odd-btn--na': !match.markets.home || match.markets.home <= 0 }" @click.stop="match.markets.home > 0 && addOdd(match,'1',match.markets.home)">
+              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'1'), 'dtmt__odd-btn--na': !match.markets.home || match.markets.home <= 0 }" @click.stop="match.markets.home > 0 && addOdd(match,'1',match.markets.home)">
                 <span class="dtmt__odd-inner">
-                  <img v-if="getMaxOdd(match) > 0 && getMaxOdd(match) === match.markets.home" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
+                  <img v-if="match.markets.home > 0 && match.markets.home >= (match.markets.draw || 0) && match.markets.home >= (match.markets.away || 0)" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
                   {{ fmtOdd(match.markets.home) }}
                 </span>
               </button>
-              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'X'), 'dtmt__odd-btn--na': !match.markets.draw || match.markets.draw <= 0, 'dtmt__odd-btn--hot': match.markets.draw && match.markets.draw > 0 && getMaxOdd(match) === match.markets.draw }" @click.stop="match.markets.draw && match.markets.draw > 0 && addOdd(match,'X',match.markets.draw)">
+              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'X'), 'dtmt__odd-btn--na': !match.markets.draw || match.markets.draw <= 0 }" @click.stop="match.markets.draw && match.markets.draw > 0 && addOdd(match,'X',match.markets.draw)">
                 <span class="dtmt__odd-inner">
-                  <img v-if="match.markets.draw && match.markets.draw > 0 && getMaxOdd(match) === match.markets.draw" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
+                  <img v-if="match.markets.draw > 0 && match.markets.draw > match.markets.home && match.markets.draw >= (match.markets.away || 0)" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
                   {{ fmtOdd(match.markets.draw) }}
                 </span>
               </button>
-              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'2'), 'dtmt__odd-btn--hot': getMaxOdd(match) > 0 && getMaxOdd(match) === match.markets.away, 'dtmt__odd-btn--na': !match.markets.away || match.markets.away <= 0 }" @click.stop="match.markets.away > 0 && addOdd(match,'2',match.markets.away)">
+              <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'2'), 'dtmt__odd-btn--na': !match.markets.away || match.markets.away <= 0 }" @click.stop="match.markets.away > 0 && addOdd(match,'2',match.markets.away)">
                 <span class="dtmt__odd-inner">
-                  <img v-if="getMaxOdd(match) > 0 && getMaxOdd(match) === match.markets.away" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
+                  <img v-if="match.markets.away > 0 && match.markets.away > match.markets.home && match.markets.away > (match.markets.draw || 0)" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
                   {{ fmtOdd(match.markets.away) }}
                 </span>
               </button>
@@ -1299,12 +1299,6 @@ const iceHockeyMatches = [
   }
   .dtmt__lock { font-size: 12px; line-height: 1; }
   .dtmt__flame { width: 11px; height: 11px; object-fit: contain; flex-shrink: 0; }
-  /* hot-boosted button accent */
-  .dtmt__odd-btn--hot {
-    border-color: #f59e0b !important;
-    background: linear-gradient(135deg, #fffbeb, #fff7ed) !important;
-  }
-  .dtmt__odd-btn--hot .dtmt__odd-inner { color: #b45309; font-weight: 900; }
 
   /* ── real styled odds boxes ── */
   .dtmt__odd-btn {
