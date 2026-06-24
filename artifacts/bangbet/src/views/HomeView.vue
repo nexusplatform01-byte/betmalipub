@@ -1505,7 +1505,7 @@ const iceHockeyMatches = [
     margin-bottom: 1px; display: flex; align-items: center; gap: 4px;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  .dtmt__league-icon { width: 18px; height: 18px; object-fit: contain; flex-shrink: 0; }
+  .dtmt__league-icon { width: 22px; height: 22px; object-fit: cover; flex-shrink: 0; border-radius: 3px; overflow: hidden; }
   .dtmt__live-badge {
     background: #e04040; color: #fff;
     font-size: 8px; font-weight: 800; padding: 1px 3px; border-radius: 3px;
