@@ -108,7 +108,7 @@ function parseScore(fd?: string): { home: number; away: number } {
 
 export function formatKickOff(ts: number): string {
   const d = new Date(ts)
-  const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+  const time = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
   const now = new Date()
   const todayStr = now.toDateString()
   const tomorrowStr = new Date(Date.now() + 86_400_000).toDateString()
