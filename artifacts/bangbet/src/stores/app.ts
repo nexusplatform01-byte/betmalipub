@@ -3,7 +3,7 @@ import { ref } from "vue";
 import { sportsMenu, promotions } from "./mockData";
 import {
   fetchLiveEvents,
-  fetchTopMatches,
+  fetchHighlightMatches,
   fetchAllSports,
   fetchBoostedMatches,
   type Match,
@@ -46,6 +46,10 @@ export const useAppStore = defineStore("app", () => {
   const liveSportsData = ref<any[]>([]);
   const liveLoading = ref(false);
   const topLoading = ref(false);
+  const topLoadingMore = ref(false);
+  const topMatchesPage = ref(1);
+  const topMatchesLastPage = ref(1);
+  const topMatchesHasMore = ref(false);
   const boostedLoading = ref(false);
   const sportsLoading = ref(false);
 
@@ -64,14 +68,35 @@ export const useAppStore = defineStore("app", () => {
     }
   }
 
-  async function loadTopMatches(sportCode = "S") {
+  async function loadTopMatches() {
     topLoading.value = true;
+    topMatchesPage.value = 1;
     try {
-      topMatches.value = await fetchTopMatches(sportCode);
+      const result = await fetchHighlightMatches(1, 50);
+      topMatches.value = result.data;
+      topMatchesLastPage.value = result.lastPage;
+      topMatchesHasMore.value = result.lastPage > 1;
     } catch (e) {
       console.error("[Bangbet] top matches fetch error:", e);
     } finally {
       topLoading.value = false;
+    }
+  }
+
+  async function loadMoreTopMatches() {
+    if (topLoadingMore.value || !topMatchesHasMore.value) return;
+    const nextPage = topMatchesPage.value + 1;
+    if (nextPage > topMatchesLastPage.value) { topMatchesHasMore.value = false; return; }
+    topLoadingMore.value = true;
+    try {
+      const result = await fetchHighlightMatches(nextPage, 50);
+      topMatches.value = [...topMatches.value, ...result.data];
+      topMatchesPage.value = nextPage;
+      topMatchesHasMore.value = nextPage < result.lastPage;
+    } catch (e) {
+      console.error("[Bangbet] load more top matches error:", e);
+    } finally {
+      topLoadingMore.value = false;
     }
   }
 
@@ -104,7 +129,7 @@ export const useAppStore = defineStore("app", () => {
 
   loadBoostedMatches();
   loadLiveMatches();
-  loadTopMatches("S");
+  loadTopMatches();
   loadSports();
   startLiveRefresh();
 
@@ -185,7 +210,12 @@ export const useAppStore = defineStore("app", () => {
     saveBet,
     loadLiveMatches,
     loadTopMatches,
+    loadMoreTopMatches,
     loadBoostedMatches,
     loadSports,
+    topLoadingMore,
+    topMatchesHasMore,
+    topMatchesPage,
+    topMatchesLastPage,
   };
 });

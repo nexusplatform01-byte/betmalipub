@@ -293,6 +293,14 @@
               <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'12'), 'dtmt__odd-btn--na': dc(match.markets.home,match.markets.away)==='-' }" @click.stop="dc(match.markets.home,match.markets.away)!=='-' && addOdd(match,'12',dc(match.markets.home,match.markets.away))">{{ dc(match.markets.home,match.markets.away) }}</button>
             </div>
           </div>
+          <!-- Infinite scroll sentinel + load-more row (both views) -->
+          <div ref="topSentinel" class="top-sentinel"></div>
+          <div v-if="store.topLoadingMore" class="top-loading-more">
+            <span class="top-loading-more__spinner"></span> Loading more matches…
+          </div>
+          <button v-else-if="store.topMatchesHasMore" class="top-load-btn" @click="store.loadMoreTopMatches()">
+            Load more matches ↓
+          </button>
         </div>
 
         <div class="section">

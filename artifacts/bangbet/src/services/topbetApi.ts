@@ -230,6 +230,24 @@ export async function fetchBandaMatchDetail(matchId: string): Promise<BandaMarke
   }
 }
 
+export interface HighlightPage {
+  data: Match[]
+  total: number
+  lastPage: number
+}
+
+export async function fetchHighlightMatches(page = 1, perPage = 50): Promise<HighlightPage> {
+  const url = `${BANDA_BASE}/highlights/1?page=${page}&per_page=${perPage}&boosted=0&highlight_market_id=0&tournament_id=0&category_id=0&upcoming=0&today=0&match_live_status=0`
+  const res = await fetch(url, { headers: { 'Accept': 'application/json' } })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  const json = await res.json()
+  return {
+    data: (json.data || []).map(mapBandaItem),
+    total: json.total || 0,
+    lastPage: json.last_page || 1,
+  }
+}
+
 export async function fetchBoostedMatches(): Promise<Match[]> {
   try {
     const items = await fetchBanda(
