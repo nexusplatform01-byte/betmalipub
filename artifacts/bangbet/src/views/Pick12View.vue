@@ -231,8 +231,14 @@
           </div>
         </div>
 
+        <!-- Loading state -->
+        <div v-if="loading" class="p12-loading">
+          <div class="p12-loading__spinner">⚽</div>
+          <div class="p12-loading__txt">Loading real matches...</div>
+        </div>
+
         <!-- OPEN: match prediction table -->
-        <div v-else class="p12-table">
+        <div v-else-if="status === 'open'" class="p12-table">
           <div class="p12-table__hdr">
             <div class="p12-th-num">#</div>
             <div class="p12-th-info">Match</div>
@@ -356,29 +362,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue';
+import { ref, reactive, computed, onMounted } from 'vue';
 import AppHeader from '@/components/AppHeader.vue';
 import BottomNav from '@/components/BottomNav.vue';
+import { fetchHighlightMatches } from '@/services/topbetApi';
 
 type Status = 'open' | 'pending' | 'won' | 'lost';
 const status = ref<Status>('open');
+const loading = ref(true);
 
 interface P12Match { id: string; league: string; home: string; away: string; time: string; }
 
-const matches: P12Match[] = [
-  { id: 'p1',  league: 'EPL',           home: 'Arsenal',        away: 'Liverpool',    time: 'Sun 28 Jun 15:00' },
-  { id: 'p2',  league: 'EPL',           home: 'Man City',       away: 'Chelsea',      time: 'Sun 28 Jun 15:00' },
-  { id: 'p3',  league: 'La Liga',       home: 'Real Madrid',    away: 'Barcelona',    time: 'Sun 28 Jun 16:00' },
-  { id: 'p4',  league: 'Bundesliga',    home: 'Bayern Munich',  away: 'Dortmund',     time: 'Sun 28 Jun 17:30' },
-  { id: 'p5',  league: 'Ligue 1',       home: 'PSG',            away: 'Lyon',         time: 'Sun 28 Jun 17:00' },
-  { id: 'p6',  league: 'Serie A',       home: 'Inter Milan',    away: 'AC Milan',     time: 'Sun 28 Jun 18:00' },
-  { id: 'p7',  league: 'Eredivisie',    home: 'Ajax',           away: 'PSV',          time: 'Sun 28 Jun 14:00' },
-  { id: 'p8',  league: 'Scottish PL',   home: 'Celtic',         away: 'Rangers',      time: 'Sun 28 Jun 13:00' },
-  { id: 'p9',  league: 'Liga Portugal', home: 'Porto',          away: 'Sporting',     time: 'Sun 28 Jun 19:00' },
-  { id: 'p10', league: 'Uganda PL',     home: 'KCCA FC',        away: 'Vipers SC',    time: 'Sun 28 Jun 15:00' },
-  { id: 'p11', league: 'Süper Lig',     home: 'Galatasaray',    away: 'Besiktas',     time: 'Sun 28 Jun 18:00' },
-  { id: 'p12', league: 'Brasileirao',   home: 'Flamengo',       away: 'Corinthians',  time: 'Sun 28 Jun 20:00' },
-];
+const matches = ref<P12Match[]>([]);
 
 const scores = reactive<([number | null, number | null])[]>(
   Array.from({ length: 12 }, () => [null, null])
@@ -440,10 +435,39 @@ const pastWinners = [
   { name: 'Sarah M. (Entebbe)', week: 'Week of 8 Jun 2026' },
   { name: 'David K. (Jinja)',   week: 'Week of 1 Jun 2026' },
 ];
+
+onMounted(async () => {
+  try {
+    const { data } = await fetchHighlightMatches(1, 50);
+    const valid = data.filter(m => m.homeTeam && m.awayTeam);
+    if (valid.length >= 12) {
+      matches.value = valid.slice(0, 12).map((m, i) => ({
+        id: `p${i + 1}`,
+        league: m.league || 'Football',
+        home: m.homeTeam,
+        away: m.awayTeam,
+        time: m.startTime || 'Today',
+      }));
+    }
+  } catch (e) {
+    console.error('[Pick12] Failed to load real matches:', e);
+  } finally {
+    loading.value = false;
+  }
+});
 </script>
 
 <style scoped>
 .p12-page { background: var(--bg-main); }
+
+/* ─── loading ───────────────────────────────────────────── */
+.p12-loading {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 48px 16px; gap: 12px;
+}
+.p12-loading__spinner { font-size: 32px; animation: p12-spin 1s linear infinite; }
+.p12-loading__txt { font-size: 13px; color: #888; }
+@keyframes p12-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 /* ─── Mobile-only hero ───────────────────────────────────── */
 .p12-hero {

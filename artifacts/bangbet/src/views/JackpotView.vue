@@ -197,8 +197,14 @@
               </div>
             </div>
 
+            <!-- Loading state -->
+            <div v-if="loading" class="jpt-loading">
+              <div class="jpt-loading__spinner">⚽</div>
+              <div class="jpt-loading__txt">Loading real matches...</div>
+            </div>
+
             <!-- Match table -->
-            <div class="jpt-table">
+            <div v-else class="jpt-table">
               <div class="jpt-table__hdr" :class="`jpt-table__hdr--${t.id}`">
                 <div class="jpt-th jpt-th--num">#</div>
                 <div class="jpt-th jpt-th--info">Match</div>
@@ -343,9 +349,11 @@ import { useAppStore } from '@/stores/app';
 import AppHeader from '@/components/AppHeader.vue';
 import BottomNav from '@/components/BottomNav.vue';
 import JackpotSection from '@/components/JackpotSection.vue';
+import { fetchHighlightMatches, type Match } from '@/services/topbetApi';
 
 const store = useAppStore();
 const activeTier = ref('gold');
+const loading = ref(true);
 
 // ─── Types ───────────────────────────────────────────────
 interface JpMatch {
@@ -354,7 +362,7 @@ interface JpMatch {
   home: string;
   away: string;
   time: string;
-  odds: [number, number, number]; // 1, X, 2
+  odds: [number, number, number];
 }
 
 interface JpTier {
@@ -363,8 +371,8 @@ interface JpTier {
   medal: string;
   stake: number;
   prizeDisplay: string;
-  lastMatchDisplay: string; // display string "Today 20:00"
-  endsAt: number;           // timestamp when last match ends (kickoff + 90min)
+  lastMatchDisplay: string;
+  endsAt: number;
   matches: JpMatch[];
 }
 
@@ -391,126 +399,33 @@ function fmtCountdown(endsAt: number): CdState {
   return { h: pad(h), m: pad(m), s: pad(s), done: false };
 }
 
-// ─── Tier & Match Data ────────────────────────────────────
-// Gold:    last match kicks off 20:00 → ends 21:30
-// Silver:  last match kicks off 18:00 → ends 19:30
-// Bronze:  last match kicks off 21:00 → ends 22:30
-// Premium: last match kicks off 16:00 → ends 17:30
-
-const tiers: JpTier[] = [
-  {
-    id: 'gold', name: 'GOLD', medal: '🥇',
-    stake: 10_000,
-    prizeDisplay: 'UGX 856,241,337',
-    lastMatchDisplay: 'Today 21:30',
-    endsAt: todayAt(21, 30),
-    matches: [
-      { id: 'g1',  league: 'EPL',          home: 'Arsenal',         away: 'Man City',        time: 'Today 15:00', odds: [2.50, 3.40, 2.65] },
-      { id: 'g2',  league: 'La Liga',       home: 'Barcelona',       away: 'Atletico Madrid', time: 'Today 15:30', odds: [1.85, 3.50, 4.20] },
-      { id: 'g3',  league: 'Bundesliga',    home: 'Bayern Munich',   away: 'Dortmund',        time: 'Today 16:00', odds: [1.70, 3.80, 4.50] },
-      { id: 'g4',  league: 'EPL',           home: 'Liverpool',       away: 'Chelsea',         time: 'Today 16:30', odds: [2.20, 3.20, 3.10] },
-      { id: 'g5',  league: 'Ligue 1',       home: 'PSG',             away: 'Marseille',       time: 'Today 17:00', odds: [1.60, 3.90, 5.00] },
-      { id: 'g6',  league: 'La Liga',       home: 'Real Madrid',     away: 'Sevilla',         time: 'Today 17:30', odds: [1.75, 3.60, 4.50] },
-      { id: 'g7',  league: 'Serie A',       home: 'Inter Milan',     away: 'AC Milan',        time: 'Today 18:00', odds: [2.30, 3.10, 2.90] },
-      { id: 'g8',  league: 'EPL',           home: 'Man United',      away: 'Tottenham',       time: 'Today 18:30', odds: [2.10, 3.30, 3.20] },
-      { id: 'g9',  league: 'Serie A',       home: 'Napoli',          away: 'Juventus',        time: 'Today 19:00', odds: [2.80, 3.20, 2.40] },
-      { id: 'g10', league: 'Eredivisie',    home: 'Ajax',            away: 'PSV',             time: 'Today 19:15', odds: [2.00, 3.20, 3.50] },
-      { id: 'g11', league: 'Liga Portugal', home: 'Porto',           away: 'Benfica',         time: 'Today 19:30', odds: [2.20, 3.25, 3.10] },
-      { id: 'g12', league: 'Bundesliga',    home: 'RB Leipzig',      away: 'Leverkusen',      time: 'Today 20:00', odds: [2.45, 3.15, 2.75] },
-    ],
-  },
-  {
-    id: 'silver', name: 'SILVER', medal: '🥈',
-    stake: 8_500,
-    prizeDisplay: 'UGX 432,817,658',
-    lastMatchDisplay: 'Today 19:30',
-    endsAt: todayAt(19, 30),
-    matches: [
-      { id: 's1',  league: 'EPL',          home: 'West Ham',        away: 'Aston Villa',     time: 'Today 13:00', odds: [2.40, 3.20, 2.80] },
-      { id: 's2',  league: 'Ligue 1',      home: 'Lyon',            away: 'Monaco',          time: 'Today 13:30', odds: [1.90, 3.40, 3.80] },
-      { id: 's3',  league: 'Serie A',      home: 'Roma',            away: 'Lazio',           time: 'Today 14:00', odds: [2.10, 3.10, 3.20] },
-      { id: 's4',  league: 'La Liga',      home: 'Valencia',        away: 'Villarreal',      time: 'Today 14:30', odds: [2.25, 3.15, 2.95] },
-      { id: 's5',  league: 'Eredivisie',   home: 'Feyenoord',       away: 'Utrecht',         time: 'Today 14:45', odds: [1.80, 3.50, 4.00] },
-      { id: 's6',  league: 'Scottish PL',  home: 'Celtic',          away: 'Rangers',         time: 'Today 15:00', odds: [1.95, 3.30, 3.75] },
-      { id: 's7',  league: 'Süper Lig',    home: 'Galatasaray',     away: 'Fenerbahce',      time: 'Today 15:30', odds: [2.05, 3.20, 3.40] },
-      { id: 's8',  league: 'Liga Portugal',home: 'Sporting',        away: 'Porto',           time: 'Today 16:00', odds: [2.30, 3.10, 2.90] },
-      { id: 's9',  league: 'Ligue 1',      home: 'Marseille',       away: 'Nice',            time: 'Today 16:30', odds: [1.85, 3.45, 4.10] },
-      { id: 's10', league: 'Bundesliga',   home: 'Stuttgart',       away: 'Freiburg',        time: 'Today 17:00', odds: [2.10, 3.30, 3.10] },
-      { id: 's11', league: 'Pro League',   home: 'Anderlecht',      away: 'Club Brugge',     time: 'Today 17:30', odds: [2.35, 3.15, 2.85] },
-      { id: 's12', league: 'EPL',          home: 'Newcastle',       away: 'Brighton',        time: 'Today 18:00', odds: [1.90, 3.45, 3.90] },
-    ],
-  },
-  {
-    id: 'bronze', name: 'BRONZE', medal: '🥉',
-    stake: 5_000,
-    prizeDisplay: 'UGX 287,542,110',
-    lastMatchDisplay: 'Today 22:30',
-    endsAt: todayAt(22, 30),
-    matches: [
-      { id: 'b1',  league: 'Uganda PL',    home: 'KCCA FC',         away: 'Express FC',      time: 'Today 16:00', odds: [1.85, 3.40, 4.20] },
-      { id: 'b2',  league: 'Ligue 1',      home: 'Stade Rennais',   away: 'Lille',           time: 'Today 16:30', odds: [2.30, 3.10, 2.90] },
-      { id: 'b3',  league: 'Serie A',      home: 'Empoli',          away: 'Fiorentina',      time: 'Today 17:00', odds: [3.00, 3.20, 2.25] },
-      { id: 'b4',  league: 'La Liga',      home: 'Real Sociedad',   away: 'Athletic Bilbao', time: 'Today 17:30', odds: [2.40, 3.15, 2.80] },
-      { id: 'b5',  league: 'Bundesliga',   home: 'Hertha Berlin',   away: 'Wolfsburg',       time: 'Today 18:00', odds: [2.20, 3.30, 2.95] },
-      { id: 'b6',  league: 'EPL',          home: 'Everton',         away: 'Wolves',          time: 'Today 18:30', odds: [2.35, 3.20, 2.85] },
-      { id: 'b7',  league: 'Egyptian PL',  home: 'Al Ahly',         away: 'Zamalek',         time: 'Today 19:00', odds: [1.95, 3.35, 3.80] },
-      { id: 'b8',  league: 'Argentine PL', home: 'Boca Juniors',    away: 'River Plate',     time: 'Today 19:30', odds: [2.50, 3.10, 2.60] },
-      { id: 'b9',  league: 'Bundesliga',   home: 'Mainz',           away: 'Augsburg',        time: 'Today 20:00', odds: [2.15, 3.25, 3.20] },
-      { id: 'b10', league: 'Serie A',      home: 'Genoa',           away: 'Bologna',         time: 'Today 20:15', odds: [2.55, 3.15, 2.65] },
-      { id: 'b11', league: 'Liga Portugal',home: 'Braga',           away: 'Vitoria SC',      time: 'Today 20:30', odds: [1.75, 3.55, 4.30] },
-      { id: 'b12', league: 'Ligue 1',      home: 'Lens',            away: 'Strasbourg',      time: 'Today 21:00', odds: [2.00, 3.35, 3.55] },
-    ],
-  },
-  {
-    id: 'premium', name: 'PREMIUM', medal: '💎',
-    stake: 2_000,
-    prizeDisplay: 'UGX 194,163,808',
-    lastMatchDisplay: 'Today 17:30',
-    endsAt: todayAt(17, 30),
-    matches: [
-      { id: 'p1',  league: 'Uganda PL',    home: 'KCCA FC',         away: 'Police FC',       time: 'Today 11:30', odds: [1.80, 3.60, 4.40] },
-      { id: 'p2',  league: 'Uganda PL',    home: 'Express FC',      away: 'SC Villa',        time: 'Today 12:00', odds: [2.10, 3.25, 3.30] },
-      { id: 'p3',  league: 'Tanzania SL',  home: 'Simba SC',        away: 'Young Africans',  time: 'Today 12:30', odds: [2.00, 3.30, 3.50] },
-      { id: 'p4',  league: 'DR Congo',     home: 'TP Mazembe',      away: 'V.Club',          time: 'Today 13:00', odds: [2.15, 3.20, 3.30] },
-      { id: 'p5',  league: 'South Africa', home: 'Mamelodi Sundowns',away: 'Kaizer Chiefs',  time: 'Today 13:30', odds: [1.75, 3.55, 4.50] },
-      { id: 'p6',  league: 'Cote d\'Ivoire',home: 'ASEC Mimosas',   away: 'Stade Abidjan',  time: 'Today 14:00', odds: [1.95, 3.35, 3.75] },
-      { id: 'p7',  league: 'Morocco Botola',home: 'Wydad AC',       away: 'Raja Casablanca', time: 'Today 14:30', odds: [2.10, 3.25, 3.30] },
-      { id: 'p8',  league: 'Uganda PL',    home: 'Wakiso Giants',   away: 'Proline FC',      time: 'Today 14:45', odds: [2.30, 3.20, 2.90] },
-      { id: 'p9',  league: 'Uganda PL',    home: 'Vipers SC',       away: 'BUL FC',          time: 'Today 15:00', odds: [1.70, 3.70, 4.80] },
-      { id: 'p10', league: 'Uganda PL',    home: 'Onduparaka FC',   away: 'URA FC',          time: 'Today 15:30', odds: [2.45, 3.15, 2.75] },
-      { id: 'p11', league: 'Uganda PL',    home: 'Busoga United',   away: 'Mbarara City',    time: 'Today 15:45', odds: [2.20, 3.25, 2.95] },
-      { id: 'p12', league: 'Uganda PL',    home: 'Arua Hill SC',    away: 'MYDA FC',         time: 'Today 16:00', odds: [1.90, 3.50, 3.95] },
-    ],
-  },
+// ─── Tier metadata (matches loaded from API) ──────────────
+const TIER_DEFS = [
+  { id: 'gold',    name: 'GOLD',    medal: '🥇', stake: 10_000, prizeDisplay: 'UGX 856,241,337', lastMatchDisplay: 'Today 21:30', endsAt: todayAt(21, 30) },
+  { id: 'silver',  name: 'SILVER',  medal: '🥈', stake: 8_500,  prizeDisplay: 'UGX 432,817,658', lastMatchDisplay: 'Today 19:30', endsAt: todayAt(19, 30) },
+  { id: 'bronze',  name: 'BRONZE',  medal: '🥉', stake: 5_000,  prizeDisplay: 'UGX 287,542,110', lastMatchDisplay: 'Today 22:30', endsAt: todayAt(22, 30) },
+  { id: 'premium', name: 'PREMIUM', medal: '💎', stake: 2_000,  prizeDisplay: 'UGX 194,163,808', lastMatchDisplay: 'Today 17:30', endsAt: todayAt(17, 30) },
 ];
 
-// ─── Recent winners (static demo data) ───────────────────
-const recentWinners = [
-  { name: 'John K.', avatar: '🧑', tier: '🥇 Gold', date: 'Yesterday', prize: 'UGX 856M' },
-  { name: 'Amina W.', avatar: '👩', tier: '🥈 Silver', date: '2 days ago', prize: 'UGX 432M' },
-  { name: 'David O.', avatar: '👨', tier: '🥉 Bronze', date: '3 days ago', prize: 'UGX 287M' },
-];
+const tiers = ref<JpTier[]>(TIER_DEFS.map(td => ({ ...td, matches: [] })));
 
-// ─── Reactive state ───────────────────────────────────────
+// ─── Reactive state (keyed by tier id) ───────────────────
 const picks = reactive<Record<string, (string | null)[]>>(
-  Object.fromEntries(tiers.map(t => [t.id, Array(12).fill(null)]))
+  Object.fromEntries(TIER_DEFS.map(t => [t.id, Array(12).fill(null)]))
 );
-
 const betPlaced = reactive<Record<string, boolean>>(
-  Object.fromEntries(tiers.map(t => [t.id, false]))
+  Object.fromEntries(TIER_DEFS.map(t => [t.id, false]))
 );
-
 const results = reactive<Record<string, ResultState | null>>(
-  Object.fromEntries(tiers.map(t => [t.id, null]))
+  Object.fromEntries(TIER_DEFS.map(t => [t.id, null]))
 );
-
 const cd = reactive<Record<string, CdState>>(
-  Object.fromEntries(tiers.map(t => [t.id, fmtCountdown(t.endsAt)]))
+  Object.fromEntries(TIER_DEFS.map(t => [t.id, fmtCountdown(t.endsAt)]))
 );
 
 // ─── Pick helpers ─────────────────────────────────────────
 function picksCount(tid: string): number {
-  return picks[tid].filter(p => p !== null).length;
+  return (picks[tid] || []).filter(p => p !== null).length;
 }
 
 function setPick(tid: string, idx: number, val: string) {
@@ -518,7 +433,7 @@ function setPick(tid: string, idx: number, val: string) {
   picks[tid][idx] = picks[tid][idx] === val ? null : val;
 }
 
-function autoPick(tid: string, matches: JpTier['matches']) {
+function autoPick(tid: string, matches: JpMatch[]) {
   if (betPlaced[tid]) return;
   const opts = ['1', 'X', '2'];
   matches.forEach((_, i) => {
@@ -542,24 +457,47 @@ function placeBet(tid: string, tier: JpTier) {
 // ─── Simulate results when countdown done ────────────────
 function simulateResults(tid: string) {
   const outcomes = ['1', 'X', '2'];
-  const correct = picks[tid].filter((p, i) => {
+  const correct = picks[tid].filter(() => {
     const outcome = outcomes[Math.floor(Math.random() * 3)];
-    return p === outcome;
+    return picks[tid].includes(outcome);
   }).length;
   const won = correct === 12;
   results[tid] = { won, correct };
   if (won) {
-    const tier = tiers.find(t => t.id === tid)!;
-    store.deposit(tier.stake + 500_000); // award demo prize
+    const tier = tiers.value.find(t => t.id === tid)!;
+    store.deposit(tier.stake + 500_000);
   }
 }
+
+// ─── Map API match → JpMatch ─────────────────────────────
+function mapToJpMatch(m: Match, idx: number, prefix: string): JpMatch {
+  return {
+    id: `${prefix}${idx}`,
+    league: m.league || 'Football',
+    home: m.homeTeam,
+    away: m.awayTeam,
+    time: m.startTime || 'Today',
+    odds: [
+      parseFloat(m.markets.home.toFixed(2)),
+      parseFloat((m.markets.draw ?? 3.00).toFixed(2)),
+      parseFloat(m.markets.away.toFixed(2)),
+    ],
+  };
+}
+
+// ─── Recent winners ───────────────────────────────────────
+const recentWinners = [
+  { name: 'John K.', avatar: '🧑', tier: '🥇 Gold', date: 'Yesterday', prize: 'UGX 856M' },
+  { name: 'Amina W.', avatar: '👩', tier: '🥈 Silver', date: '2 days ago', prize: 'UGX 432M' },
+  { name: 'David O.', avatar: '👨', tier: '🥉 Bronze', date: '3 days ago', prize: 'UGX 287M' },
+];
 
 // ─── Countdown interval ───────────────────────────────────
 let timer: ReturnType<typeof setInterval>;
 
-onMounted(() => {
+onMounted(async () => {
   timer = setInterval(() => {
-    for (const t of tiers) {
+    for (const t of TIER_DEFS) {
       const state = fmtCountdown(t.endsAt);
       cd[t.id] = state;
       if (state.done && betPlaced[t.id] && !results[t.id]) {
@@ -567,6 +505,35 @@ onMounted(() => {
       }
     }
   }, 1000);
+
+  try {
+    const { data } = await fetchHighlightMatches(1, 80);
+    const valid = data.filter(m =>
+      m.markets.home > 1 &&
+      m.markets.draw != null &&
+      m.markets.away > 1 &&
+      m.homeTeam &&
+      m.awayTeam
+    );
+
+    if (valid.length >= 12) {
+      const getSlice = (offset: number): Match[] => {
+        const out: Match[] = [];
+        for (let i = 0; i < 12; i++) {
+          out.push(valid[(offset + i) % valid.length]);
+        }
+        return out;
+      };
+      tiers.value = TIER_DEFS.map((td, ti) => ({
+        ...td,
+        matches: getSlice(ti * 12).map((m, i) => mapToJpMatch(m, i, td.id[0])),
+      }));
+    }
+  } catch (e) {
+    console.error('[Jackpot] Failed to load real matches:', e);
+  } finally {
+    loading.value = false;
+  }
 });
 
 onUnmounted(() => clearInterval(timer));
@@ -619,6 +586,15 @@ onUnmounted(() => clearInterval(timer));
 .jpt-tab--silver.jpt-tab--active { border-bottom: 3px solid #c0c8d8; }
 .jpt-tab--bronze.jpt-tab--active { border-bottom: 3px solid #d4834a; }
 .jpt-tab--premium.jpt-tab--active { border-bottom: 3px solid #c080ff; }
+
+/* ─── loading ───────────────────────────────────────────── */
+.jpt-loading {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 48px 16px; gap: 12px;
+}
+.jpt-loading__spinner { font-size: 32px; animation: jpt-spin 1s linear infinite; }
+.jpt-loading__txt { font-size: 13px; color: #888; }
+@keyframes jpt-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 /* ─── panel ─────────────────────────────────────────────── */
 .jpt-panel { background: #f0f1f5; }
