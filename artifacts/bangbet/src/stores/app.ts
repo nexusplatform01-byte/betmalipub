@@ -68,12 +68,18 @@ export const useAppStore = defineStore("app", () => {
     }
   }
 
+  function hasAllOdds(m: Match): boolean {
+    return m.markets.home > 0 &&
+      m.markets.draw != null && m.markets.draw > 0 &&
+      m.markets.away > 0;
+  }
+
   async function loadTopMatches() {
     topLoading.value = true;
     topMatchesPage.value = 1;
     try {
       const result = await fetchHighlightMatches(1, 50);
-      topMatches.value = result.data;
+      topMatches.value = result.data.filter(hasAllOdds);
       topMatchesLastPage.value = result.lastPage;
       topMatchesHasMore.value = result.lastPage > 1;
     } catch (e) {
@@ -90,7 +96,7 @@ export const useAppStore = defineStore("app", () => {
     topLoadingMore.value = true;
     try {
       const result = await fetchHighlightMatches(nextPage, 50);
-      topMatches.value = [...topMatches.value, ...result.data];
+      topMatches.value = [...topMatches.value, ...result.data.filter(hasAllOdds)];
       topMatchesPage.value = nextPage;
       topMatchesHasMore.value = nextPage < result.lastPage;
     } catch (e) {

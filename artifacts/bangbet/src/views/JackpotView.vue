@@ -344,12 +344,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, onUnmounted } from 'vue';
+import { ref, reactive, watch, onMounted, onUnmounted } from 'vue';
 import { useAppStore } from '@/stores/app';
 import AppHeader from '@/components/AppHeader.vue';
 import BottomNav from '@/components/BottomNav.vue';
 import JackpotSection from '@/components/JackpotSection.vue';
-import { fetchHighlightMatches, type Match } from '@/services/topbetApi';
+import { type Match } from '@/services/topbetApi';
 
 const store = useAppStore();
 const activeTier = ref('gold');
@@ -498,7 +498,46 @@ const recentWinners = [
 // ─── Countdown interval ───────────────────────────────────
 let timer: ReturnType<typeof setInterval>;
 
-onMounted(async () => {
+// ─── Populate tiers from already-loaded store matches ────
+function getValidMatches(): Match[] {
+  const all = [...store.boostedMatches, ...store.topMatches];
+  const seen = new Set<string>();
+  return all.filter(m => {
+    if (seen.has(m.id)) return false;
+    seen.add(m.id);
+    return (
+      m.homeTeam && m.awayTeam &&
+      m.markets.home > 0 &&
+      m.markets.draw != null && m.markets.draw > 0 &&
+      m.markets.away > 0
+    );
+  });
+}
+
+function populateTiers() {
+  const valid = getValidMatches();
+  if (valid.length < 12) return false;
+  const getSlice = (offset: number): Match[] => {
+    const out: Match[] = [];
+    for (let i = 0; i < 12; i++) out.push(valid[(offset + i) % valid.length]);
+    return out;
+  };
+  tiers.value = TIER_DEFS.map((td, ti) => ({
+    ...td,
+    matches: getSlice(ti * 12).map((m, i) => mapToJpMatch(m, i, td.id[0])),
+  }));
+  loading.value = false;
+  return true;
+}
+
+// Watch store matches — fires both immediately (if already loaded) and when they arrive
+watch(
+  () => store.topMatches.length + store.boostedMatches.length,
+  () => { if (loading.value) populateTiers(); },
+  { immediate: true }
+);
+
+onMounted(() => {
   timer = setInterval(() => {
     for (const t of TIER_DEFS) {
       const state = fmtCountdown(t.endsAt);
@@ -509,28 +548,11 @@ onMounted(async () => {
     }
   }, 1000);
 
-  try {
-    const { data } = await fetchHighlightMatches(1, 80);
-    const valid = data.filter(m => m.homeTeam && m.awayTeam);
+  // Attempt immediately in case store is already populated
+  if (loading.value) populateTiers();
 
-    if (valid.length >= 12) {
-      const getSlice = (offset: number): Match[] => {
-        const out: Match[] = [];
-        for (let i = 0; i < 12; i++) {
-          out.push(valid[(offset + i) % valid.length]);
-        }
-        return out;
-      };
-      tiers.value = TIER_DEFS.map((td, ti) => ({
-        ...td,
-        matches: getSlice(ti * 12).map((m, i) => mapToJpMatch(m, i, td.id[0])),
-      }));
-    }
-  } catch (e) {
-    console.error('[Jackpot] Failed to load real matches:', e);
-  } finally {
-    loading.value = false;
-  }
+  // Safety fallback — stop spinner after 8s if still no data
+  setTimeout(() => { loading.value = false; }, 8000);
 });
 
 onUnmounted(() => clearInterval(timer));
