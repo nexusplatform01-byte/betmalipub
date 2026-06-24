@@ -144,8 +144,8 @@ function placeBet(matchId: string, team: string, odds: number, market: string) {
   line-height: 1;
 }
 .odds-btn__flame-img {
-  width: 14px;
-  height: 14px;
+  width: 10px;
+  height: 10px;
   object-fit: contain;
 }
 

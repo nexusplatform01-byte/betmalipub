@@ -80,9 +80,9 @@
 
       <!-- MARKETS TAB -->
       <div v-if="activeTab === 'markets'" class="md-markets">
-        <div v-if="!markets.length" class="md-empty">No markets available for this match.</div>
+        <div v-if="!sortedMarkets.length" class="md-empty">No markets available for this match.</div>
 
-        <div v-for="(mkt, idx) in markets" :key="`${mkt.market_id}-${idx}`" class="md-group">
+        <div v-for="(mkt, idx) in sortedMarkets" :key="`${mkt.market_id}-${idx}`" class="md-group">
           <!-- accordion header -->
           <div class="md-group__head" @click="toggleGroup(`${mkt.market_id}-${idx}`)">
             <div class="md-group__title-wrap">
@@ -214,9 +214,30 @@ const loading = ref(true)
 const error = ref<string | null>(null)
 const openGroups = ref<Record<string, boolean>>({})
 
-const mainMarket = computed(() => markets.value.find((m) => m.market_id === 2) || markets.value[0] || null)
+function priorityScore(mkt: BandaMarket): number {
+  const n = mkt.market_name.toLowerCase()
+  if (mkt.market_id === 2 || n === '1 x 2') return 0
+  if (n.includes('double chance')) return 1
+  if ((n.includes('over') || n.includes('under')) && n.includes('2.5')) return 2
+  if (n.includes('over') && n.includes('under')) return 3
+  if (n.includes('both teams') || n.includes('btts')) return 4
+  if (n.includes('half') && n.includes('full')) return 5
+  if (n.includes('1st half') || n.includes('first half') || (n.includes('half') && n.includes('time'))) return 6
+  if (n.includes('goalscorer') || n.includes('goal scorer') || n.includes('anytime')) return 50
+  if (n.includes('card')) return 30
+  if (n.includes('corner')) return 35
+  return 20 + mkt.market_id
+}
 
-const totalMarkets = computed(() => markets.value.length)
+const sortedMarkets = computed<BandaMarket[]>(() =>
+  markets.value
+    .filter((m) => m.status === 0 && (m.outcomes || []).some((o) => o.active === 1))
+    .sort((a, b) => priorityScore(a) - priorityScore(b))
+)
+
+const mainMarket = computed(() => sortedMarkets.value.find((m) => m.market_id === 2) || sortedMarkets.value[0] || null)
+
+const totalMarkets = computed(() => sortedMarkets.value.length)
 
 const tabs = computed(() => [
   { id: 'markets', label: 'Markets', icon: '📋', count: totalMarkets.value || null },
@@ -244,7 +265,7 @@ async function loadMarkets() {
   error.value = null
   try {
     markets.value = await fetchBandaMatchDetail(matchId.value)
-    markets.value.slice(0, 3).forEach((m, i) => {
+    sortedMarkets.value.slice(0, 3).forEach((m, i) => {
       openGroups.value[`${m.market_id}-${i}`] = true
     })
   } catch {

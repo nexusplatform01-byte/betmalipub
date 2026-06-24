@@ -1247,6 +1247,18 @@ const iceHockeyMatches = [
   .dt-only  { display: block; }
 }
 
+/* ── boosted badge: base styles (mobile + desktop) ── */
+.boosted-badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  background: linear-gradient(90deg, #f59e0b, #ef4444);
+  color: #fff; font-size: 11px; font-weight: 900;
+  padding: 2px 6px; border-radius: 4px; letter-spacing: .3px;
+  white-space: nowrap;
+}
+.boosted-badge__flame {
+  width: 12px; height: 12px; object-fit: contain; flex-shrink: 0;
+}
+
 /* ══════════════════════════════════════════════
    DESKTOP TOP NAV BAR
 ══════════════════════════════════════════════ */
