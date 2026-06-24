@@ -175,7 +175,7 @@ function mapBandaItem(item: any): Match {
     sportCode: 'S',
     league: item.tournament || '',
     leagueId: String(item.tournament_id || ''),
-    leagueLogo: SPORT_ICON('S'),
+    leagueLogo: (item.tournament || '').toLowerCase().includes('world cup') ? '/static/img/wc2026.png' : SPORT_ICON('S'),
     homeTeam: item.home_team || '',
     awayTeam: item.away_team || '',
     homeScore,
