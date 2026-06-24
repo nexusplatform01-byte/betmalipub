@@ -40,17 +40,26 @@
           <MatchCard v-for="match in lg.matches" :key="match.id" :match="match" />
         </div>
 
-        <!-- Load More -->
-        <div v-if="hasMore" class="load-more-wrap">
+        <!-- Infinite scroll sentinel -->
+        <div ref="sentinelEl" class="scroll-sentinel"></div>
+
+        <!-- Load More button (fallback / manual trigger) -->
+        <div v-if="hasMore || loadingMore" class="load-more-wrap">
           <button class="load-more-btn" :disabled="loadingMore" @click="loadMore">
-            <span v-if="loadingMore" class="spinner-sm"></span>
-            <span v-else>Load More Matches</span>
+            <span v-if="loadingMore" class="load-more-btn__inner">
+              <span class="lm-spinner"></span>
+              <span>Loading matches…</span>
+            </span>
+            <span v-else class="load-more-btn__inner">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+              Load More Matches
+            </span>
           </button>
         </div>
 
         <!-- End of matches -->
         <div v-else-if="filteredGroups.length > 0" class="end-note">
-          All {{ sportName }} matches loaded
+          <span class="end-note__icon">✓</span> All {{ sportName }} matches loaded
         </div>
       </template>
     </main>
@@ -66,7 +75,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, onMounted } from "vue";
+import { computed, ref, watch, onMounted, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
 import AppHeader from "@/components/AppHeader.vue";
 import BottomNav from "@/components/BottomNav.vue";
@@ -89,8 +98,31 @@ const sportCode = computed(() => {
 const sportCodeRef = computed(() => sportCode.value);
 const { leagueGroups, loading, loadingMore, hasMore, init, loadMore } = useSportMatches(sportCodeRef);
 
-onMounted(() => init(sportCode.value));
-watch(sportCode, (code) => init(code));
+const sentinelEl = ref<HTMLElement | null>(null);
+let observer: IntersectionObserver | null = null;
+
+function setupObserver() {
+  if (observer) observer.disconnect();
+  observer = new IntersectionObserver(
+    (entries) => {
+      if (entries[0].isIntersecting && hasMore.value && !loadingMore.value) {
+        loadMore();
+      }
+    },
+    { rootMargin: '200px' }
+  );
+  if (sentinelEl.value) observer.observe(sentinelEl.value);
+}
+
+onMounted(() => {
+  init(sportCode.value);
+  setupObserver();
+});
+watch(sportCode, (code) => {
+  init(code);
+});
+watch(sentinelEl, () => setupObserver());
+onUnmounted(() => observer?.disconnect());
 
 const liveFiltered = computed(() =>
   store.liveMatches.filter((m) => {
@@ -128,40 +160,85 @@ const filteredGroups = computed(() => {
   font-size: 12px;
   font-weight: 400;
 }
+.scroll-sentinel {
+  height: 1px;
+  width: 100%;
+}
+
 .load-more-wrap {
   display: flex;
   justify-content: center;
-  padding: 16px;
+  padding: 20px 16px 28px;
 }
+
 .load-more-btn {
-  background: #c026d3;
+  position: relative;
+  background: linear-gradient(135deg, #c026d3, #a21caf);
   color: #fff;
   border: none;
-  border-radius: 8px;
-  padding: 10px 28px;
+  border-radius: 50px;
+  padding: 0;
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
+  min-width: 200px;
+  box-shadow: 0 4px 16px rgba(192, 38, 211, 0.35);
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+  overflow: hidden;
+}
+.load-more-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(192, 38, 211, 0.45);
+}
+.load-more-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(192, 38, 211, 0.3);
+}
+.load-more-btn:disabled {
+  cursor: default;
+  background: linear-gradient(135deg, #d580e0, #c059c9);
+  box-shadow: none;
+}
+.load-more-btn__inner {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  transition: opacity 0.15s;
+  padding: 13px 28px;
 }
-.load-more-btn:disabled { opacity: 0.65; cursor: default; }
-.spinner-sm {
-  width: 14px; height: 14px;
-  border: 2px solid rgba(255,255,255,0.4);
+
+.lm-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2.5px solid rgba(255, 255, 255, 0.35);
   border-top-color: #fff;
   border-radius: 50%;
-  animation: spin .7s linear infinite;
-  display: inline-block;
+  animation: lm-spin 0.7s linear infinite;
+  flex-shrink: 0;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes lm-spin { to { transform: rotate(360deg); } }
+
 .end-note {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   font-size: 12px;
   color: #9ca3af;
-  padding: 16px;
+  padding: 20px 16px 28px;
+}
+.end-note__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: #d1fae5;
+  color: #059669;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 900;
+  flex-shrink: 0;
 }
 .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 50px 20px; gap: 10px; }
 .spinner { width: 28px; height: 28px; border: 3px solid #e6e7eb; border-top-color: #c026d3; border-radius: 50%; animation: spin .7s linear infinite; }

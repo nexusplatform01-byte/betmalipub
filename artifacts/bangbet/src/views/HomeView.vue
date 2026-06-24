@@ -295,12 +295,18 @@
           </div>
           <!-- Infinite scroll sentinel + load-more row (both views) -->
           <div ref="topSentinel" class="top-sentinel"></div>
-          <div v-if="store.topLoadingMore" class="top-loading-more">
-            <span class="top-loading-more__spinner"></span> Loading more matches…
+          <div v-if="store.topLoadingMore || store.topMatchesHasMore" class="load-more-wrap">
+            <button class="load-more-btn" :disabled="store.topLoadingMore" @click="store.loadMoreTopMatches()">
+              <span v-if="store.topLoadingMore" class="load-more-btn__inner">
+                <span class="lm-spinner"></span>
+                <span>Loading matches…</span>
+              </span>
+              <span v-else class="load-more-btn__inner">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+                Load More Matches
+              </span>
+            </button>
           </div>
-          <button v-else-if="store.topMatchesHasMore" class="top-load-btn" @click="store.loadMoreTopMatches()">
-            Load more matches ↓
-          </button>
         </div>
 
         <div class="section">
@@ -1020,7 +1026,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import { useRouter } from 'vue-router';
 import AppHeader from "@/components/AppHeader.vue";
 import BottomNav from "@/components/BottomNav.vue";
@@ -1062,6 +1068,26 @@ watch(() => store.activeSport, (newSport) => {
 const showBetslip = ref(false);
 const stakeAmount = ref<number | string>(1000);
 const selectedMatch = ref<any | null>(null);
+
+const topSentinel = ref<HTMLElement | null>(null);
+let topObserver: IntersectionObserver | null = null;
+
+function setupTopObserver() {
+  if (topObserver) topObserver.disconnect();
+  topObserver = new IntersectionObserver(
+    (entries) => {
+      if (entries[0].isIntersecting && store.topMatchesHasMore && !store.topLoadingMore) {
+        store.loadMoreTopMatches();
+      }
+    },
+    { rootMargin: '300px' }
+  );
+  if (topSentinel.value) topObserver.observe(topSentinel.value);
+}
+
+onMounted(() => setupTopObserver());
+watch(topSentinel, () => setupTopObserver());
+onUnmounted(() => topObserver?.disconnect());
 
 function openMatch(match: any) {
   if (window.innerWidth >= 1024) {
@@ -2204,32 +2230,65 @@ const iceHockeyMatches = [
   color: #9599a4;
 }
 
+.top-sentinel { height: 1px; width: 100%; }
+
 .load-more-wrap {
   display: flex;
   justify-content: center;
-  padding: 16px 0 8px;
+  padding: 20px 0 12px;
 }
+
 .load-more-btn {
-  background: #1e1f28;
-  color: #c026d3;
-  border: 1.5px solid #c026d3;
-  border-radius: 8px;
-  padding: 10px 32px;
+  position: relative;
+  background: linear-gradient(135deg, #c026d3, #a21caf);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 0;
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  min-width: 200px;
+  box-shadow: 0 4px 16px rgba(192, 38, 211, 0.35);
+  transition: transform 0.15s, box-shadow 0.15s;
+  overflow: hidden;
 }
 .load-more-btn:hover:not(:disabled) {
-  background: #c026d3;
-  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(192, 38, 211, 0.45);
+}
+.load-more-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(192, 38, 211, 0.3);
 }
 .load-more-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  cursor: default;
+  background: linear-gradient(135deg, #d580e0, #c059c9);
+  box-shadow: none;
 }
+.load-more-btn__inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 28px;
+}
+.lm-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2.5px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: lm-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes lm-spin { to { transform: rotate(360deg); } }
 
 .end-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   text-align: center;
   padding: 12px;
   font-size: 12px;
