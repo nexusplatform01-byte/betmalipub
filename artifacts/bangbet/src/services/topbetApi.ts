@@ -198,6 +198,38 @@ async function fetchBanda(url: string): Promise<any[]> {
   return json.data || []
 }
 
+export interface BandaMarket {
+  market_name: string
+  market_id: number
+  specifier: string
+  status: number
+  status_name: string
+  outcomes: Array<{
+    alias: string
+    outcome_name: string
+    outcome_id: string
+    outcome_type_id: number
+    odds: number
+    active: number
+    probability: number
+  }>
+  handicap: boolean
+}
+
+export async function fetchBandaMatchDetail(matchId: string): Promise<BandaMarket[]> {
+  try {
+    const res = await fetch(`${BANDA_BASE}/match/${matchId}`, {
+      headers: { 'Accept': 'application/json' },
+    })
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    const json = await res.json()
+    return json.markets || []
+  } catch (e) {
+    console.error('[Bangbet] banda match detail error:', String(e))
+    return []
+  }
+}
+
 export async function fetchBoostedMatches(): Promise<Match[]> {
   try {
     const items = await fetchBanda(

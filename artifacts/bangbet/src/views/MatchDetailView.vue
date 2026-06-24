@@ -7,63 +7,64 @@
         <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
       </button>
       <div class="md-header__league">
-        <span>{{ match?.leagueName || 'Match Detail' }}</span>
+        <span>{{ storeMatch?.league || 'Match Detail' }}</span>
       </div>
-      <div v-if="match?.sport" class="md-header__sport">{{ match.sport }}</div>
+      <div v-if="storeMatch?.sport" class="md-header__sport">{{ storeMatch.sport }}</div>
     </div>
 
     <!-- Loading -->
     <div v-if="loading" class="md-loading">
       <div class="spinner"></div>
-      <p>Loading match…</p>
+      <p>Loading markets…</p>
     </div>
 
     <!-- Error -->
     <div v-else-if="error" class="md-error">
       <p>{{ error }}</p>
-      <button class="btn-retry" @click="loadMatch">Retry</button>
+      <button class="btn-retry" @click="loadMarkets">Retry</button>
     </div>
 
-    <template v-else-if="match">
+    <template v-else>
 
       <!-- Hero -->
       <div class="md-hero">
         <div class="md-hero__teams">
           <div class="md-hero__side">
-            <div class="md-hero__badge">{{ initials(match.home) }}</div>
-            <span class="md-hero__name">{{ match.home }}</span>
+            <div class="md-hero__badge">{{ initials(homeName) }}</div>
+            <span class="md-hero__name">{{ homeName }}</span>
           </div>
           <div class="md-hero__mid">
-            <template v-if="liveData">
-              <div class="md-hero__score">{{ liveData.homeScore }} – {{ liveData.awayScore }}</div>
+            <template v-if="storeMatch?.isLive">
+              <div class="md-hero__score">{{ storeMatch.homeScore ?? 0 }} – {{ storeMatch.awayScore ?? 0 }}</div>
               <div class="md-hero__live-badge">
-                <span class="dot red"></span>{{ liveData.minute }}'
+                <span class="dot red"></span>{{ storeMatch.minute ? storeMatch.minute + '\'' : 'Live' }}
               </div>
             </template>
             <template v-else>
               <span class="md-hero__vs">VS</span>
-              <span class="md-hero__time">{{ formattedTime }}</span>
+              <span class="md-hero__time">{{ storeMatch?.startTime || '' }}</span>
             </template>
           </div>
           <div class="md-hero__side">
-            <div class="md-hero__badge">{{ initials(match.away) }}</div>
-            <span class="md-hero__name">{{ match.away }}</span>
+            <div class="md-hero__badge">{{ initials(awayName) }}</div>
+            <span class="md-hero__name">{{ awayName }}</span>
           </div>
         </div>
 
-        <!-- 1X2 hero odds -->
-        <div class="md-hero__odds" v-if="home1x2">
-          <button class="md-hero__odd" :class="{ selected: isSelected('1') }" @click="placeBet(match.home, home1x2!, '1')">
-            <span class="md-hero__odd-label">1</span>
-            <span class="md-hero__odd-val">{{ home1x2 }}</span>
-          </button>
-          <button v-if="draw1x2" class="md-hero__odd" :class="{ selected: isSelected('X') }" @click="placeBet('Draw', draw1x2!, 'X')">
-            <span class="md-hero__odd-label">X</span>
-            <span class="md-hero__odd-val">{{ draw1x2 }}</span>
-          </button>
-          <button class="md-hero__odd" :class="{ selected: isSelected('2') }" @click="placeBet(match.away, away1x2!, '2')">
-            <span class="md-hero__odd-label">2</span>
-            <span class="md-hero__odd-val">{{ away1x2 }}</span>
+        <!-- 1X2 hero odds from markets -->
+        <div class="md-hero__odds" v-if="mainMarket">
+          <button
+            v-for="o in mainMarket.outcomes"
+            :key="o.alias"
+            class="md-hero__odd"
+            :class="{ selected: isSelected(`1X2-${o.alias}`), locked: o.active !== 1 || mainMarket.status !== 0 }"
+            @click="o.active === 1 && mainMarket.status === 0 && placeBet(o.alias, o.odds, `1X2-${o.alias}`)"
+          >
+            <span class="md-hero__odd-label">{{ o.alias }}</span>
+            <span class="md-hero__odd-val">
+              <span v-if="o.active !== 1 || mainMarket.status !== 0">🔒</span>
+              <span v-else>{{ o.odds }}</span>
+            </span>
           </button>
         </div>
       </div>
@@ -79,28 +80,43 @@
 
       <!-- MARKETS TAB -->
       <div v-if="activeTab === 'markets'" class="md-markets">
-        <div v-if="!marketGroups.length" class="md-empty">No markets available</div>
-        <div v-for="group in marketGroups" :key="group.id" class="md-group">
-          <div class="md-group__head" @click="group.open = !group.open">
-            <span class="md-group__title">{{ group.title }}</span>
-            <span class="md-group__meta">{{ group.markets.length }} market{{ group.markets.length !== 1 ? 's' : '' }}
-              <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" :style="{ transform: group.open ? 'rotate(180deg)' : 'none', transition: '.2s' }"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>
+        <div v-if="!markets.length" class="md-empty">No markets available for this match.</div>
+
+        <div v-for="(mkt, idx) in markets" :key="`${mkt.market_id}-${idx}`" class="md-group">
+          <!-- accordion header -->
+          <div class="md-group__head" @click="toggleGroup(`${mkt.market_id}-${idx}`)">
+            <div class="md-group__title-wrap">
+              <span class="md-group__title">{{ mkt.market_name }}</span>
+              <span v-if="mkt.status !== 0" class="md-group__suspended">Suspended</span>
+            </div>
+            <span class="md-group__meta">
+              {{ (mkt.outcomes || []).length }} outcome{{ (mkt.outcomes || []).length !== 1 ? 's' : '' }}
+              <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"
+                :style="{ transform: openGroups[`${mkt.market_id}-${idx}`] ? 'rotate(180deg)' : 'none', transition: '.2s' }">
+                <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/>
+              </svg>
             </span>
           </div>
-          <div v-if="group.open">
-            <div v-for="mkt in group.markets" :key="mkt.name" class="md-market">
-              <div class="md-market__name">{{ mkt.name }}</div>
-              <div class="md-market__odds" :class="mkt.outcomes.length === 2 ? 'two-col' : 'three-col'">
-                <button
-                  v-for="outcome in mkt.outcomes" :key="outcome.label"
-                  class="md-odd-btn"
-                  :class="{ selected: isSelected(`${mkt.name}-${outcome.label}`) }"
-                  @click="placeBet(outcome.label, outcome.odds, `${mkt.name}-${outcome.label}`)"
-                >
-                  <span class="md-odd-btn__label">{{ outcome.label }}</span>
-                  <span class="md-odd-btn__val">{{ outcome.odds }}</span>
-                </button>
-              </div>
+
+          <!-- outcomes -->
+          <div v-if="openGroups[`${mkt.market_id}-${idx}`] && (mkt.outcomes || []).length" class="md-market">
+            <div class="md-market__odds" :class="gridClass((mkt.outcomes || []).length)">
+              <button
+                v-for="o in (mkt.outcomes || [])"
+                :key="o.outcome_id"
+                class="md-odd-btn"
+                :class="{
+                  selected: isSelected(`${mkt.market_id}-${o.outcome_id}`),
+                  locked: o.active !== 1 || mkt.status !== 0,
+                }"
+                @click="o.active === 1 && mkt.status === 0 && placeBet(o.alias, o.odds, `${mkt.market_id}-${o.outcome_id}`)"
+              >
+                <span class="md-odd-btn__label">{{ o.alias }}</span>
+                <span class="md-odd-btn__val">
+                  <span v-if="o.active !== 1 || mkt.status !== 0" class="md-lock">🔒</span>
+                  <span v-else>{{ o.odds }}</span>
+                </span>
+              </button>
             </div>
           </div>
         </div>
@@ -108,43 +124,27 @@
 
       <!-- STATISTICS TAB -->
       <div v-if="activeTab === 'stats'" class="md-stats-tab">
-        <template v-if="liveData">
+        <template v-if="storeMatch?.isLive">
           <div class="md-stat-live-header">
-            <span class="live-dot-text"><span class="dot red"></span> LIVE {{ liveData.minute }}'</span>
-            <span>{{ match.home }} {{ liveData.homeScore }} – {{ liveData.awayScore }} {{ match.away }}</span>
-          </div>
-          <div class="md-stat-row" v-for="stat in liveStats" :key="stat.label">
-            <span class="md-stat-home">{{ stat.home }}</span>
-            <div class="md-stat-bar-wrap">
-              <div class="md-stat-bar">
-                <div class="md-stat-bar__fill md-stat-bar__fill--home" :style="{ width: stat.homePct + '%' }"></div>
-                <div class="md-stat-bar__fill md-stat-bar__fill--away" :style="{ width: stat.awayPct + '%', marginLeft: 'auto' }"></div>
-              </div>
-              <span class="md-stat-label">{{ stat.label }}</span>
-            </div>
-            <span class="md-stat-away">{{ stat.away }}</span>
+            <span class="live-dot-text"><span class="dot red"></span> LIVE {{ storeMatch.minute }}'</span>
+            <span>{{ homeName }} {{ storeMatch.homeScore }} – {{ storeMatch.awayScore }} {{ awayName }}</span>
           </div>
         </template>
         <template v-else>
           <div class="md-prematch-stats">
             <div class="prematch-block">
               <div class="prematch-icon">📅</div>
-              <div class="prematch-title">{{ match.home }} vs {{ match.away }}</div>
-              <div class="prematch-sub">{{ formattedTime }}</div>
+              <div class="prematch-title">{{ homeName }} vs {{ awayName }}</div>
+              <div class="prematch-sub">{{ storeMatch?.startTime || '' }}</div>
             </div>
-            <div class="prematch-odds-grid" v-if="home1x2">
+            <div class="prematch-odds-grid" v-if="mainMarket">
               <div class="prematch-odds-row">
-                <div class="prematch-odds-item">
-                  <span class="prematch-odds-label">1 — {{ match.home }}</span>
-                  <span class="prematch-odds-val">{{ home1x2 }}</span>
-                </div>
-                <div v-if="draw1x2" class="prematch-odds-item">
-                  <span class="prematch-odds-label">X — Draw</span>
-                  <span class="prematch-odds-val">{{ draw1x2 }}</span>
-                </div>
-                <div class="prematch-odds-item">
-                  <span class="prematch-odds-label">2 — {{ match.away }}</span>
-                  <span class="prematch-odds-val">{{ away1x2 }}</span>
+                <div v-for="o in mainMarket.outcomes" :key="o.alias" class="prematch-odds-item">
+                  <span class="prematch-odds-label">{{ o.alias }}</span>
+                  <span class="prematch-odds-val">
+                    <span v-if="o.active !== 1">🔒</span>
+                    <span v-else>{{ o.odds }}</span>
+                  </span>
                 </div>
               </div>
             </div>
@@ -187,36 +187,36 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import BottomNav from '@/components/BottomNav.vue'
-import {
-  fetchMatchDetail,
-  fetchLiveEvents,
-  parseMarketGroups,
-  formatKickOff,
-  type MarketGroup,
-} from '@/services/topbetApi'
+import { fetchBandaMatchDetail, type BandaMarket } from '@/services/topbetApi'
 
 const route = useRoute()
 const store = useAppStore()
 const showBetslip = ref(false)
 const activeTab = ref('markets')
 
-const match = ref<any>(null)
-const loading = ref(true)
-const error = ref<string | null>(null)
-const marketGroups = ref<MarketGroup[]>([])
-const liveData = ref<{ homeScore: number; awayScore: number; minute: number } | null>(null)
-
 const matchId = computed(() => route.params.id as string)
 
-const home1x2 = computed(() => match.value?.betMap?.['1']?.['NULL']?.ov ?? null)
-const draw1x2 = computed(() => match.value?.betMap?.['2']?.['NULL']?.ov ?? null)
-const away1x2 = computed(() => match.value?.betMap?.['3']?.['NULL']?.ov ?? null)
-const totalMarkets = computed(() => Object.keys(match.value?.betMap || {}).length)
-
-const formattedTime = computed(() => {
-  if (!match.value?.kickOffTime) return ''
-  return formatKickOff(match.value.kickOffTime)
+const storeMatch = computed(() => {
+  const id = matchId.value
+  return (
+    store.boostedMatches.find((m) => m.id === id) ||
+    store.liveMatches.find((m) => m.id === id) ||
+    (store as any).topMatches?.find((m: any) => m.id === id) ||
+    null
+  )
 })
+
+const homeName = computed(() => storeMatch.value?.homeTeam || 'Home')
+const awayName = computed(() => storeMatch.value?.awayTeam || 'Away')
+
+const markets = ref<BandaMarket[]>([])
+const loading = ref(true)
+const error = ref<string | null>(null)
+const openGroups = ref<Record<string, boolean>>({})
+
+const mainMarket = computed(() => markets.value.find((m) => m.market_id === 2) || markets.value[0] || null)
+
+const totalMarkets = computed(() => markets.value.length)
 
 const tabs = computed(() => [
   { id: 'markets', label: 'Markets', icon: '📋', count: totalMarkets.value || null },
@@ -224,84 +224,54 @@ const tabs = computed(() => [
   { id: 'aichat',  label: 'AI Chat', icon: '🤖', count: null },
 ])
 
-const liveStats = computed(() => {
-  if (!liveData.value) return []
-  const { homeScore, awayScore } = liveData.value
-  const total = homeScore + awayScore || 1
-  return [
-    {
-      label: 'Goals',
-      home: String(homeScore),
-      away: String(awayScore),
-      homePct: Math.round((homeScore / total) * 100),
-      awayPct: Math.round((awayScore / total) * 100),
-    },
-  ]
-})
-
-function initials(name: string): string {
-  return name
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((w) => w[0]?.toUpperCase() || '')
-    .join('')
+function gridClass(count: number): string {
+  if (count <= 2) return 'two-col'
+  if (count === 3) return 'three-col'
+  if (count === 4) return 'four-col'
+  return 'multi-col'
 }
 
-async function loadMatch() {
+function toggleGroup(key: string) {
+  openGroups.value[key] = !openGroups.value[key]
+}
+
+function initials(name: string): string {
+  return name.split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() || '').join('')
+}
+
+async function loadMarkets() {
   loading.value = true
   error.value = null
   try {
-    const data = await fetchMatchDetail(matchId.value)
-    if (data?.status === 404 || data?.error) {
-      error.value = 'Match not found'
-      return
-    }
-    match.value = data
-    marketGroups.value = parseMarketGroups(
-      data.betMap || {},
-      data.home || '',
-      data.away || '',
-    )
-  } catch (e) {
-    error.value = 'Failed to load match data'
-    console.error('[MatchDetailView] load error:', e)
+    markets.value = await fetchBandaMatchDetail(matchId.value)
+    markets.value.slice(0, 3).forEach((m, i) => {
+      openGroups.value[`${m.market_id}-${i}`] = true
+    })
+  } catch {
+    error.value = 'Failed to load markets. Please try again.'
   } finally {
     loading.value = false
   }
 }
 
-async function checkLive() {
-  try {
-    const { matches } = await fetchLiveEvents()
-    const m = matches.find((x) => x.id === matchId.value)
-    if (m) {
-      liveData.value = {
-        homeScore: m.homeScore ?? 0,
-        awayScore: m.awayScore ?? 0,
-        minute: m.minute ?? 0,
-      }
-    }
-  } catch (_) {}
-}
-
-onMounted(async () => {
-  await Promise.all([loadMatch(), checkLive()])
-})
-
 function isSelected(key: string) {
   return store.betslip.some((b) => b.matchId === `${matchId.value}-${key}`)
 }
 
-function placeBet(team: string, odds: number, key: string) {
-  if (!odds) return
+function placeBet(label: string, odds: number, key: string) {
+  if (!odds || odds <= 0) return
   store.addToBetslip({
     matchId: `${matchId.value}-${key}`,
     baseMatchId: matchId.value,
-    team,
+    team: label,
     odds,
     market: key,
   })
 }
+
+onMounted(() => {
+  loadMarkets()
+})
 </script>
 
 <style scoped>
@@ -316,9 +286,7 @@ function placeBet(team: string, odds: number, key: string) {
 
 /* header */
 .md-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  display: flex; align-items: center; gap: 10px;
   padding: 10px 14px;
   background: linear-gradient(135deg, #c026d3, #a21caf);
   color: #fff;
@@ -360,6 +328,7 @@ function placeBet(team: string, odds: number, key: string) {
 .md-hero__odds { display: flex; gap: 8px; }
 .md-hero__odd { flex: 1; background: rgba(192,38,211,.28); border: 1.5px solid rgba(217,70,239,.55); border-radius: 8px; display: flex; flex-direction: column; align-items: center; padding: 6px 4px; cursor: pointer; color: #fff; transition: background .15s, border-color .15s; }
 .md-hero__odd.selected { background: rgba(192,38,211,.7); border-color: #e879f9; }
+.md-hero__odd.locked { opacity: .55; cursor: not-allowed; }
 .md-hero__odd-label { font-size: 10px; font-weight: 600; opacity: .8; }
 .md-hero__odd-val { font-size: 15px; font-weight: 800; }
 
@@ -373,36 +342,41 @@ function placeBet(team: string, odds: number, key: string) {
 /* markets */
 .md-markets { padding: 0; box-sizing: border-box; width: 100%; }
 .md-empty { text-align: center; padding: 40px; color: #9ca3af; font-size: 13px; }
-.md-group { background: #fff; overflow: hidden; margin-bottom: 6px; border-top: 1px solid #e6e7eb; border-bottom: 1px solid #e6e7eb; width: 100%; box-sizing: border-box; }
-.md-group__head { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
+
+.md-group { background: #fff; overflow: hidden; margin-bottom: 4px; border-top: 1px solid #e6e7eb; border-bottom: 1px solid #e6e7eb; width: 100%; box-sizing: border-box; }
+.md-group__head { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; cursor: pointer; user-select: none; }
+.md-group__head:hover { background: #fafbfd; }
+.md-group__title-wrap { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .md-group__title { font-size: 13px; font-weight: 700; color: #292a33; }
-.md-group__meta { display: flex; align-items: center; gap: 3px; font-size: 11px; color: #6a6f7a; }
-.md-market { padding: 10px 12px 12px; border-bottom: 1px solid #f4f4f6; box-sizing: border-box; width: 100%; }
-.md-market:last-child { border-bottom: none; }
-.md-market__name { font-size: 11px; font-weight: 600; color: #6a6f7a; margin-bottom: 7px; }
+.md-group__suspended { font-size: 9px; font-weight: 800; background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; border-radius: 4px; padding: 1px 5px; letter-spacing: .4px; flex-shrink: 0; }
+.md-group__meta { display: flex; align-items: center; gap: 3px; font-size: 11px; color: #6a6f7a; flex-shrink: 0; }
+
+.md-market { padding: 10px 12px 14px; box-sizing: border-box; width: 100%; border-top: 1px solid #f4f4f6; }
 .md-market__odds { display: grid; gap: 6px; width: 100%; box-sizing: border-box; }
 .md-market__odds.two-col   { grid-template-columns: 1fr 1fr; }
 .md-market__odds.three-col { grid-template-columns: 1fr 1fr 1fr; }
-.md-odd-btn { display: flex; flex-direction: column; align-items: center; padding: 8px 4px; background: #f2f3f5; border: 1.5px solid #e6e7eb; border-radius: 8px; cursor: pointer; transition: background .15s, border-color .15s; position: relative; }
+.md-market__odds.four-col  { grid-template-columns: 1fr 1fr 1fr 1fr; }
+.md-market__odds.multi-col { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+
+.md-odd-btn {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 8px 6px; min-height: 46px;
+  background: #f2f3f5; border: 1.5px solid #e6e7eb; border-radius: 8px;
+  cursor: pointer; transition: background .15s, border-color .15s;
+  position: relative; width: 100%;
+}
 .md-odd-btn.selected { background: rgba(192,38,211,.08); border-color: #c026d3; }
-.md-odd-btn__label { font-size: 10px; color: #6a6f7a; font-weight: 500; }
+.md-odd-btn.selected::after { content: '✓'; position: absolute; top: 3px; right: 5px; font-size: 8px; font-weight: 900; color: #c026d3; }
+.md-odd-btn.locked { opacity: .5; cursor: not-allowed; background: #f8f8f9; }
+.md-odd-btn__label { font-size: 10px; color: #6a6f7a; font-weight: 500; text-align: center; line-height: 1.2; margin-bottom: 2px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .md-odd-btn__val { font-size: 14px; font-weight: 800; color: #292a33; }
 .md-odd-btn.selected .md-odd-btn__val { color: #c026d3; }
-.md-odd-btn.selected::after { content: '✓'; position: absolute; top: 2px; right: 4px; font-size: 8px; font-weight: 900; color: #c026d3; line-height: 1; }
+.md-lock { font-size: 14px; line-height: 1; }
 
 /* statistics tab */
 .md-stats-tab { padding: 12px 14px; }
 .md-stat-live-header { background: #1e293b; color: #fff; border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 600; margin-bottom: 12px; }
 .live-dot-text { display: flex; align-items: center; gap: 5px; color: #f87171; }
-.md-stat-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
-.md-stat-home, .md-stat-away { font-size: 12px; font-weight: 700; color: #292a33; min-width: 32px; }
-.md-stat-away { text-align: right; }
-.md-stat-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
-.md-stat-bar { width: 100%; height: 5px; background: #e6e7eb; border-radius: 3px; display: flex; overflow: hidden; }
-.md-stat-bar__fill { height: 100%; border-radius: 3px; transition: width .5s; }
-.md-stat-bar__fill--home { background: #c026d3; }
-.md-stat-bar__fill--away { background: #16a34a; }
-.md-stat-label { font-size: 10px; color: #6a6f7a; font-weight: 500; }
 
 /* pre-match stats */
 .md-prematch-stats { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 20px 0; }
@@ -421,4 +395,11 @@ function placeBet(team: string, odds: number, key: string) {
 .md-aichat { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; color: #6a6f7a; gap: 10px; }
 .md-aichat__icon { font-size: 48px; }
 .md-aichat p { font-size: 14px; }
+
+/* modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 200; display: flex; align-items: flex-end; justify-content: center; }
+.modal { background: #fff; width: 100%; max-width: 480px; border-radius: 16px 16px 0 0; padding: 20px 16px; max-height: 70vh; overflow-y: auto; }
+.modal__close { position: absolute; top: 14px; right: 16px; background: none; border: none; font-size: 18px; cursor: pointer; color: #6a6f7a; }
+.modal__title { font-size: 16px; font-weight: 800; color: #292a33; margin-bottom: 12px; }
+.btn-full { width: 100%; padding: 13px; background: linear-gradient(135deg, #c026d3, #a21caf); color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: 800; cursor: pointer; }
 </style>
