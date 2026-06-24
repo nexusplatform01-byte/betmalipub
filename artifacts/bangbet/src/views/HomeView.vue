@@ -517,7 +517,7 @@
 
         <!-- Promotions widget -->
         <div class="dt-promo">
-          <div class="dt-promo__head">🎁 Promotions</div>
+          <div class="dt-promo__head"><img src="/promo-gift.png" alt="" class="sidebar-head-icon" /> Promotions</div>
           <div class="dt-promo__item" v-for="p in promos" :key="p.title">
             <span class="dt-promo__icon"><img src="/promo-gift.png" alt="promo" class="dt-promo__gift-img" /></span>
             <div>
@@ -530,7 +530,7 @@
         <!-- Live scores widget -->
         <div class="dt-livescores">
           <div class="dt-livescores__head">
-            <span class="live-dot"></span> Live Scores
+            <img src="/live-icon.png" alt="" class="sidebar-head-icon" /> Live Scores
           </div>
           <div v-for="m in store.liveMatches" :key="m.id" class="dt-livescores__row" @click="openMatch(m)">
             <div class="dt-livescores__teams">
@@ -547,7 +547,7 @@
 
         <!-- Today's Tips widget -->
         <div class="dt-tips">
-          <div class="dt-tips__head">🎯 Today's Tips</div>
+          <div class="dt-tips__head"><img src="/tips-icon.png" alt="" class="sidebar-head-icon" /> Today's Tips</div>
           <div v-for="t in todaysTips" :key="t.match" class="dt-tips__item">
             <div class="dt-tips__match">{{ t.match }}</div>
             <div class="dt-tips__row">
@@ -566,7 +566,7 @@
 
         <!-- Recent Results widget -->
         <div class="dt-results">
-          <div class="dt-results__head">📋 Recent Results</div>
+          <div class="dt-results__head"><img src="/results-icon.png" alt="" class="sidebar-head-icon" /> Recent Results</div>
           <div v-for="r in recentResults" :key="r.home + r.away" class="dt-results__item">
             <div class="dt-results__teams">
               <span>{{ r.home }}</span>
@@ -1513,10 +1513,15 @@ const iceHockeyMatches = [
     box-shadow: 0 1px 6px rgba(0,0,0,.06);
     flex-shrink: 0;
   }
+  .sidebar-head-icon {
+    width: 22px; height: 22px; object-fit: contain;
+    display: inline-block; vertical-align: middle; margin-right: 4px; flex-shrink: 0;
+  }
   .dt-promo__head {
     font-size: 11px; font-weight: 800; color: #292a33;
     padding: 10px 14px; border-bottom: 1px solid #f0f0f4;
     text-transform: uppercase; letter-spacing: .5px;
+    display: flex; align-items: center;
   }
   .dt-promo__item {
     display: flex; align-items: flex-start; gap: 10px;
@@ -1616,6 +1621,7 @@ const iceHockeyMatches = [
     font-size: 11px; font-weight: 800; color: #292a33;
     padding: 10px 14px; border-bottom: 1px solid #f0f0f4;
     text-transform: uppercase; letter-spacing: .5px;
+    display: flex; align-items: center;
   }
   .dt-tips__item {
     padding: 9px 14px; border-bottom: 1px solid #f5f6f9;
@@ -1650,6 +1656,7 @@ const iceHockeyMatches = [
     font-size: 11px; font-weight: 800; color: #292a33;
     padding: 10px 14px; border-bottom: 1px solid #f0f0f4;
     text-transform: uppercase; letter-spacing: .5px;
+    display: flex; align-items: center;
   }
   .dt-results__item {
     padding: 7px 14px; border-bottom: 1px solid #f5f6f9;
