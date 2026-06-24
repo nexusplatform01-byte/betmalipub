@@ -21,10 +21,9 @@
       </div>
 
       <!-- Loading skeleton -->
-      <div v-if="loading" class="empty-state">
-        <div class="spinner"></div>
-        <p>Loading {{ sportName }} matches…</p>
-      </div>
+      <template v-if="loading">
+        <MatchCardSkeleton v-for="n in 5" :key="n" />
+      </template>
 
       <!-- Upcoming by League (paginated) -->
       <template v-else>
@@ -81,6 +80,7 @@ import AppHeader from "@/components/AppHeader.vue";
 import BottomNav from "@/components/BottomNav.vue";
 import SportMenu from "@/components/SportMenu.vue";
 import MatchCard from "@/components/MatchCard.vue";
+import MatchCardSkeleton from "@/components/MatchCardSkeleton.vue";
 import { useAppStore } from "@/stores/app";
 import { SPORT_CODE_MAP } from "@/services/topbetApi";
 import { useSportMatches } from "@/composables/useSportMatches";

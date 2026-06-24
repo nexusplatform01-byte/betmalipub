@@ -1039,6 +1039,7 @@ import MatchDetailPanel from "@/components/MatchDetailPanel.vue";
 import { useAppStore } from "@/stores/app";
 import { useHomeMatches, leagueFlag } from "@/composables/useHomeMatches";
 import { useSportMatches } from "@/composables/useSportMatches";
+import { useBandaMatches } from "@/composables/useBandaMatches";
 import { SPORT_CODE_MAP } from "@/services/topbetApi";
 
 const router = useRouter();

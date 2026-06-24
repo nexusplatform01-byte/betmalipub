@@ -402,6 +402,19 @@ html, body {
   border-bottom: 1px solid #f0f1f3;
 }
 
+/* ── Loading Skeleton ── */
+@keyframes sk-shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+.sk-bar, .sk-btn {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: sk-shimmer 1.4s ease-in-out infinite;
+  border-radius: 4px;
+  display: inline-block;
+}
+
 .match-card__league-icon { width: 18px; height: 18px; object-fit: cover; opacity: 1; border-radius: 3px; overflow: hidden; }
 .match-card__league { font-size: 11px; color: var(--text-light); flex: 1; }
 

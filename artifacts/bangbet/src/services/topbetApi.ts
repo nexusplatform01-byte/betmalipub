@@ -248,6 +248,29 @@ export async function fetchHighlightMatches(page = 1, perPage = 50): Promise<Hig
   }
 }
 
+const BANDA_SPORT_ID_CODE: Record<number, string> = { 1: 'S', 2: 'B', 5: 'T', 107: 'E' }
+
+export async function fetchHighlightsBySport(sportId: number, page = 1, perPage = 20, boosted = 0): Promise<HighlightPage> {
+  const url = `${BANDA_BASE}/highlights/${sportId}?page=${page}&per_page=${perPage}&boosted=${boosted}&highlight_market_id=0&tournament_id=0&category_id=0&upcoming=0&today=0&match_live_status=0`
+  const res = await fetch(url, { headers: { 'Accept': 'application/json' } })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  const json = await res.json()
+  const sc = BANDA_SPORT_ID_CODE[sportId] || 'S'
+  const sportName = SPORT_NAME_MAP[sc] || 'Football'
+  return {
+    data: (json.data || []).map((item: any) => ({
+      ...mapBandaItem(item),
+      sport: sportName,
+      sportCode: sc,
+      leagueLogo: (item.tournament || '').toLowerCase().includes('world cup')
+        ? '/static/img/wc2026.png'
+        : SPORT_ICON(sc),
+    })),
+    total: json.total || 0,
+    lastPage: json.last_page || 1,
+  }
+}
+
 export async function fetchBoostedMatches(): Promise<Match[]> {
   try {
     const items = await fetchBanda(
