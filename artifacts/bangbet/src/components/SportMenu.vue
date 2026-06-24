@@ -24,17 +24,7 @@ import { useRouter } from "vue-router";
 const store = useAppStore();
 const router = useRouter();
 
-const FILTER_SPORTS = new Set([
-  "Football", "World Cup", "Basketball", "Tennis", "Table Tennis",
-  "Ice Hockey", "Volleyball", "Handball", "Rugby", "Baseball",
-  "Am.Football", "Darts", "Cricket",
-]);
-
 function select(item: { name: string; route: string }) {
-  if (FILTER_SPORTS.has(item.name)) {
-    store.activeSport = item.name;
-  } else {
-    router.push(item.route);
-  }
+  store.activeSport = item.name;
 }
 </script>

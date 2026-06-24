@@ -7,10 +7,10 @@
       <button
         v-for="tab in desktopNavTabs" :key="tab.label"
         class="dt-topnav__tab"
-        :class="{ active: tab.label === 'Sportsbook' }"
+        :class="{ active: tab.active }"
         @click="tab.route && $router.push(tab.route)"
       >
-        <span>{{ tab.icon }}</span> {{ tab.label }}
+        <span class="dt-topnav__tab-icon" v-html="tab.icon"></span> {{ tab.label }}
         <span v-if="tab.badge" class="dt-topnav__badge">{{ tab.badge }}</span>
       </button>
     </nav>
@@ -26,12 +26,15 @@
         </div>
 
         <div class="dt-sidebar__section">
-          <div class="dt-sidebar__head">🏅 Sports</div>
+          <div class="dt-sidebar__head">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="15" r="6"/><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/></svg>
+            Sports
+          </div>
           <button
             v-for="s in sidebarSports" :key="s.name"
             class="dt-sidebar__item"
-            :class="{ active: s.name === store.activeSport }"
-            @click="store.activeSport = s.name"
+            :class="{ active: s.name === store.activeSport && !activeLeague }"
+            @click="selectSport(s.name)"
           >
             <img :src="s.icon" class="dt-sidebar__item-icon" onerror="this.style.display='none'" />
             <span class="dt-sidebar__item-name">{{ s.name }}</span>
@@ -40,69 +43,87 @@
         </div>
 
         <div class="dt-sidebar__section">
-          <div class="dt-sidebar__head">🌍 Top Leagues</div>
-          <RouterLink
+          <div class="dt-sidebar__head">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            Top Leagues
+          </div>
+          <button
             v-for="l in topLeagues"
             :key="l.name"
-            :to="`/sports/Football?league=${encodeURIComponent(l.name)}`"
-            class="dt-sidebar__item dt-sidebar__item--link"
+            class="dt-sidebar__item"
+            :class="{ active: activeLeague === l.name }"
+            @click="selectLeague(l.name)"
           >
-            <span class="dt-sidebar__league-flag">{{ l.flag }}</span>
+            <span class="dt-sidebar__league-dot"></span>
             <span class="dt-sidebar__item-name">{{ l.name }}</span>
             <span v-if="l.live" class="dt-sidebar__live-chip">LIVE</span>
-          </RouterLink>
+          </button>
         </div>
 
         <div class="dt-sidebar__section">
-          <div class="dt-sidebar__head">🔥 More Sports</div>
-          <RouterLink
+          <div class="dt-sidebar__head">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+            More Sports
+          </div>
+          <button
             v-for="s in moreSports"
             :key="s.name"
-            :to="`/sports/${encodeURIComponent(s.name)}`"
-            class="dt-sidebar__item dt-sidebar__item--link"
+            class="dt-sidebar__item"
+            :class="{ active: s.name === store.activeSport && !activeLeague }"
+            @click="selectSport(s.name)"
           >
-            <span class="dt-sidebar__league-flag">{{ s.icon }}</span>
+            <img :src="s.icon" class="dt-sidebar__item-icon" onerror="this.style.display='none'" />
             <span class="dt-sidebar__item-name">{{ s.name }}</span>
             <span class="dt-sidebar__item-count">{{ s.count }}</span>
-          </RouterLink>
+          </button>
         </div>
 
         <div class="dt-sidebar__section">
-          <div class="dt-sidebar__head">🏟 Competitions</div>
-          <RouterLink
+          <div class="dt-sidebar__head">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Competitions
+          </div>
+          <button
             v-for="c in popularComps"
             :key="c.name"
-            :to="`/sports/Football?league=${encodeURIComponent(c.name)}`"
-            class="dt-sidebar__item dt-sidebar__item--link"
+            class="dt-sidebar__item"
+            :class="{ active: activeLeague === c.name }"
+            @click="selectLeague(c.name)"
           >
-            <span class="dt-sidebar__league-flag">{{ c.flag }}</span>
+            <span class="dt-sidebar__league-dot"></span>
             <span class="dt-sidebar__item-name">{{ c.name }}</span>
             <span v-if="c.live" class="dt-sidebar__live-chip">LIVE</span>
-          </RouterLink>
+          </button>
         </div>
 
         <div class="dt-sidebar__section">
-          <div class="dt-sidebar__head">⚡ Quick Links</div>
+          <div class="dt-sidebar__head">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Quick Links
+          </div>
           <RouterLink to="/casino" class="dt-sidebar__item dt-sidebar__item--link">
-            <span class="dt-sidebar__league-flag">🎰</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="8" cy="8" r="1.5" fill="currentColor" stroke="none"/><circle cx="16" cy="8" r="1.5" fill="currentColor" stroke="none"/><circle cx="8" cy="16" r="1.5" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>
             <span class="dt-sidebar__item-name">Casino Games</span>
           </RouterLink>
           <RouterLink to="/jackpot" class="dt-sidebar__item dt-sidebar__item--link">
-            <span class="dt-sidebar__league-flag">🏆</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
             <span class="dt-sidebar__item-name">Jackpot</span>
           </RouterLink>
           <RouterLink to="/virtuals" class="dt-sidebar__item dt-sidebar__item--link">
-            <span class="dt-sidebar__league-flag">🎮</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="15" y1="13" x2="15.01" y2="13"/><line x1="18" y1="11" x2="18.01" y2="11"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/></svg>
             <span class="dt-sidebar__item-name">Virtual Sports</span>
           </RouterLink>
           <RouterLink to="/promotions" class="dt-sidebar__item dt-sidebar__item--link">
-            <span class="dt-sidebar__league-flag">🎁</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
             <span class="dt-sidebar__item-name">Promotions</span>
           </RouterLink>
         </div>
 
         <div class="dt-sidebar__resp">
-          <div class="dt-sidebar__resp-title">🛡 Responsible Gaming</div>
+          <div class="dt-sidebar__resp-title">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Responsible Gaming
+          </div>
           <p class="dt-sidebar__resp-text">Bet within your limits. 18+ only.</p>
           <div class="dt-sidebar__resp-logos">
             <span class="dt-sidebar__resp-badge">18+</span>
@@ -210,7 +231,7 @@
                 <!-- 1 -->
                 <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'1'), 'dtmt__odd-btn--na': !match.markets.home || match.markets.home <= 0 }" @click.stop="match.markets.home > 0 && addOdd(match,'1',match.markets.home)">
                   <span class="dtmt__odd-inner">
-                    <span v-if="!match.markets.home || match.markets.home <= 0" class="dtmt__lock">🔒</span>
+                    <svg v-if="!match.markets.home || match.markets.home <= 0" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                     <template v-else>
                       <img v-if="match.markets.home > 0 && match.markets.home >= (match.markets.draw || 0) && match.markets.home >= (match.markets.away || 0)" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
                       {{ fmtOdd(match.markets.home) }}
@@ -220,7 +241,7 @@
                 <!-- X -->
                 <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'X'), 'dtmt__odd-btn--na': !match.markets.draw || match.markets.draw <= 0 }" @click.stop="match.markets.draw && match.markets.draw > 0 && addOdd(match,'X',match.markets.draw)">
                   <span class="dtmt__odd-inner">
-                    <span v-if="!match.markets.draw || match.markets.draw <= 0" class="dtmt__lock">🔒</span>
+                    <svg v-if="!match.markets.draw || match.markets.draw <= 0" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                     <template v-else>
                       <img v-if="match.markets.draw > 0 && match.markets.draw > match.markets.home && match.markets.draw >= (match.markets.away || 0)" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
                       {{ fmtOdd(match.markets.draw) }}
@@ -230,7 +251,7 @@
                 <!-- 2 -->
                 <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'2'), 'dtmt__odd-btn--na': !match.markets.away || match.markets.away <= 0 }" @click.stop="match.markets.away > 0 && addOdd(match,'2',match.markets.away)">
                   <span class="dtmt__odd-inner">
-                    <span v-if="!match.markets.away || match.markets.away <= 0" class="dtmt__lock">🔒</span>
+                    <svg v-if="!match.markets.away || match.markets.away <= 0" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                     <template v-else>
                       <img v-if="match.markets.away > 0 && match.markets.away > match.markets.home && match.markets.away > (match.markets.draw || 0)" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
                       {{ fmtOdd(match.markets.away) }}
@@ -239,17 +260,17 @@
                 </button>
                 <!-- 1X -->
                 <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'1X'), 'dtmt__odd-btn--na': dc(match.markets.home,match.markets.draw)==='-' }" @click.stop="dc(match.markets.home,match.markets.draw)!=='-' && addOdd(match,'1X',dc(match.markets.home,match.markets.draw))">
-                  <span v-if="dc(match.markets.home,match.markets.draw)==='-'" class="dtmt__lock">🔒</span>
+                  <svg v-if="dc(match.markets.home,match.markets.draw)==='-'" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                   <span v-else>{{ dc(match.markets.home,match.markets.draw) }}</span>
                 </button>
                 <!-- X2 -->
                 <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'X2'), 'dtmt__odd-btn--na': dc(match.markets.draw,match.markets.away)==='-' }" @click.stop="dc(match.markets.draw,match.markets.away)!=='-' && addOdd(match,'X2',dc(match.markets.draw,match.markets.away))">
-                  <span v-if="dc(match.markets.draw,match.markets.away)==='-'" class="dtmt__lock">🔒</span>
+                  <svg v-if="dc(match.markets.draw,match.markets.away)==='-'" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                   <span v-else>{{ dc(match.markets.draw,match.markets.away) }}</span>
                 </button>
                 <!-- 12 -->
                 <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'12'), 'dtmt__odd-btn--na': dc(match.markets.home,match.markets.away)==='-' }" @click.stop="dc(match.markets.home,match.markets.away)!=='-' && addOdd(match,'12',dc(match.markets.home,match.markets.away))">
-                  <span v-if="dc(match.markets.home,match.markets.away)==='-'" class="dtmt__lock">🔒</span>
+                  <svg v-if="dc(match.markets.home,match.markets.away)==='-'" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                   <span v-else>{{ dc(match.markets.home,match.markets.away) }}</span>
                 </button>
               </div>
@@ -257,9 +278,21 @@
           </template>
         </div>
 
+        <!-- League filter banner -->
+        <div v-if="activeLeague" class="dt-league-filter-bar">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span>{{ activeLeague }}</span>
+          <button class="dt-league-filter-bar__clear" @click="activeLeague = ''">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+
         <div class="section">
           <div class="section-header">
-            <div class="section-title">⭐ Top Matches</div>
+            <div class="section-title">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              Top Matches
+            </div>
             <RouterLink to="/sports/Football" class="section-more mob-only">See All ›</RouterLink>
           </div>
           <!-- Mobile: card grid -->
@@ -328,7 +361,10 @@
 
         <div class="section">
           <div class="section-header">
-            <div class="section-title">🏆 Sports Jackpot</div>
+            <div class="section-title">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#c026d3" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
+              Sports Jackpot
+            </div>
             <RouterLink to="/jackpot" class="section-more">Play ›</RouterLink>
           </div>
           <div style="margin:0 10px 8px;border-radius:8px;overflow:hidden;cursor:pointer" @click="$router.push('/jackpot')">
@@ -424,7 +460,7 @@
             </div>
             <div v-else-if="sportLeagueGroups.length > 0" class="end-note">All {{ store.activeSport }} matches loaded</div>
             <div v-else-if="!sportLoading && !store.liveMatches.filter(m => m.sportCode === activeSportCode).length" class="sport-empty">
-              <div style="font-size:28px;margin-bottom:8px;">🔍</div>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:8px;opacity:0.4"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               <div style="font-weight:700;color:#292a33;margin-bottom:4px;">No {{ store.activeSport }} matches right now</div>
               <div style="font-size:12px;color:#9599a4;">Check back soon for upcoming fixtures</div>
             </div>
@@ -440,7 +476,10 @@
         <!-- Betslip widget -->
         <div class="dt-bs">
           <div class="dt-bs__header">
-            <button class="dt-bs__tab" :class="{ active: betslipTab === 'slip' }" @click="betslipTab = 'slip'">🎟 Bet Slip</button>
+            <button class="dt-bs__tab" :class="{ active: betslipTab === 'slip' }" @click="betslipTab = 'slip'">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:3px"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/></svg>
+              Bet Slip
+            </button>
             <button class="dt-bs__tab" :class="{ active: betslipTab === 'mybets' }" @click="betslipTab = 'mybets'">My Bets <span v-if="store.myBets.length" class="dt-bs__mybets-count">{{ store.myBets.length }}</span></button>
           </div>
 
@@ -467,7 +506,10 @@
               <!-- Bet Bonus Banner -->
               <div class="dt-bs__bonus">
                 <div class="dt-bs__bonus-header">
-                  <span class="dt-bs__bonus-title">🎁 Bet Bonus</span>
+                  <span class="dt-bs__bonus-title">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:3px"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+                    Bet Bonus
+                  </span>
                   <span class="dt-bs__bonus-max">Up to 500%</span>
                 </div>
                 <div class="dt-bs__bonus-bar-wrap">
@@ -535,7 +577,7 @@
         <div class="dt-promo">
           <div class="dt-promo__head"><img src="/promo-gift.png" alt="" class="sidebar-head-icon" /> Promotions</div>
           <div class="dt-promo__item" v-for="p in promos" :key="p.title">
-            <span class="dt-promo__icon"><img src="/promo-gift.png" alt="promo" class="dt-promo__gift-img" /></span>
+            <span class="dt-promo__icon" v-html="p.icon"></span>
             <div>
               <div class="dt-promo__title">{{ p.title }}</div>
               <div class="dt-promo__sub">{{ p.sub }}</div>
@@ -595,21 +637,27 @@
 
         <!-- Casino Highlights widget -->
         <div class="dt-casino-widget">
-          <div class="dt-casino-widget__head">🎰 Casino Highlights</div>
+          <div class="dt-casino-widget__head">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="8" cy="8" r="1.5" fill="currentColor" stroke="none"/><circle cx="16" cy="8" r="1.5" fill="currentColor" stroke="none"/><circle cx="8" cy="16" r="1.5" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>
+            Casino Highlights
+          </div>
           <div v-for="g in casinoHighlights" :key="g.name" class="dt-casino-widget__item" @click="$router.push('/casino')">
-            <span class="dt-casino-widget__emoji">{{ g.emoji }}</span>
+            <span class="dt-casino-widget__icon-wrap" v-html="g.icon"></span>
             <div class="dt-casino-widget__info">
               <div class="dt-casino-widget__name">{{ g.name }}</div>
               <div class="dt-casino-widget__players">{{ g.players }} playing now</div>
             </div>
-            <span class="dt-casino-widget__hot" v-if="g.hot">🔥</span>
+            <svg v-if="g.hot" width="13" height="13" viewBox="0 0 24 24" fill="#ef4444" stroke="none"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
           </div>
           <button class="dt-casino-widget__cta" @click="$router.push('/casino')">Play Casino →</button>
         </div>
 
         <!-- Jackpot countdown widget -->
         <div class="dt-jackpot-widget">
-          <div class="dt-jackpot-widget__head">🏆 Next Jackpot Draw</div>
+          <div class="dt-jackpot-widget__head">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
+            Next Jackpot Draw
+          </div>
           <div class="dt-jackpot-widget__prize">UGX 856,241,380</div>
           <div class="dt-jackpot-widget__label">Gold Jackpot Pool</div>
           <div class="dt-jackpot-widget__timer">
@@ -624,7 +672,9 @@
 
         <!-- App Download Banner -->
         <div class="dt-app-banner">
-          <div class="dt-app-banner__icon">📱</div>
+          <div class="dt-app-banner__icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-width="3"/></svg>
+          </div>
           <div class="dt-app-banner__text">
             <div class="dt-app-banner__title">Get the Bangbet App</div>
             <div class="dt-app-banner__sub">Bet anytime, anywhere</div>
@@ -702,11 +752,11 @@
       <div class="sff__partners">
         <span class="sff__partner-label">Payment Methods</span>
         <div class="sff__partner-chips">
-          <span class="sff__chip">📱 MTN Mobile Money</span>
-          <span class="sff__chip">📱 Airtel Money</span>
-          <span class="sff__chip">💳 Visa</span>
-          <span class="sff__chip">💳 Mastercard</span>
-          <span class="sff__chip">🏦 Bank Transfer</span>
+          <span class="sff__chip"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-width="3"/></svg> MTN Mobile Money</span>
+          <span class="sff__chip"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-width="3"/></svg> Airtel Money</span>
+          <span class="sff__chip"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Visa</span>
+          <span class="sff__chip"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Mastercard</span>
+          <span class="sff__chip"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg> Bank Transfer</span>
         </div>
       </div>
 
@@ -748,7 +798,10 @@
         <!-- Mobile Bet Bonus Banner -->
         <div class="mob-bs-bonus">
           <div class="mob-bs-bonus__header">
-            <span class="mob-bs-bonus__title">🎁 Bet Bonus</span>
+            <span class="mob-bs-bonus__title">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:2px"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+              Bet Bonus
+            </span>
             <span class="mob-bs-bonus__max">Up to 500%</span>
           </div>
           <div class="mob-bs-bonus__bar-wrap">
@@ -831,6 +884,16 @@ watch(() => store.activeSport, (newSport) => {
 const showBetslip = ref(false);
 const stakeAmount = ref<number | string>(1000);
 const selectedMatch = ref<any | null>(null);
+const activeLeague = ref('');
+
+function selectSport(name: string) {
+  store.activeSport = name;
+  activeLeague.value = '';
+}
+
+function selectLeague(name: string) {
+  activeLeague.value = activeLeague.value === name ? '' : name;
+}
 
 const topSentinel = ref<HTMLElement | null>(null);
 let topObserver: IntersectionObserver | null = null;
@@ -929,14 +992,17 @@ function isDtSel(match: any, market: string) {
   return store.betslip.some(b => b.matchId === `${match.id}_${market}`);
 }
 
-const desktopNavTabs = computed(() => [
-  { label: 'Sportsbook', icon: '⚽', route: '/' },
-  { label: 'Live',       icon: '🔴', route: '/sports/Football', badge: store.liveMatches.length ? String(store.liveMatches.length) : '' },
-  { label: 'Casino',     icon: '🎰', route: '/casino' },
-  { label: 'Jackpot',    icon: '🏆', route: '/jackpot' },
-  { label: 'Virtuals',   icon: '🎮', route: '/virtuals' },
-  { label: 'Results',    icon: '📋', route: '/results' },
-]);
+const desktopNavTabs = computed(() => {
+  const route = router.currentRoute.value.path;
+  return [
+    { label: 'Sportsbook', icon: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>', route: '/', active: route === '/' },
+    { label: 'Live',       icon: '<span class="dt-live-dot"></span>', route: '/', badge: store.liveMatches.length ? String(store.liveMatches.length) : '', active: false },
+    { label: 'Casino',     icon: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="8" cy="8" r="1.5" fill="currentColor" stroke="none"/><circle cx="16" cy="8" r="1.5" fill="currentColor" stroke="none"/><circle cx="8" cy="16" r="1.5" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>', route: '/casino', active: route === '/casino' },
+    { label: 'Jackpot',    icon: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>', route: '/jackpot', active: route === '/jackpot' },
+    { label: 'Virtuals',   icon: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="15" y1="13" x2="15.01" y2="13"/><line x1="18" y1="11" x2="18.01" y2="11"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/></svg>', route: '/virtuals', active: route === '/virtuals' },
+    { label: 'Results',    icon: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/></svg>', route: '/results', active: route === '/results' },
+  ];
+});
 
 const SIDEBAR_SPORT_CODES = ['S','B','T','V','HB','BB','TT','SN','R','BO','MM','F1','IH','W','E','AF'];
 const sidebarSports = computed(() =>
@@ -986,22 +1052,37 @@ const topLeagues = computed(() => {
 const PRIMARY_SPORTS = new Set(['S']);
 const moreSports = computed(() => {
   if (!store.sports?.length) return [
-    { icon: '🏐', name: 'Handball',      count: 0, id: 'HB' },
-    { icon: '🏉', name: 'Rugby',         count: 0, id: 'R'  },
-    { icon: '🥊', name: 'Boxing / MMA', count: 0, id: 'BO' },
-    { icon: '🎱', name: 'Snooker',       count: 0, id: 'SN' },
+    { icon: 'https://www.topbet.ug/face/assets/sports-desk/sport_HB.svg', name: 'Handball',     count: 0, id: 'HB' },
+    { icon: 'https://www.topbet.ug/face/assets/sports-desk/sport_R.svg',  name: 'Rugby',        count: 0, id: 'R'  },
+    { icon: 'https://www.topbet.ug/face/assets/sports-desk/sport_BO.svg', name: 'Boxing / MMA', count: 0, id: 'BO' },
+    { icon: 'https://www.topbet.ug/face/assets/sports-desk/sport_SN.svg', name: 'Snooker',      count: 0, id: 'SN' },
   ];
   const SPORT_EMOJI: Record<string, string> = {
-    B: '🏀', T: '🎾', TT: '🏓', V: '🏐', HB: '🤾',
-    SN: '🎱', E: '🎮', BB: '⚾', R: '🏉', BO: '🥊',
-    MM: '🥋', F1: '🏎', IH: '🏒', W: '🤽', AF: '🏈',
-    FK: '⚽', MO: '🏎', OR: '🏆', VS: '💻',
+    B: 'https://www.topbet.ug/face/assets/sports-desk/sport_B.svg',
+    T: 'https://www.topbet.ug/face/assets/sports-desk/sport_T.svg',
+    TT: 'https://www.topbet.ug/face/assets/sports-desk/sport_TT.svg',
+    V: 'https://www.topbet.ug/face/assets/sports-desk/sport_V.svg',
+    HB: 'https://www.topbet.ug/face/assets/sports-desk/sport_HB.svg',
+    SN: 'https://www.topbet.ug/face/assets/sports-desk/sport_SN.svg',
+    E: 'https://www.topbet.ug/face/assets/sports-desk/sport_E.svg',
+    BB: 'https://www.topbet.ug/face/assets/sports-desk/sport_BB.svg',
+    R: 'https://www.topbet.ug/face/assets/sports-desk/sport_R.svg',
+    BO: 'https://www.topbet.ug/face/assets/sports-desk/sport_BO.svg',
+    MM: 'https://www.topbet.ug/face/assets/sports-desk/sport_MM.svg',
+    F1: 'https://www.topbet.ug/face/assets/sports-desk/sport_F1.svg',
+    IH: 'https://www.topbet.ug/face/assets/sports-desk/sport_IH.svg',
+    W: 'https://www.topbet.ug/face/assets/sports-desk/sport_W.svg',
+    AF: 'https://www.topbet.ug/face/assets/sports-desk/sport_AF.svg',
+    FK: 'https://www.topbet.ug/face/assets/sports-desk/sport_S.svg',
+    MO: 'https://www.topbet.ug/face/assets/sports-desk/sport_F1.svg',
+    OR: 'https://www.topbet.ug/face/assets/sports-desk/sport_S.svg',
+    VS: 'https://www.topbet.ug/face/assets/sports-desk/sport_E.svg',
   };
   return store.sports
     .filter(s => !PRIMARY_SPORTS.has(s.id) && s.count > 0)
     .sort((a, b) => b.count - a.count)
     .slice(0, 8)
-    .map(s => ({ icon: SPORT_EMOJI[s.id] ?? '🏅', name: s.name, count: s.count, id: s.id }));
+    .map(s => ({ icon: SPORT_EMOJI[s.id] ?? 'https://www.topbet.ug/face/assets/sports-desk/sport_S.svg', name: s.name, count: s.count, id: s.id }));
 });
 
 // Competitions derived from real match data — unique leagues with live indicator
@@ -1032,9 +1113,9 @@ const popularComps = computed(() => {
 });
 
 const promos = [
-  { icon: '💰', title: '100% First Deposit',   sub: 'Up to UGX 500,000' },
-  { icon: '⚡', title: 'Live Betting Boost',   sub: 'Extra 5% on winnings' },
-  { icon: '🏆', title: 'Weekly Jackpot',        sub: 'Win UGX 50,000,000' },
+  { icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c026d3" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>', title: '100% First Deposit', sub: 'Up to UGX 500,000' },
+  { icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c026d3" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>', title: 'Live Betting Boost', sub: 'Extra 5% on winnings' },
+  { icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c026d3" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>', title: 'Weekly Jackpot', sub: 'Win UGX 50,000,000' },
 ];
 
 
@@ -1054,11 +1135,11 @@ const recentResults = [
 ];
 
 const casinoHighlights = [
-  { emoji: '🎰', name: 'Mega Fortune Slots',  players: '1,240', hot: true  },
-  { emoji: '🃏', name: 'Live Blackjack VIP',  players: '876',   hot: false },
-  { emoji: '🎡', name: 'Lightning Roulette',  players: '2,105', hot: true  },
-  { emoji: '🎲', name: 'Crash Multiplier',    players: '3,421', hot: true  },
-  { emoji: '🎴', name: 'Teen Patti Live',     players: '598',   hot: false },
+  { icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c026d3" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="8" cy="8" r="1.5" fill="#c026d3" stroke="none"/><circle cx="16" cy="8" r="1.5" fill="#c026d3" stroke="none"/><circle cx="8" cy="16" r="1.5" fill="#c026d3" stroke="none"/><circle cx="16" cy="16" r="1.5" fill="#c026d3" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="#c026d3" stroke="none"/></svg>', name: 'Mega Fortune Slots',  players: '1,240', hot: true  },
+  { icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c026d3" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M9 8h1M14 8h1M9 12h6M9 16h6"/></svg>', name: 'Live Blackjack VIP',  players: '876',   hot: false },
+  { icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c026d3" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="9"/><line x1="12" y1="15" x2="12" y2="22"/></svg>', name: 'Lightning Roulette',  players: '2,105', hot: true  },
+  { icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c026d3" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>', name: 'Crash Multiplier',    players: '3,421', hot: true  },
+  { icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c026d3" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>', name: 'Teen Patti Live',     players: '598',   hot: false },
 ];
 
 
