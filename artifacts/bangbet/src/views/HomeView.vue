@@ -44,6 +44,7 @@
           <button v-for="l in topLeagues" :key="l.name" class="dt-sidebar__item">
             <span class="dt-sidebar__league-flag">{{ l.flag }}</span>
             <span class="dt-sidebar__item-name">{{ l.name }}</span>
+            <span v-if="l.live" class="dt-sidebar__live-chip">LIVE</span>
           </button>
         </div>
 
@@ -937,26 +938,82 @@ const sidebarSports = computed(() =>
 );
 
 const topLeagues = computed(() => {
+  const liveLeagueNames = new Set(store.liveMatches.filter(m => m.isLive && m.league).map(m => m.league));
   const seen = new Set<string>();
-  const result: { name: string; flag: string }[] = [];
-  for (const m of store.topMatches) {
+  const result: { name: string; flag: string; live: boolean }[] = [];
+  // Merge live matches first (so live leagues appear at top), then top matches
+  const allMatches = [
+    ...store.liveMatches.filter(m => m.isLive),
+    ...store.liveMatches.filter(m => !m.isLive),
+    ...store.topMatches,
+  ];
+  for (const m of allMatches) {
     if (!seen.has(m.league) && m.league) {
       seen.add(m.league);
-      result.push({ name: m.league, flag: leagueFlag(m.league) });
+      result.push({ name: m.league, flag: leagueFlag(m.league), live: liveLeagueNames.has(m.league) });
     }
   }
   if (!result.length) {
     return [
-      { name: 'FIFA World Cup 2026',     flag: '🌍' },
-      { name: 'UEFA Champions League',   flag: '🇪🇺' },
-      { name: 'Premier League',          flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
-      { name: 'La Liga',                 flag: '🇪🇸' },
-      { name: 'Serie A',                 flag: '🇮🇹' },
-      { name: 'Bundesliga',              flag: '🇩🇪' },
-      { name: 'Uganda Premier League',   flag: '🇺🇬' },
+      { name: 'FIFA World Cup 2026',     flag: '🌍',          live: false },
+      { name: 'UEFA Champions League',   flag: '🇪🇺',         live: false },
+      { name: 'Premier League',          flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',       live: false },
+      { name: 'La Liga',                 flag: '🇪🇸',         live: false },
+      { name: 'Serie A',                 flag: '🇮🇹',         live: false },
+      { name: 'Bundesliga',              flag: '🇩🇪',         live: false },
+      { name: 'Uganda Premier League',   flag: '🇺🇬',         live: false },
     ];
   }
   return result.slice(0, 12);
+});
+
+// Real sports from API — exclude Football (S) which already has its own primary section
+const PRIMARY_SPORTS = new Set(['S']);
+const moreSports = computed(() => {
+  if (!store.sports?.length) return [
+    { icon: '🏐', name: 'Handball',      count: 0, id: 'HB' },
+    { icon: '🏉', name: 'Rugby',         count: 0, id: 'R'  },
+    { icon: '🥊', name: 'Boxing / MMA', count: 0, id: 'BO' },
+    { icon: '🎱', name: 'Snooker',       count: 0, id: 'SN' },
+  ];
+  const SPORT_EMOJI: Record<string, string> = {
+    B: '🏀', T: '🎾', TT: '🏓', V: '🏐', HB: '🤾',
+    SN: '🎱', E: '🎮', BB: '⚾', R: '🏉', BO: '🥊',
+    MM: '🥋', F1: '🏎', IH: '🏒', W: '🤽', AF: '🏈',
+    FK: '⚽', MO: '🏎', OR: '🏆', VS: '💻',
+  };
+  return store.sports
+    .filter(s => !PRIMARY_SPORTS.has(s.id) && s.count > 0)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 8)
+    .map(s => ({ icon: SPORT_EMOJI[s.id] ?? '🏅', name: s.name, count: s.count, id: s.id }));
+});
+
+// Competitions derived from real match data — unique leagues with live indicator
+const popularComps = computed(() => {
+  const liveLeagueNames = new Set(store.liveMatches.filter(m => m.isLive && m.league).map(m => m.league));
+  const seen = new Set<string>();
+  const result: { flag: string; name: string; live: boolean }[] = [];
+  const allMatches = [
+    ...store.liveMatches,
+    ...store.topMatches,
+  ];
+  for (const m of allMatches) {
+    if (!seen.has(m.league) && m.league) {
+      seen.add(m.league);
+      result.push({ name: m.league, flag: leagueFlag(m.league), live: liveLeagueNames.has(m.league) });
+    }
+  }
+  if (!result.length) return [
+    { flag: '🇺🇬', name: 'Uganda Premier League', live: false },
+    { flag: '🇪🇺', name: 'UEFA Europa League',    live: false },
+    { flag: '🇧🇷', name: 'Brasileirão',            live: false },
+    { flag: '🇫🇷', name: 'Ligue 1',               live: false },
+  ];
+  // Sort: live leagues first, then alphabetical
+  return result
+    .sort((a, b) => (b.live ? 1 : 0) - (a.live ? 1 : 0))
+    .slice(0, 10);
 });
 
 const promos = [
@@ -965,26 +1022,6 @@ const promos = [
   { icon: '🏆', title: 'Weekly Jackpot',        sub: 'Win UGX 50,000,000' },
 ];
 
-const moreSports = [
-  { icon: '🏐', name: 'Handball',        count: 12 },
-  { icon: '🏉', name: 'Rugby',           count: 8  },
-  { icon: '🥊', name: 'Boxing / MMA',   count: 5  },
-  { icon: '⛳', name: 'Golf',            count: 3  },
-  { icon: '🏏', name: 'Table Tennis',   count: 22 },
-  { icon: '🎱', name: 'Snooker',        count: 7  },
-  { icon: '🏈', name: 'Am. Football',   count: 6  },
-  { icon: '🏇', name: 'Horse Racing',   count: 14 },
-];
-
-const popularComps = [
-  { flag: '🇺🇬', name: 'Uganda Premier League', live: true  },
-  { flag: '🇪🇺', name: 'UEFA Europa League',    live: true  },
-  { flag: '🇧🇷', name: 'Brasileirão',            live: false },
-  { flag: '🇫🇷', name: 'Ligue 1',               live: false },
-  { flag: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', name: 'Scottish Premiership',  live: false },
-  { flag: '🌍', name: 'AFCON Qualifiers',        live: true  },
-  { flag: '🌎', name: 'CONCACAF Nations',        live: false },
-];
 
 const todaysTips = [
   { match: 'Arsenal vs Chelsea',        pick: 'Arsenal Win',  odds: '1.85', confidence: 78 },
