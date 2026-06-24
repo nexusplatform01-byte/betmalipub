@@ -402,7 +402,7 @@ html, body {
   border-bottom: 1px solid #f0f1f3;
 }
 
-.match-card__league-icon { width: 13px; height: 13px; object-fit: contain; opacity: 0.7; }
+.match-card__league-icon { width: 22px; height: 22px; object-fit: contain; opacity: 1; }
 .match-card__league { font-size: 11px; color: var(--text-light); flex: 1; }
 
 .match-card__live-badge {

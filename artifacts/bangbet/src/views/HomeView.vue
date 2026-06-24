@@ -176,6 +176,7 @@
                   <div class="dtmt__league">
                     <span v-if="match.isLive" class="dtmt__live-badge">Live</span>
                     <img src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__boosted-pin-img" />
+                    <img :src="match.leagueLogo" class="dtmt__league-icon" />
                     {{ match.league }}
                   </div>
                   <div class="dtmt__teams">
@@ -262,7 +263,7 @@
             </div>
             <div v-for="match in store.topMatches" :key="match.id" class="dtmt__row" @click="openMatch(match)">
               <div class="dtmt__col-match">
-                <div class="dtmt__league">{{ match.league }}</div>
+                <div class="dtmt__league"><img :src="match.leagueLogo" class="dtmt__league-icon" />{{ match.league }}</div>
                 <div class="dtmt__teams">
                   <span class="dtmt__team-name">{{ match.homeTeam }}</span>
                   <span class="dtmt__vs">vs</span>
@@ -333,7 +334,7 @@
             </div>
             <div v-for="m in wcMatches" :key="m.id" class="dtmt__row" @click="addOdd(m,'1',m.markets.home)">
               <div class="dtmt__col-match">
-                <div class="dtmt__league">{{ m.league }}</div>
+                <div class="dtmt__league"><img :src="m.leagueLogo" class="dtmt__league-icon" />{{ m.league }}</div>
                 <div class="dtmt__teams">
                   <span class="dtmt__team-name">{{ m.homeTeam }}</span>
                   <span class="dtmt__vs">vs</span>
@@ -365,7 +366,7 @@
             </div>
             <div v-for="m in plMatches" :key="m.id" class="dtmt__row">
               <div class="dtmt__col-match">
-                <div class="dtmt__league">{{ m.league }}</div>
+                <div class="dtmt__league"><img :src="m.leagueLogo" class="dtmt__league-icon" />{{ m.league }}</div>
                 <div class="dtmt__teams">
                   <span class="dtmt__team-name">{{ m.homeTeam }}</span>
                   <span class="dtmt__vs">vs</span>
@@ -397,7 +398,7 @@
             </div>
             <div v-for="m in uclMatches" :key="m.id" class="dtmt__row">
               <div class="dtmt__col-match">
-                <div class="dtmt__league">{{ m.league }}</div>
+                <div class="dtmt__league"><img :src="m.leagueLogo" class="dtmt__league-icon" />{{ m.league }}</div>
                 <div class="dtmt__teams">
                   <span class="dtmt__team-name">{{ m.homeTeam }}</span>
                   <span class="dtmt__vs">vs</span>
@@ -429,7 +430,7 @@
             </div>
             <div v-for="m in nbaMatches" :key="m.id" class="dtmt__row">
               <div class="dtmt__col-match">
-                <div class="dtmt__league">{{ m.league }}</div>
+                <div class="dtmt__league"><img :src="m.leagueLogo" class="dtmt__league-icon" />{{ m.league }}</div>
                 <div class="dtmt__teams">
                   <span class="dtmt__team-name">{{ m.homeTeam }}</span>
                   <span class="dtmt__vs">vs</span>
@@ -461,7 +462,7 @@
             </div>
             <div v-for="m in uplMatches" :key="m.id" class="dtmt__row">
               <div class="dtmt__col-match">
-                <div class="dtmt__league">{{ m.league }}</div>
+                <div class="dtmt__league"><img :src="m.leagueLogo" class="dtmt__league-icon" />{{ m.league }}</div>
                 <div class="dtmt__teams">
                   <span class="dtmt__team-name">{{ m.homeTeam }}</span>
                   <span class="dtmt__vs">vs</span>
@@ -492,7 +493,7 @@
             </div>
             <div v-for="m in tennisMatches" :key="m.id" class="dtmt__row">
               <div class="dtmt__col-match">
-                <div class="dtmt__league">{{ m.league }}</div>
+                <div class="dtmt__league"><img :src="m.leagueLogo" class="dtmt__league-icon" />{{ m.league }}</div>
                 <div class="dtmt__teams">
                   <span class="dtmt__team-name">{{ m.homeTeam }}</span>
                   <span class="dtmt__vs">vs</span>
@@ -524,7 +525,7 @@
             </div>
             <div v-for="m in volleyMatches" :key="m.id" class="dtmt__row">
               <div class="dtmt__col-match">
-                <div class="dtmt__league">{{ m.league }}</div>
+                <div class="dtmt__league"><img :src="m.leagueLogo" class="dtmt__league-icon" />{{ m.league }}</div>
                 <div class="dtmt__teams">
                   <span class="dtmt__team-name">{{ m.homeTeam }}</span>
                   <span class="dtmt__vs">vs</span>
@@ -556,7 +557,7 @@
             </div>
             <div v-for="m in iceHockeyMatches" :key="m.id" class="dtmt__row">
               <div class="dtmt__col-match">
-                <div class="dtmt__league">{{ m.league }}</div>
+                <div class="dtmt__league"><img :src="m.leagueLogo" class="dtmt__league-icon" />{{ m.league }}</div>
                 <div class="dtmt__teams">
                   <span class="dtmt__team-name">{{ m.homeTeam }}</span>
                   <span class="dtmt__vs">vs</span>
@@ -635,7 +636,7 @@
                 </div>
                 <div v-for="m in lg.matches" :key="m.id" class="dtmt__row" @click="openMatch(m)">
                   <div class="dtmt__col-match">
-                    <div class="dtmt__league">{{ m.league }}</div>
+                    <div class="dtmt__league"><img :src="m.leagueLogo" class="dtmt__league-icon" />{{ m.league }}</div>
                     <div class="dtmt__teams">
                       <span class="dtmt__team-name">{{ m.homeTeam }}</span>
                       <span class="dtmt__vs">vs</span>
@@ -1504,6 +1505,7 @@ const iceHockeyMatches = [
     margin-bottom: 1px; display: flex; align-items: center; gap: 4px;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
+  .dtmt__league-icon { width: 18px; height: 18px; object-fit: contain; flex-shrink: 0; }
   .dtmt__live-badge {
     background: #e04040; color: #fff;
     font-size: 8px; font-weight: 800; padding: 1px 3px; border-radius: 3px;

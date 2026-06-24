@@ -128,7 +128,7 @@ function mapEsMatch(e: any, sportCode?: string): Match {
     sportCode: sc,
     league: e.leagueName || '',
     leagueId: e.leagueId || '',
-    leagueLogo: SPORT_ICON(sc),
+    leagueLogo: (e.leagueName || '').toLowerCase().includes('world cup') ? '/static/img/wc2026.png' : SPORT_ICON(sc),
     homeTeam: e.home || '',
     awayTeam: e.away || '',
     startTime: e.kickOffTime ? formatKickOff(e.kickOffTime) : undefined,

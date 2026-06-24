@@ -82,7 +82,7 @@ export const topMatches = [
     id: "top1",
     sport: "Football",
     league: "World Cup 2026 - Group Stage",
-    leagueLogo: "/images/activity/mCTDFOptZSaSNBa.png",
+    leagueLogo: "/static/img/wc2026.png",
     homeTeam: "Brazil",
     awayTeam: "Argentina",
     startTime: "Today 21:00",
