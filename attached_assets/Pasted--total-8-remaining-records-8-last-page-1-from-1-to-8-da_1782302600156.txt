@@ -1,0 +1,649 @@
+{
+  "total": 8,
+  "remaining_records": 8,
+  "last_page": 1,
+  "from": 1,
+  "to": 8,
+  "data": [
+    {
+      "producer_id": 3,
+      "producer_status": 1,
+      "highlight_market": {
+        "handicap": false,
+        "market_id": 2,
+        "market_name": "1 X 2",
+        "outcomes": [
+          {
+            "active": 1,
+            "alias": "1",
+            "odds": 1.42,
+            "outcome_id": "387333103",
+            "outcome_name": "1",
+            "outcome_type_id": 1,
+            "probability": 0
+          },
+          {
+            "active": 1,
+            "alias": "X",
+            "odds": 5.25,
+            "outcome_id": "387333104",
+            "outcome_name": "X",
+            "outcome_type_id": 2,
+            "probability": 0
+          },
+          {
+            "active": 1,
+            "alias": "2",
+            "odds": 8.5,
+            "outcome_id": "387333105",
+            "outcome_name": "2",
+            "outcome_type_id": 3,
+            "probability": 0
+          }
+        ],
+        "specifier": "",
+        "status": 0,
+        "status_name": "Open"
+      },
+      "tournament": "World Cup",
+      "sport_id": 1,
+      "game_id": 1083,
+      "name": "Bosnia-Herzegovina v Qatar",
+      "match_id": 13345028,
+      "date": "2026-06-24 22:00:00",
+      "tournament_id": 215,
+      "status": 0,
+      "market_name": "",
+      "country": "World",
+      "category_id": 2,
+      "home_team": "Bosnia-Herzegovina",
+      "away_team": "Qatar",
+      "highlights_priority": 8000,
+      "upcoming_priority": 0,
+      "boosted_priority": 1,
+      "src": "gs",
+      "fixture_status": {
+        "event_id": 0,
+        "event_prefix": "",
+        "sport_id": 0,
+        "status": 0,
+        "status_name": "not_started",
+        "home_score": "",
+        "away_score": "",
+        "match_status": "",
+        "status_code": 0,
+        "event_time": "",
+        "home_penalty_score": 0,
+        "away_penalty_score": 0,
+        "markets": 243
+      },
+      "weight": 9701,
+      "bet_builder_coverage": {
+        "PreMatch": 1,
+        "InPlay": 1
+      },
+      "home_competitor_id": 10124,
+      "away_competitor_id": 136803
+    },
+    {
+      "producer_id": 3,
+      "producer_status": 1,
+      "highlight_market": {
+        "handicap": false,
+        "market_id": 2,
+        "market_name": "1 X 2",
+        "outcomes": [
+          {
+            "active": 1,
+            "alias": "1",
+            "odds": 2.4,
+            "outcome_id": "387334032",
+            "outcome_name": "1",
+            "outcome_type_id": 1,
+            "probability": 0
+          },
+          {
+            "active": 1,
+            "alias": "X",
+            "odds": 3.3,
+            "outcome_id": "387334033",
+            "outcome_name": "X",
+            "outcome_type_id": 2,
+            "probability": 0
+          },
+          {
+            "active": 1,
+            "alias": "2",
+            "odds": 3.4,
+            "outcome_id": "387334034",
+            "outcome_name": "2",
+            "outcome_type_id": 3,
+            "probability": 0
+          }
+        ],
+        "specifier": "",
+        "status": 0,
+        "status_name": "Open"
+      },
+      "tournament": "World Cup",
+      "sport_id": 1,
+      "game_id": 1084,
+      "name": "Switzerland v Canada",
+      "match_id": 13344888,
+      "date": "2026-06-24 22:00:00",
+      "tournament_id": 215,
+      "status": 0,
+      "market_name": "",
+      "country": "World",
+      "category_id": 2,
+      "home_team": "Switzerland",
+      "away_team": "Canada",
+      "highlights_priority": 7900,
+      "upcoming_priority": 0,
+      "boosted_priority": 1,
+      "src": "gs",
+      "fixture_status": {
+        "event_id": 0,
+        "event_prefix": "",
+        "sport_id": 0,
+        "status": 0,
+        "status_name": "not_started",
+        "home_score": "",
+        "away_score": "",
+        "match_status": "",
+        "status_code": 0,
+        "event_time": "",
+        "home_penalty_score": 0,
+        "away_penalty_score": 0,
+        "markets": 245
+      },
+      "weight": 9701,
+      "bet_builder_coverage": {
+        "PreMatch": 0,
+        "InPlay": 0
+      },
+      "home_competitor_id": 10062,
+      "away_competitor_id": 127911
+    },
+    {
+      "producer_id": 3,
+      "producer_status": 1,
+      "highlight_market": {
+        "handicap": false,
+        "market_id": 2,
+        "market_name": "1 X 2",
+        "outcomes": [
+          {
+            "active": 1,
+            "alias": "1",
+            "odds": 13,
+            "outcome_id": "387340204",
+            "outcome_name": "1",
+            "outcome_type_id": 1,
+            "probability": 0
+          },
+          {
+            "active": 1,
+            "alias": "X",
+            "odds": 5.75,
+            "outcome_id": "387340205",
+            "outcome_name": "X",
+            "outcome_type_id": 2,
+            "probability": 0
+          },
+          {
+            "active": 1,
+            "alias": "2",
+            "odds": 1.32,
+            "outcome_id": "387340206",
+            "outcome_name": "2",
+            "outcome_type_id": 3,
+            "probability": 0
+          }
+        ],
+        "specifier": "",
+        "status": 0,
+        "status_name": "Open"
+      },
+      "tournament": "World Cup",
+      "sport_id": 1,
+      "game_id": 1088,
+      "name": "Scotland v Brazil",
+      "match_id": 13344904,
+      "date": "2026-06-25 01:00:00",
+      "tournament_id": 215,
+      "status": 0,
+      "market_name": "",
+      "country": "World",
+      "category_id": 2,
+      "home_team": "Scotland",
+      "away_team": "Brazil",
+      "highlights_priority": 7800,
+      "upcoming_priority": 0,
+      "boosted_priority": 1,
+      "src": "gs",
+      "fixture_status": {
+        "event_id": 0,
+        "event_prefix": "",
+        "sport_id": 0,
+        "status": 0,
+        "status_name": "not_started",
+        "home_score": "",
+        "away_score": "",
+        "match_status": "",
+        "status_code": 0,
+        "event_time": "",
+        "home_penalty_score": 0,
+        "away_penalty_score": 0,
+        "markets": 243
+      },
+      "weight": 9701,
+      "bet_builder_coverage": {
+        "PreMatch": 1,
+        "InPlay": 1
+      },
+      "home_competitor_id": 90293,
+      "away_competitor_id": 95380
+    },
+    {
+      "producer_id": 3,
+      "producer_status": 1,
+      "highlight_market": {
+        "handicap": false,
+        "market_id": 2,
+        "market_name": "1 X 2",
+        "outcomes": [
+          {
+            "active": 1,
+            "alias": "1",
+            "odds": 1.22,
+            "outcome_id": "387797976",
+            "outcome_name": "1",
+            "outcome_type_id": 1,
+            "probability": 0
+          },
+          {
+            "active": 1,
+            "alias": "X",
+            "odds": 7.25,
+            "outcome_id": "387797977",
+            "outcome_name": "X",
+            "outcome_type_id": 2,
+            "probability": 0
+          },
+          {
+            "active": 1,
+            "alias": "2",
+            "odds": 18,
+            "outcome_id": "387797978",
+            "outcome_name": "2",
+            "outcome_type_id": 3,
+            "probability": 0
+          }
+        ],
+        "specifier": "",
+        "status": 0,
+        "status_name": "Open"
+      },
+      "tournament": "World Cup",
+      "sport_id": 1,
+      "game_id": 433,
+      "name": "Morocco v Haiti",
+      "match_id": 13344934,
+      "date": "2026-06-25 01:00:00",
+      "tournament_id": 215,
+      "status": 0,
+      "market_name": "",
+      "country": "World",
+      "category_id": 2,
+      "home_team": "Morocco",
+      "away_team": "Haiti",
+      "highlights_priority": 7700,
+      "upcoming_priority": 0,
+      "boosted_priority": 1,
+      "src": "gs",
+      "fixture_status": {
+        "event_id": 0,
+        "event_prefix": "",
+        "sport_id": 0,
+        "status": 0,
+        "status_name": "not_started",
+        "home_score": "",
+        "away_score": "",
+        "match_status": "",
+        "status_code": 0,
+        "event_time": "",
+        "home_penalty_score": 0,
+        "away_penalty_score": 0,
+        "markets": 243
+      },
+      "weight": 9701,
+      "bet_builder_coverage": {
+        "PreMatch": 1,
+        "InPlay": 1
+      },
+      "home_competitor_id": 86869,
+      "away_competitor_id": 127861
+    },
+    {
+      "producer_id": 3,
+      "producer_status": 1,
+      "highlight_market": {
+        "handicap": false,
+        "market_id": 2,
+        "market_name": "1 X 2",
+        "outcomes": [
+          {
+            "active": 1,
+            "alias": "1",
+            "odds": 5.75,
+            "outcome_id": "387801855",
+            "outcome_name": "1",
+            "outcome_type_id": 1,
+            "probability": 0
+          },
+          {
+            "active": 1,
+            "alias": "X",
+            "odds": 4,
+            "outcome_id": "387801856",
+            "outcome_name": "X",
+            "outcome_type_id": 2,
+            "probability": 0
+          },
+          {
+            "active": 1,
+            "alias": "2",
+            "odds": 1.7,
+            "outcome_id": "387801857",
+            "outcome_name": "2",
+            "outcome_type_id": 3,
+            "probability": 0
+          }
+        ],
+        "specifier": "",
+        "status": 0,
+        "status_name": "Open"
+      },
+      "tournament": "World Cup",
+      "sport_id": 1,
+      "game_id": 449,
+      "name": "South Africa v South Korea",
+      "match_id": 13344898,
+      "date": "2026-06-25 04:00:00",
+      "tournament_id": 215,
+      "status": 0,
+      "market_name": "",
+      "country": "World",
+      "category_id": 2,
+      "home_team": "South Africa",
+      "away_team": "South Korea",
+      "highlights_priority": 7600,
+      "upcoming_priority": 0,
+      "boosted_priority": 1,
+      "src": "gs",
+      "fixture_status": {
+        "event_id": 0,
+        "event_prefix": "",
+        "sport_id": 0,
+        "status": 0,
+        "status_name": "not_started",
+        "home_score": "",
+        "away_score": "",
+        "match_status": "",
+        "status_code": 0,
+        "event_time": "",
+        "home_penalty_score": 0,
+        "away_penalty_score": 0,
+        "markets": 243
+      },
+      "weight": 9701,
+      "bet_builder_coverage": {
+        "PreMatch": 1,
+        "InPlay": 1
+      },
+      "home_competitor_id": 107417,
+      "away_competitor_id": 10060
+    },
+    {
+      "producer_id": 3,
+      "producer_status": 1,
+      "highlight_market": {
+        "handicap": false,
+        "market_id": 2,
+        "market_name": "1 X 2",
+        "outcomes": [
+          {
+            "active": 1,
+            "alias": "1",
+            "odds": 4.1,
+            "outcome_id": "387828949",
+            "outcome_name": "1",
+            "outcome_type_id": 1,
+            "probability": 0
+          },
+          {
+            "active": 1,
+            "alias": "X",
+            "odds": 3.9,
+            "outcome_id": "387828950",
+            "outcome_name": "X",
+            "outcome_type_id": 2,
+            "probability": 0
+          },
+          {
+            "active": 1,
+            "alias": "2",
+            "odds": 1.95,
+            "outcome_id": "387828951",
+            "outcome_name": "2",
+            "outcome_type_id": 3,
+            "probability": 0
+          }
+        ],
+        "specifier": "",
+        "status": 0,
+        "status_name": "Open"
+      },
+      "tournament": "World Cup",
+      "sport_id": 1,
+      "game_id": 196,
+      "name": "Czech Republic v Mexico",
+      "match_id": 13345004,
+      "date": "2026-06-25 04:00:00",
+      "tournament_id": 215,
+      "status": 0,
+      "market_name": "",
+      "country": "World",
+      "category_id": 2,
+      "home_team": "Czech Republic",
+      "away_team": "Mexico",
+      "highlights_priority": 7500,
+      "upcoming_priority": 0,
+      "boosted_priority": 1,
+      "src": "gs",
+      "fixture_status": {
+        "event_id": 0,
+        "event_prefix": "",
+        "sport_id": 0,
+        "status": 0,
+        "status_name": "not_started",
+        "home_score": "",
+        "away_score": "",
+        "match_status": "",
+        "status_code": 0,
+        "event_time": "",
+        "home_penalty_score": 0,
+        "away_penalty_score": 0,
+        "markets": 243
+      },
+      "weight": 9701,
+      "bet_builder_coverage": {
+        "PreMatch": 1,
+        "InPlay": 1
+      },
+      "home_competitor_id": 10053,
+      "away_competitor_id": 10048
+    },
+    {
+      "producer_id": 3,
+      "producer_status": 1,
+      "highlight_market": {
+        "handicap": false,
+        "market_id": 2,
+        "market_name": "1 X 2",
+        "outcomes": [
+          {
+            "active": 1,
+            "alias": "1",
+            "odds": 4.4,
+            "outcome_id": "387798883",
+            "outcome_name": "1",
+            "outcome_type_id": 1,
+            "probability": 0
+          },
+          {
+            "active": 1,
+            "alias": "X",
+            "odds": 4.1,
+            "outcome_id": "387798884",
+            "outcome_name": "X",
+            "outcome_type_id": 2,
+            "probability": 0
+          },
+          {
+            "active": 1,
+            "alias": "2",
+            "odds": 1.85,
+            "outcome_id": "387798885",
+            "outcome_name": "2",
+            "outcome_type_id": 3,
+            "probability": 0
+          }
+        ],
+        "specifier": "",
+        "status": 0,
+        "status_name": "Open"
+      },
+      "tournament": "World Cup",
+      "sport_id": 1,
+      "game_id": 114,
+      "name": "Ecuador v Germany",
+      "match_id": 13344884,
+      "date": "2026-06-25 23:00:00",
+      "tournament_id": 215,
+      "status": 0,
+      "market_name": "",
+      "country": "World",
+      "category_id": 2,
+      "home_team": "Ecuador",
+      "away_team": "Germany",
+      "highlights_priority": 0,
+      "upcoming_priority": 0,
+      "boosted_priority": 1,
+      "src": "gs",
+      "fixture_status": {
+        "event_id": 0,
+        "event_prefix": "",
+        "sport_id": 0,
+        "status": 0,
+        "status_name": "not_started",
+        "home_score": "",
+        "away_score": "",
+        "match_status": "",
+        "status_code": 0,
+        "event_time": "",
+        "home_penalty_score": 0,
+        "away_penalty_score": 0,
+        "markets": 245
+      },
+      "weight": 9701,
+      "bet_builder_coverage": {
+        "PreMatch": 1,
+        "InPlay": 1
+      },
+      "home_competitor_id": 10037,
+      "away_competitor_id": 10035
+    },
+    {
+      "producer_id": 3,
+      "producer_status": 1,
+      "highlight_market": {
+        "handicap": false,
+        "market_id": 2,
+        "market_name": "1 X 2",
+        "outcomes": [
+          {
+            "active": 1,
+            "alias": "1",
+            "odds": 22,
+            "outcome_id": "387798888",
+            "outcome_name": "1",
+            "outcome_type_id": 1,
+            "probability": 0
+          },
+          {
+            "active": 1,
+            "alias": "X",
+            "odds": 8.25,
+            "outcome_id": "387798889",
+            "outcome_name": "X",
+            "outcome_type_id": 2,
+            "probability": 0
+          },
+          {
+            "active": 1,
+            "alias": "2",
+            "odds": 1.19,
+            "outcome_id": "387798890",
+            "outcome_name": "2",
+            "outcome_type_id": 3,
+            "probability": 0
+          }
+        ],
+        "specifier": "",
+        "status": 0,
+        "status_name": "Open"
+      },
+      "tournament": "World Cup",
+      "sport_id": 1,
+      "game_id": 442,
+      "name": "Curaçao v Ivory Coast",
+      "match_id": 13344937,
+      "date": "2026-06-25 23:00:00",
+      "tournament_id": 215,
+      "status": 0,
+      "market_name": "",
+      "country": "World",
+      "category_id": 2,
+      "home_team": "Curaçao",
+      "away_team": "Ivory Coast",
+      "highlights_priority": 0,
+      "upcoming_priority": 0,
+      "boosted_priority": 1,
+      "src": "gs",
+      "fixture_status": {
+        "event_id": 0,
+        "event_prefix": "",
+        "sport_id": 0,
+        "status": 0,
+        "status_name": "not_started",
+        "home_score": "",
+        "away_score": "",
+        "match_status": "",
+        "status_code": 0,
+        "event_time": "",
+        "home_penalty_score": 0,
+        "away_penalty_score": 0,
+        "markets": 244
+      },
+      "weight": 9701,
+      "bet_builder_coverage": {
+        "PreMatch": 1,
+        "InPlay": 1
+      },
+      "home_competitor_id": 137581,
+      "away_competitor_id": 10046
+    }
+  ]
+}

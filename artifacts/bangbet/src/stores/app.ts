@@ -5,6 +5,7 @@ import {
   fetchLiveEvents,
   fetchTopMatches,
   fetchAllSports,
+  fetchBoostedMatches,
   type Match,
   type SportCategory,
 } from "@/services/topbetApi";
@@ -40,10 +41,12 @@ export const useAppStore = defineStore("app", () => {
 
   const liveMatches = ref<Match[]>([]);
   const topMatches = ref<Match[]>([]);
+  const boostedMatches = ref<Match[]>([]);
   const sports = ref<SportCategory[]>([]);
   const liveSportsData = ref<any[]>([]);
   const liveLoading = ref(false);
   const topLoading = ref(false);
+  const boostedLoading = ref(false);
   const sportsLoading = ref(false);
 
   let liveTimer: ReturnType<typeof setInterval> | null = null;
@@ -72,6 +75,17 @@ export const useAppStore = defineStore("app", () => {
     }
   }
 
+  async function loadBoostedMatches() {
+    boostedLoading.value = true;
+    try {
+      boostedMatches.value = await fetchBoostedMatches();
+    } catch (e) {
+      console.error("[Bangbet] boosted matches fetch error:", e);
+    } finally {
+      boostedLoading.value = false;
+    }
+  }
+
   async function loadSports() {
     sportsLoading.value = true;
     try {
@@ -88,6 +102,7 @@ export const useAppStore = defineStore("app", () => {
     liveTimer = setInterval(loadLiveMatches, 30_000);
   }
 
+  loadBoostedMatches();
   loadLiveMatches();
   loadTopMatches("S");
   loadSports();
@@ -154,11 +169,13 @@ export const useAppStore = defineStore("app", () => {
     sportsMenu,
     liveMatches,
     topMatches,
+    boostedMatches,
     promotions,
     sports,
     liveSportsData,
     liveLoading,
     topLoading,
+    boostedLoading,
     sportsLoading,
     login,
     logout,
@@ -168,6 +185,7 @@ export const useAppStore = defineStore("app", () => {
     saveBet,
     loadLiveMatches,
     loadTopMatches,
+    loadBoostedMatches,
     loadSports,
   };
 });

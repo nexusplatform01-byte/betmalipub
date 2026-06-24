@@ -103,17 +103,18 @@
         <SportMenu />
         <JackpotSection />
 
+        <!-- ══ BOOSTED MATCHES SECTION ══ -->
         <div class="section">
           <div class="section-header">
             <div class="section-title">
-              <span class="live-dot"></span>
-              {{ store.liveMatches.filter(m => m.isLive).length > 0 ? `Live Now (${store.liveMatches.filter(m=>m.isLive).length})` : `Today\'s Matches (${store.liveMatches.length})` }}
+              <span class="boosted-badge">⚡ BOOSTED</span>
+              Boosted Matches
             </div>
             <RouterLink to="/sports/Football" class="section-more">See All ›</RouterLink>
           </div>
 
           <!-- ── SKELETON (loading) ── -->
-          <template v-if="store.liveLoading">
+          <template v-if="store.boostedLoading">
             <!-- Mobile skeleton -->
             <div class="mob-only">
               <div v-for="i in 4" :key="i" class="skel-card">
@@ -132,10 +133,11 @@
             </div>
             <!-- Desktop skeleton -->
             <div class="dt-match-table dt-only">
-              <div class="dtmt__head">
+              <div class="dtmt__head dtmt__head--3col">
                 <div class="dtmt__col-match">Match</div>
-                <div class="dtmt__col-odd">1</div><div class="dtmt__col-odd">X</div><div class="dtmt__col-odd">2</div>
-                <div class="dtmt__col-odd">1X</div><div class="dtmt__col-odd">X2</div><div class="dtmt__col-odd">12</div>
+                <div class="dtmt__col-odd">1</div>
+                <div class="dtmt__col-odd">X</div>
+                <div class="dtmt__col-odd">2</div>
               </div>
               <div v-for="i in 6" :key="i" class="dtmt__row dtmt__row--skel">
                 <div class="dtmt__col-match">
@@ -143,32 +145,35 @@
                   <div class="skel-line skel-line--lg" style="width:80%;margin-bottom:5px"></div>
                   <div class="skel-line skel-line--sm" style="width:30%"></div>
                 </div>
-                <div v-for="j in 6" :key="j" class="skel-odd-pill"></div>
+                <div v-for="j in 3" :key="j" class="skel-odd-pill"></div>
               </div>
             </div>
+          </template>
+
+          <!-- ── EMPTY STATE ── -->
+          <template v-else-if="store.boostedMatches.length === 0">
+            <div class="boosted-empty">No boosted matches available right now.</div>
           </template>
 
           <!-- ── LOADED ── -->
           <template v-else>
             <!-- Mobile: card grid -->
             <div class="mob-only">
-              <MatchCard v-for="match in store.liveMatches" :key="match.id" :match="match" />
+              <MatchCard v-for="match in store.boostedMatches" :key="match.id" :match="match" />
             </div>
-            <!-- Desktop: row table -->
-            <div class="dt-match-table dt-only">
-              <div class="dtmt__head">
+            <!-- Desktop: 1X2 only table -->
+            <div class="dt-match-table dt-match-table--3col dt-only">
+              <div class="dtmt__head dtmt__head--3col">
                 <div class="dtmt__col-match">Match</div>
                 <div class="dtmt__col-odd">1</div>
                 <div class="dtmt__col-odd">X</div>
                 <div class="dtmt__col-odd">2</div>
-                <div class="dtmt__col-odd">1X</div>
-                <div class="dtmt__col-odd">X2</div>
-                <div class="dtmt__col-odd">12</div>
               </div>
-              <div v-for="match in store.liveMatches" :key="match.id" class="dtmt__row" @click="openMatch(match)">
+              <div v-for="match in store.boostedMatches" :key="match.id" class="dtmt__row" @click="openMatch(match)">
                 <div class="dtmt__col-match">
                   <div class="dtmt__league">
                     <span v-if="match.isLive" class="dtmt__live-badge">Live</span>
+                    <span class="dtmt__boosted-pin">⚡</span>
                     {{ match.league }}
                   </div>
                   <div class="dtmt__teams">
@@ -182,29 +187,24 @@
                       <span class="dtmt__live-min">{{ match.minute ? match.minute + '\'' : match.status }}</span>
                     </span>
                     <span v-else>{{ match.startTime }}</span>
+                    <span v-if="match.marketsCount" class="dtmt__mkt-count">+{{ match.marketsCount }}</span>
                   </div>
                 </div>
-                <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'1'), 'dtmt__odd-btn--hot': getMaxOdd(match) > 0 && getMaxOdd(match) === match.markets.home, 'dtmt__odd-btn--na': !match.markets.home || match.markets.home <= 0 }" @click.stop="match.markets.home > 0 && addOdd(match,'1',match.markets.home)">
-                  <span class="dtmt__odd-inner">
-                    <img v-if="getMaxOdd(match) > 0 && getMaxOdd(match) === match.markets.home" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
-                    {{ fmtOdd(match.markets.home) }}
-                  </span>
-                </button>
-                <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'X'), 'dtmt__odd-btn--na': !match.markets.draw || match.markets.draw <= 0, 'dtmt__odd-btn--hot': match.markets.draw && match.markets.draw > 0 && getMaxOdd(match) === match.markets.draw }" @click.stop="match.markets.draw && match.markets.draw > 0 && addOdd(match,'X',match.markets.draw)">
-                  <span class="dtmt__odd-inner">
-                    <img v-if="match.markets.draw && match.markets.draw > 0 && getMaxOdd(match) === match.markets.draw" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
-                    {{ fmtOdd(match.markets.draw) }}
-                  </span>
-                </button>
-                <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'2'), 'dtmt__odd-btn--hot': getMaxOdd(match) > 0 && getMaxOdd(match) === match.markets.away, 'dtmt__odd-btn--na': !match.markets.away || match.markets.away <= 0 }" @click.stop="match.markets.away > 0 && addOdd(match,'2',match.markets.away)">
-                  <span class="dtmt__odd-inner">
-                    <img v-if="getMaxOdd(match) > 0 && getMaxOdd(match) === match.markets.away" src="https://uxwing.com/wp-content/themes/uxwing/download/e-commerce-currency-shopping/hot-icon.png" class="dtmt__flame" />
-                    {{ fmtOdd(match.markets.away) }}
-                  </span>
-                </button>
-                <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'1X'), 'dtmt__odd-btn--na': dc(match.markets.home,match.markets.draw)==='-' }" @click.stop="dc(match.markets.home,match.markets.draw)!=='-' && addOdd(match,'1X',dc(match.markets.home,match.markets.draw))">{{ dc(match.markets.home,match.markets.draw) }}</button>
-                <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'X2'), 'dtmt__odd-btn--na': dc(match.markets.draw,match.markets.away)==='-' }" @click.stop="dc(match.markets.draw,match.markets.away)!=='-' && addOdd(match,'X2',dc(match.markets.draw,match.markets.away))">{{ dc(match.markets.draw,match.markets.away) }}</button>
-                <button class="dtmt__odd-btn" :class="{ selected: isDtSel(match,'12'), 'dtmt__odd-btn--na': dc(match.markets.home,match.markets.away)==='-' }" @click.stop="dc(match.markets.home,match.markets.away)!=='-' && addOdd(match,'12',dc(match.markets.home,match.markets.away))">{{ dc(match.markets.home,match.markets.away) }}</button>
+                <button
+                  class="dtmt__odd-btn"
+                  :class="{ selected: isDtSel(match,'1'), 'dtmt__odd-btn--na': !match.markets.home || match.markets.home <= 0 }"
+                  @click.stop="match.markets.home > 0 && addOdd(match,'1',match.markets.home)"
+                >{{ fmtOdd(match.markets.home) }}</button>
+                <button
+                  class="dtmt__odd-btn"
+                  :class="{ selected: isDtSel(match,'X'), 'dtmt__odd-btn--na': !match.markets.draw || match.markets.draw <= 0 }"
+                  @click.stop="match.markets.draw && match.markets.draw > 0 && addOdd(match,'X',match.markets.draw)"
+                >{{ fmtOdd(match.markets.draw) }}</button>
+                <button
+                  class="dtmt__odd-btn"
+                  :class="{ selected: isDtSel(match,'2'), 'dtmt__odd-btn--na': !match.markets.away || match.markets.away <= 0 }"
+                  @click.stop="match.markets.away > 0 && addOdd(match,'2',match.markets.away)"
+                >{{ fmtOdd(match.markets.away) }}</button>
               </div>
             </div>
           </template>
@@ -1397,6 +1397,15 @@ const iceHockeyMatches = [
     border-bottom: 1px solid #e6e7eb;
     padding: 0 4px;
   }
+  .dtmt__head--3col {
+    grid-template-columns: 1fr repeat(3, minmax(70px, 90px));
+  }
+  .dt-match-table--3col .dtmt__row {
+    grid-template-columns: 1fr repeat(3, minmax(70px, 90px));
+  }
+  .dt-match-table--3col .dtmt__row--skel {
+    grid-template-columns: 1fr repeat(3, minmax(70px, 90px));
+  }
   .dtmt__col-match {
     padding: 6px 10px;
     font-size: 10px; font-weight: 800; color: #9599a4;
@@ -1446,7 +1455,20 @@ const iceHockeyMatches = [
     flex-shrink: 0;
   }
   .dtmt__vs { color: #aaa; font-weight: 400; font-size: 10px; flex-shrink: 0; }
-  .dtmt__time { font-size: 9px; color: #9599a4; margin-top: 1px; }
+  .dtmt__time { font-size: 9px; color: #9599a4; margin-top: 1px; display: flex; align-items: center; gap: 5px; }
+  .dtmt__mkt-count { font-size: 8px; color: #c026d3; font-weight: 700; background: rgba(192,38,211,.08); border-radius: 4px; padding: 1px 4px; flex-shrink: 0; }
+  .dtmt__boosted-pin { font-size: 10px; flex-shrink: 0; }
+
+  /* ── boosted section styles ── */
+  .boosted-badge {
+    display: inline-flex; align-items: center;
+    background: linear-gradient(90deg, #f59e0b, #ef4444);
+    color: #fff; font-size: 9px; font-weight: 900;
+    padding: 2px 6px; border-radius: 4px; letter-spacing: .6px;
+  }
+  .boosted-empty {
+    padding: 20px 14px; font-size: 12px; color: #9599a4; text-align: center;
+  }
 
   /* ── real styled odds boxes ── */
   .dtmt__odd-btn {

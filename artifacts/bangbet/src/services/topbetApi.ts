@@ -198,6 +198,18 @@ async function fetchBanda(url: string): Promise<any[]> {
   return json.data || []
 }
 
+export async function fetchBoostedMatches(): Promise<Match[]> {
+  try {
+    const items = await fetchBanda(
+      `${BANDA_BASE}/highlights/1?page=1&per_page=10&boosted=1&highlight_market_id=0&tournament_id=0&category_id=0&upcoming=0&today=0&match_live_status=0`,
+    )
+    return items.map(mapBandaItem)
+  } catch (e) {
+    console.error('[Bangbet] boosted fetch error:', String(e))
+    return []
+  }
+}
+
 export async function fetchLiveEvents(): Promise<{ liveSports: any[]; matches: Match[] }> {
   try {
     // Fetch currently-live matches first
