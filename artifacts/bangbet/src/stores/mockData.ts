@@ -1,6 +1,6 @@
 export const sportsMenu = [
   { id: 1, name: "Football", icon: "/images/icon/Icon_Football_40.svg", route: "/sports/Football", level: 1 },
-  { id: 2, name: "World Cup", icon: "/images/activity/mCTDFOptZSaSNBa.png", route: "/sports/WorldCup", level: 1, isNew: true },
+  { id: 2, name: "World Cup", icon: "/static/img/wc2026.png", route: "/sports/WorldCup", level: 1, isNew: true },
   { id: 3, name: "Jackpot", icon: "/images/activity/FmjegxbnxixEBAr.svg", route: "/jackpot", level: 1, selfText: "USH6.6M" },
   { id: 4, name: "Virtuals", icon: "/images/activity/dbjzJiSbOnADjwD.svg", route: "/virtuals", level: 1 },
   { id: 5, name: "Pick12", icon: "/images/activity/VCzLgbAhETDblul.svg", route: "/pick12", level: 1 },
