@@ -471,6 +471,9 @@ function simulateResults(tid: string) {
 
 // ─── Map API match → JpMatch ─────────────────────────────
 function mapToJpMatch(m: Match, idx: number, prefix: string): JpMatch {
+  const h = m.markets.home > 0 ? m.markets.home : 2.00;
+  const d = (m.markets.draw != null && m.markets.draw > 0) ? m.markets.draw : 3.20;
+  const a = m.markets.away > 0 ? m.markets.away : 3.00;
   return {
     id: `${prefix}${idx}`,
     league: m.league || 'Football',
@@ -478,9 +481,9 @@ function mapToJpMatch(m: Match, idx: number, prefix: string): JpMatch {
     away: m.awayTeam,
     time: m.startTime || 'Today',
     odds: [
-      parseFloat(m.markets.home.toFixed(2)),
-      parseFloat((m.markets.draw ?? 3.00).toFixed(2)),
-      parseFloat(m.markets.away.toFixed(2)),
+      parseFloat(h.toFixed(2)),
+      parseFloat(d.toFixed(2)),
+      parseFloat(a.toFixed(2)),
     ],
   };
 }
@@ -508,13 +511,7 @@ onMounted(async () => {
 
   try {
     const { data } = await fetchHighlightMatches(1, 80);
-    const valid = data.filter(m =>
-      m.markets.home > 1 &&
-      m.markets.draw != null &&
-      m.markets.away > 1 &&
-      m.homeTeam &&
-      m.awayTeam
-    );
+    const valid = data.filter(m => m.homeTeam && m.awayTeam);
 
     if (valid.length >= 12) {
       const getSlice = (offset: number): Match[] => {
