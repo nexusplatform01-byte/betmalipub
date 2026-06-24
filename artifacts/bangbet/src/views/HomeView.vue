@@ -41,29 +41,44 @@
 
         <div class="dt-sidebar__section">
           <div class="dt-sidebar__head">🌍 Top Leagues</div>
-          <button v-for="l in topLeagues" :key="l.name" class="dt-sidebar__item">
+          <RouterLink
+            v-for="l in topLeagues"
+            :key="l.name"
+            :to="`/sports/Football?league=${encodeURIComponent(l.name)}`"
+            class="dt-sidebar__item dt-sidebar__item--link"
+          >
             <span class="dt-sidebar__league-flag">{{ l.flag }}</span>
             <span class="dt-sidebar__item-name">{{ l.name }}</span>
             <span v-if="l.live" class="dt-sidebar__live-chip">LIVE</span>
-          </button>
+          </RouterLink>
         </div>
 
         <div class="dt-sidebar__section">
           <div class="dt-sidebar__head">🔥 More Sports</div>
-          <button v-for="s in moreSports" :key="s.name" class="dt-sidebar__item">
+          <RouterLink
+            v-for="s in moreSports"
+            :key="s.name"
+            :to="`/sports/${encodeURIComponent(s.name)}`"
+            class="dt-sidebar__item dt-sidebar__item--link"
+          >
             <span class="dt-sidebar__league-flag">{{ s.icon }}</span>
             <span class="dt-sidebar__item-name">{{ s.name }}</span>
             <span class="dt-sidebar__item-count">{{ s.count }}</span>
-          </button>
+          </RouterLink>
         </div>
 
         <div class="dt-sidebar__section">
           <div class="dt-sidebar__head">🏟 Competitions</div>
-          <button v-for="c in popularComps" :key="c.name" class="dt-sidebar__item">
+          <RouterLink
+            v-for="c in popularComps"
+            :key="c.name"
+            :to="`/sports/Football?league=${encodeURIComponent(c.name)}`"
+            class="dt-sidebar__item dt-sidebar__item--link"
+          >
             <span class="dt-sidebar__league-flag">{{ c.flag }}</span>
             <span class="dt-sidebar__item-name">{{ c.name }}</span>
             <span v-if="c.live" class="dt-sidebar__live-chip">LIVE</span>
-          </button>
+          </RouterLink>
         </div>
 
         <div class="dt-sidebar__section">

@@ -9,6 +9,14 @@
     <main>
       <SportMenu :active-name="sportName" />
 
+      <!-- League filter banner -->
+      <div v-if="leagueFilter" class="league-filter-banner">
+        <span class="league-filter-banner__label">
+          {{ leagueFilter }}
+        </span>
+        <RouterLink to="/" class="league-filter-banner__clear">✕ Clear</RouterLink>
+      </div>
+
       <!-- Live Matches -->
       <div class="section" v-if="liveFiltered.length">
         <div class="section-header">
@@ -29,7 +37,7 @@
       <template v-else>
         <div v-if="filteredGroups.length === 0 && !liveFiltered.length" class="empty-state">
           <div class="empty-state__icon">🔍</div>
-          <p>No {{ sportName }} matches found</p>
+          <p>No {{ leagueFilter || sportName }} matches found</p>
         </div>
 
         <div class="section" v-for="lg in filteredGroups" :key="lg.id">
@@ -39,11 +47,11 @@
           <MatchCard v-for="match in lg.matches" :key="match.id" :match="match" />
         </div>
 
-        <!-- Infinite scroll sentinel -->
-        <div ref="sentinelEl" class="scroll-sentinel"></div>
+        <!-- Infinite scroll sentinel (hidden when league filter active) -->
+        <div v-if="!leagueFilter" ref="sentinelEl" class="scroll-sentinel"></div>
 
         <!-- Load More button (fallback / manual trigger) -->
-        <div v-if="hasMore || loadingMore" class="load-more-wrap">
+        <div v-if="!leagueFilter && (hasMore || loadingMore)" class="load-more-wrap">
           <button class="load-more-btn" :disabled="loadingMore" @click="loadMore">
             <span v-if="loadingMore" class="load-more-btn__inner">
               <span class="lm-spinner"></span>
@@ -57,7 +65,7 @@
         </div>
 
         <!-- End of matches -->
-        <div v-else-if="filteredGroups.length > 0" class="end-note">
+        <div v-else-if="filteredGroups.length > 0 && !leagueFilter" class="end-note">
           <span class="end-note__icon">✓</span> All {{ sportName }} matches loaded
         </div>
       </template>
@@ -95,6 +103,9 @@ const sportCode = computed(() => {
   return SPORT_CODE_MAP[name] || SPORT_CODE_MAP[name.replace(/ /g, '')] || 'S';
 });
 
+// League filter from query param (e.g. ?league=World+Cup)
+const leagueFilter = computed(() => (route.query.league as string) || "");
+
 const sportCodeRef = computed(() => sportCode.value);
 const { leagueGroups, loading, loadingMore, hasMore, init, loadMore } = useSportMatches(sportCodeRef);
 
@@ -129,18 +140,30 @@ const liveFiltered = computed(() =>
     const matchesSport =
       m.sportCode === sportCode.value ||
       m.sport.toLowerCase() === sportName.value.toLowerCase();
+    const matchesLeague =
+      !leagueFilter.value ||
+      m.league.toLowerCase().includes(leagueFilter.value.toLowerCase());
     const matchesQuery =
       !query.value ||
       m.homeTeam.toLowerCase().includes(query.value.toLowerCase()) ||
       m.awayTeam.toLowerCase().includes(query.value.toLowerCase());
-    return matchesSport && matchesQuery;
+    return matchesSport && matchesLeague && matchesQuery;
   })
 );
 
 const filteredGroups = computed(() => {
-  if (!query.value) return leagueGroups.value;
+  let groups = leagueGroups.value;
+
+  // Apply league filter from URL query param
+  if (leagueFilter.value) {
+    const lf = leagueFilter.value.toLowerCase();
+    groups = groups.filter((lg) => lg.name.toLowerCase().includes(lf));
+  }
+
+  // Apply text search
+  if (!query.value) return groups;
   const q = query.value.toLowerCase();
-  return leagueGroups.value
+  return groups
     .map((lg) => ({
       ...lg,
       matches: lg.matches.filter(
@@ -155,6 +178,43 @@ const filteredGroups = computed(() => {
 </script>
 
 <style scoped>
+.league-filter-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #f3e8ff, #ede9fe);
+  border: 1px solid #d8b4fe;
+  border-radius: 10px;
+  margin: 8px 12px 4px;
+  padding: 8px 14px;
+  gap: 8px;
+}
+.league-filter-banner__label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #7c3aed;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.league-filter-banner__clear {
+  font-size: 11px;
+  font-weight: 700;
+  color: #a855f7;
+  background: none;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+.league-filter-banner__clear:hover {
+  background: rgba(168,85,247,0.12);
+}
+
 .section-count {
   color: #a0a3b1;
   font-size: 12px;
