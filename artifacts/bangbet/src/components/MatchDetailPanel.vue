@@ -269,7 +269,7 @@ async function loadMarkets(matchId: string) {
   try {
     bandaMarkets.value = await fetchBandaMatchDetail(matchId)
     grpOpen.value = {}
-    marketGroups.value.forEach((g) => { grpOpen.value[g.id] = g.id === 'top' })
+    marketGroups.value.forEach((g) => { grpOpen.value[g.id] = true })
   } catch {
     bandaMarkets.value = []
   } finally {

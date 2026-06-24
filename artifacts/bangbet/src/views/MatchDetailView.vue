@@ -265,7 +265,7 @@ async function loadMarkets() {
   error.value = null
   try {
     markets.value = await fetchBandaMatchDetail(matchId.value)
-    sortedMarkets.value.slice(0, 3).forEach((m, i) => {
+    sortedMarkets.value.forEach((m, i) => {
       openGroups.value[`${m.market_id}-${i}`] = true
     })
   } catch {
